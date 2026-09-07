@@ -22,9 +22,14 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
   },
   webServer: {
-    command: `npm run build && npx vite preview --port ${PORT} --strictPort`,
+    // Bind explicitly to 127.0.0.1: `vite preview` otherwise listens on
+    // `localhost`, which on CI runners can resolve to ::1 while Playwright polls
+    // the IPv4 address — the server comes up and the wait still times out.
+    command: `npm run build && npx vite preview --host 127.0.0.1 --port ${PORT} --strictPort`,
     url: BASE,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
 });
