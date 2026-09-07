@@ -47,10 +47,34 @@ export interface Schema<T> {
 
 export type Infer<S> = S extends Schema<infer T> ? T : never;
 
+/**
+ * A schema marked as an optional object member: absent input stays absent, so
+ * the key is optional in the inferred type too.
+ */
+export interface OptionalSchema<T> extends Schema<T> {
+  readonly __optional: true;
+  readonly __hasDefault?: false;
+}
+
+/**
+ * A schema with a default: the key may be omitted by the author, but the parsed
+ * value always has it. That asymmetry between input and output is exactly what
+ * lets a widget read `props.title` without a null check.
+ */
+export interface DefaultedSchema<T> extends Schema<T> {
+  readonly __optional: true;
+  readonly __hasDefault: true;
+}
+
 type ObjectShape = Record<string, Schema<unknown>>;
 
+/** Optional in the *output*: declared optional and carrying no default. */
 type OptionalKeys<S extends ObjectShape> = {
-  [K in keyof S]: S[K] extends { __optional: true } ? K : never;
+  [K in keyof S]: S[K] extends { __hasDefault: true }
+    ? never
+    : S[K] extends { __optional: true }
+      ? K
+      : never;
 }[keyof S];
 
 type RequiredKeys<S extends ObjectShape> = Exclude<keyof S, OptionalKeys<S>>;
@@ -186,16 +210,17 @@ const object = <S extends ObjectShape>(shape: S): Schema<InferObject<S>> =>
     return issues.length ? err(issues) : ok(out as InferObject<S>);
   });
 
-const optional = <T>(inner: Schema<T>): Schema<T> => ({
+const optional = <T>(inner: Schema<T>): OptionalSchema<T> => ({
   ...inner,
   __optional: true,
   parse: (value, path = '') => (value === undefined ? ok(undefined as T) : inner.parse(value, path)),
   describe: () => `${inner.describe()}?`,
 });
 
-const withDefault = <T>(inner: Schema<T>, fallback: T | (() => T)): Schema<T> => ({
+const withDefault = <T>(inner: Schema<T>, fallback: T | (() => T)): DefaultedSchema<T> => ({
   ...inner,
   __optional: true,
+  __hasDefault: true,
   __default: () => (typeof fallback === 'function' ? (fallback as () => T)() : fallback),
   parse: (value, path = '') =>
     value === undefined

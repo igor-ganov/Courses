@@ -49,13 +49,13 @@ describe('elementary cellular automata', () => {
     expect(history).toHaveLength(21);
     expect(population({ w: 41, h: 1, cells: Uint8Array.from(history[0]) })).toBe(1);
     // Rule 30 is chaotic: after 20 steps a good share of the row is alive.
-    const filled = history[20].reduce((a, b) => a + b, 0);
+    const filled = history[20].reduce<number>((a, b) => a + b, 0);
     expect(filled).toBeGreaterThan(5);
   });
 
   it('rule 110 neither dies out nor fills up — the edge of chaos', () => {
     const history = runElementary(seededRow(60, 3, 0.5), 110, 60);
-    const last = history[history.length - 1].reduce((a, b) => a + b, 0);
+    const last = history[history.length - 1].reduce<number>((a, b) => a + b, 0);
     expect(last).toBeGreaterThan(0);
     expect(last).toBeLessThan(60);
   });

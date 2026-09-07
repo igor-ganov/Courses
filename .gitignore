@@ -8,3 +8,4 @@ test-results/
 *.local
 .vite/
 dev-dist/
+tsconfig.tsbuildinfo

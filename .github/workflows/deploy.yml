@@ -1,0 +1,76 @@
+name: CI и публикация на GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Тесты и типы
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Проверка типов
+        run: npm run typecheck
+      - name: Модульные и компонентные тесты
+        run: npm test
+      - name: Сборка
+        run: npm run build
+      - name: Установка браузера для e2e
+        run: npx playwright install --with-deps chromium
+      - name: Сквозные тесты
+        run: npm run test:e2e
+      - name: Сохранить отчёт при падении
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  deploy:
+    name: Публикация
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Сборка для Pages
+        run: npm run build
+        env:
+          # Project site is served from /<repo>/; override for a custom domain.
+          BASE_PATH: /${{ github.event.repository.name }}/
+      - name: SPA-фолбэк для прямых ссылок
+        run: cp dist/index.html dist/404.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

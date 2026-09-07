@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Cybernetica">
+  <defs>
+    <linearGradient id="loop" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#35e0d0" />
+      <stop offset="1" stop-color="#7c6cff" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0b1020" />
+  <!-- An open loop with an arrowhead: the subject of the platform, drawn. -->
+  <path
+    d="M46 20 A19 19 0 1 0 50 33"
+    fill="none"
+    stroke="url(#loop)"
+    stroke-width="5.5"
+    stroke-linecap="round"
+    transform="rotate(18 32 32)"
+  />
+  <path d="M50 14 L57 27 L43 27 Z" fill="#35e0d0" transform="rotate(18 32 32)" />
+</svg>
