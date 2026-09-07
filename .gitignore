@@ -1,11 +1,7 @@
 node_modules/
 dist/
-dist-ssr/
-coverage/
-playwright-report/
+.astro/
+.pw/
 test-results/
+playwright-report/
 .DS_Store
-*.local
-.vite/
-dev-dist/
-tsconfig.tsbuildinfo

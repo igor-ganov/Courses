@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telescrivente — телетайп</title>
+<link rel="stylesheet" href="../fonts/caratteri.css">
+<style>
+/* 03 — TELESCRIVENTE
+   1948 год, тот самый. Рулон, лента, литеры. Всё выровнено по знакоместу,
+   потому что машинка иначе не умеет, — и от этого сетка честная, а не
+   нарисованная дизайнером. Красная половина ленты работает как в
+   бухгалтерии: ею отмечают то, что пошло не так. Оттиск неровный: литера
+   бьёт по ленте с разной силой, поэтому знаки чуть пляшут по базовой линии
+   и прокрашены неодинаково. Перфолента слева — это оглавление: дырки
+   пробиты там, где уровень пройден. */
+
+:root{
+  --рулон:#efe7d6;
+  --лента:#2a2622;
+  --лента-слабо:#6b6459;
+  --красная:#a3352a;
+  --штрих:#c9bfa8;
+  --знак:9.6px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;color:var(--лента);
+  font-family:'PT Mono',monospace;font-size:15px;line-height:22px;
+  -webkit-font-smoothing:antialiased;
+}
+canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
+
+/* Перфолента: край рулона с пробитыми отверстиями. */
+.nastro{
+  position:fixed;left:0;top:0;bottom:0;width:52px;z-index:-1;pointer-events:none;
+  background:
+    linear-gradient(var(--штрих),var(--штрих)) left 51px top 0/1px 100% no-repeat,
+    radial-gradient(circle 3.4px at 26px 11px, rgba(0,0,0,.42) 96%, transparent 100%) 0 0/52px 22px repeat-y,
+    radial-gradient(circle 1.5px at 40px 11px, rgba(0,0,0,.3) 96%, transparent 100%) 0 0/52px 22px repeat-y;
+  opacity:.5;
+}
+main{max-width:74ch;margin:0 auto;padding:26px 26px 90px 78px}
+
+/* Оттиск: каждая строка сидит на своей высоте чуть иначе. */
+.battuta{display:inline-block}
+.battuta:nth-of-type(3n){transform:translateY(.4px)}
+.battuta:nth-of-type(5n){transform:translateY(-.35px)}
+
+/* ── шапка: как бланк телеграммы ───────────────────────────── */
+.intestazione{
+  border-top:2px solid var(--лента);border-bottom:1px solid var(--лента);
+  padding:6px 0 5px;margin-bottom:26px;display:flex;gap:16px;flex-wrap:wrap;
+  font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+}
+.intestazione b{font-weight:400;color:var(--лента-слабо)}
+.intestazione .fine{margin-left:auto}
+
+h1{
+  margin:22px 0 4px;font-family:'PT Mono',monospace;font-weight:400;
+  font-size:clamp(26px,4.4vw,40px);line-height:1.12;letter-spacing:-.01em;
+  text-transform:uppercase;text-wrap:balance;
+}
+h1 mark{background:none;color:var(--красная)}
+.sotto{margin:0 0 26px;color:var(--лента-слабо);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+p{margin:0 0 22px;max-width:70ch}
+
+/* Правка на полях: карандаш поверх машинописи. */
+.correzione{
+  font-family:'Caveat',cursive;font-size:21px;line-height:1.15;color:var(--красная);
+  margin:-8px 0 22px;transform:rotate(-.5deg);
+}
+
+/* ── схема: набрана знаками, как на телетайпе ──────────────── */
+.schema-testo{
+  white-space:pre;overflow-x:auto;font-size:13.5px;line-height:19px;
+  color:var(--лента);margin:0 0 8px;
+}
+.schema-testo b{font-weight:400;color:var(--красная)}
+figcaption{margin:0 0 26px;font-size:12px;color:var(--лента-слабо);letter-spacing:.08em;text-transform:uppercase}
+
+/* ── прибор: сводка, отбитая по знакоместам ────────────────── */
+.strumento{
+  border-top:1px solid var(--лента);border-bottom:2px solid var(--лента);
+  padding:14px 0 16px;margin:0 0 26px;
+}
+.titolo-strumento{margin:0 0 2px;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.suggerimento{margin:0 0 14px;font-size:13px;color:var(--лента-слабо)}
+.grafico{display:block;width:100%;height:auto;margin-bottom:10px}
+
+.quadranti{display:grid;gap:0;margin-bottom:14px;font-size:13.5px}
+.quadrante{display:flex;gap:8px;align-items:baseline}
+.quadrante b{font-weight:400;color:var(--лента-слабо)}
+/* Точечная линия ведёт от подписи к числу — как в накладной. */
+.quadrante i{flex:1;border-bottom:1px dotted var(--штрих);transform:translateY(-4px)}
+.quadrante span{font-variant-numeric:tabular-nums}
+.quadrante.male span{color:var(--красная)}
+
+.manopole{display:grid;gap:8px}
+.manopola{display:grid;grid-template-columns:16ch 1fr 7ch;gap:10px;align-items:center;font-size:13px}
+.manopola label{color:var(--лента-слабо)}
+.manopola output{text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:ew-resize}
+input[type=range]::-webkit-slider-runnable-track{height:14px;background:
+  repeating-linear-gradient(to right, var(--штрих) 0 1px, transparent 1px 8px) center/100% 8px no-repeat}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:9px;height:16px;margin-top:-1px;background:var(--лента);border-radius:1px;
+}
+
+/* ── чипы: клавиши ─────────────────────────────────────────── */
+.pastiglie{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+.pastiglia{
+  border:1px solid var(--штрих);background:none;cursor:pointer;padding:5px 11px;
+  font:inherit;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--лента-слабо);
+  border-radius:2px;
+  box-shadow:calc(var(--luce-dx,0) * -2px) calc(var(--luce-dy,0) * 2px + 1.5px) 0 var(--штрих);
+}
+.pastiglia[aria-pressed=true]{color:var(--рулон);background:var(--лента);border-color:var(--лента);box-shadow:none;transform:translateY(1.5px)}
+
+/* ── вопрос ────────────────────────────────────────────────── */
+.domanda{margin:0 0 10px}
+.opzioni{display:grid;gap:0;margin:0 0 26px;padding:0}
+.opzione{
+  display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;
+  border:0;background:none;cursor:pointer;padding:5px 0;font:inherit;font-size:14.5px;color:var(--лента);
+}
+.opzione .lettera{color:var(--лента-слабо)}
+.opzione[aria-checked=true] .lettera{color:var(--красная)}
+/* Выбранный ответ перебит поверх иксами — так правили на машинке. */
+.opzione[aria-checked=true] .lettera::before{content:"×"}
+.opzione[aria-checked=true]{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+
+/* ── кнопки: клавиша с ходом ───────────────────────────────── */
+.azioni{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bottone{
+  border:1px solid var(--лента);background:var(--рулон);cursor:pointer;
+  font:inherit;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--лента);
+  padding:10px 20px;border-radius:2px;
+  box-shadow:calc(var(--luce-dx,0) * -3px) calc(var(--luce-dy,0) * 3px + 2.5px) 0 var(--лента-слабо);
+  transform:translateY(calc(var(--premuto,0) * 1.6px));
+}
+.bottone--pieno{background:var(--лента);color:var(--рулон)}
+.bottone:active{transform:translateY(2.5px);box-shadow:none}
+.legenda{font-size:12px;color:var(--лента-слабо);text-transform:uppercase;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<canvas data-materia data-carta="efe7d6" data-ombra="9c907a" data-luce="fff4dd" data-rilievo="10" data-fibra="0.05" data-calore="0.045"></canvas>
+<div class="nastro"></div>
+
+<main>
+  <div class="intestazione">
+    <span><b>курс</b> КИБЕРНЕТИКА</span>
+    <span><b>лист</b> 07/17</span>
+    <span><b>разряд</b> РЕГУЛЯТОР</span>
+    <span class="fine"><b>опыт</b> 640</span>
+  </div>
+
+  <p class="sotto">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и <mark>предел усиления</mark></h1>
+
+  <p class="battuta">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="correzione">душ с длинной трубой — тот же контур!</p>
+
+  <p class="battuta">Регулятор всегда исправляет прошлое. Коррекция, рассчитанная для состояния
+  «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается воздействием
+  не в ту сторону. При достаточном усилении она перестаёт гасить отклонение и начинает его
+  поддерживать.</p>
+
+  <figure>
+<pre class="schema-testo">   +----------+     +------------+     +----------+     +----------+
+   |   ЦЕЛЬ   |---->| РЕГУЛЯТОР  |---->|  ОБЪЕКТ  |---->|  ДАТЧИК  |
+   +----------+     +------------+     +----------+     +----------+
+        ^                                                     |
+        |                                                     v
+        +-----------------------&lt;&lt;&lt;-----------------------------+
+                        <b>здесь теряется время</b></pre>
+    <figcaption>рис. 4 — контур с запаздыванием в цепи измерения</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Стенд · усиление и запаздывание</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно; верните усиление и двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 640 150" role="img" aria-label="Переходный процесс">
+      <path d="M40,40 H630" stroke="#6b6459" stroke-width="1" stroke-dasharray="2 4" fill="none"/>
+      <text x="630" y="33" font-family="PT Mono, monospace" font-size="10" fill="#6b6459" text-anchor="end">УСТАВКА</text>
+      <path d="M40,132 C60,130 68,100 84,60 C98,22 112,4 128,16 C144,28 150,74 166,86 C184,100 198,60 216,46 C236,30 250,50 270,58 C292,67 308,42 334,40 C368,37 404,46 442,42 C486,37 540,40 630,38"
+            fill="none" stroke="#2a2622" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M40,132 C62,132 82,130 106,122 C136,113 164,102 208,94 C264,84 332,78 630,74"
+            fill="none" stroke="#a3352a" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <path d="M40,6 V136 M36,134 H632" stroke="#2a2622" stroke-width="1.1" fill="none"/>
+      <g font-family="PT Mono, monospace" font-size="10" fill="#6b6459">
+        <text x="34" y="44" text-anchor="end">1.0</text><text x="34" y="136" text-anchor="end">0</text>
+        <text x="628" y="148" text-anchor="end">СЕК</text>
+      </g>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>СТАТИЧЕСКАЯ ОШИБКА</b><i></i><span>0.182</span></span>
+      <span class="quadrante male"><b>ПЕРЕРЕГУЛИРОВАНИЕ</b><i></i><span>34 %</span></span>
+      <span class="quadrante"><b>ВРЕМЯ УСТАНОВЛЕНИЯ</b><i></i><span>—</span></span>
+      <span class="quadrante"><b>ПЕРЕСЕЧЕНИЙ УСТАВКИ</b><i></i><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>УСИЛЕНИЕ P</label><input type="range" min="0" max="16" value="6"><output>6.0</output></span>
+      <span class="manopola"><label>ИНТЕГРАЛ I</label><input type="range" min="0" max="4" step=".05" value="0.5"><output>0.50</output></span>
+      <span class="manopola"><label>ЗАПАЗДЫВАНИЕ</label><input type="range" min="0" max="40" value="12"><output>0.60c</output></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda">01. Контур с заметным запаздыванием реагирует вяло. Инженер увеличивает усиление
+  вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А.</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б.</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В.</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+<script src="../materia.js"></script>
+</body>
+</html>
