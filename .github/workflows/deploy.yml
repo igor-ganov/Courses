@@ -70,11 +70,11 @@ jobs:
           BASE_PATH: /${{ github.event.repository.name }}/
       - name: SPA-фолбэк для прямых ссылок
         run: cp dist/index.html dist/404.html
+      # One-time manual step before this can succeed: Settings → Pages →
+      # Source: GitHub Actions. The workflow token cannot create the Pages site
+      # itself (`enablement: true` returns "Resource not accessible by
+      # integration"), because that call needs repository-admin scope.
       - uses: actions/configure-pages@v5
-        with:
-          # Turn Pages on for the repository the first time this runs, so no
-          # manual visit to Settings is needed to get the site published.
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
