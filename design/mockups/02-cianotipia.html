@@ -26,7 +26,8 @@
   --сетка:#2d5871;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html{height:100%}
+body{min-height:100%;position:relative}
 body{
   margin:0;color:var(--линия);
   font-family:'Oswald',"Helvetica Neue",sans-serif;font-weight:400;
@@ -36,7 +37,7 @@ body{
 canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
 /* Миллиметровка проявляется под чертежом, а не поверх него. */
 .reticolo{
-  position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;opacity:.5;
   background:
     repeating-linear-gradient(to right, color-mix(in srgb,var(--сетка) 70%, transparent) 0 1px, transparent 1px 10px),
     repeating-linear-gradient(to bottom, color-mix(in srgb,var(--сетка) 70%, transparent) 0 1px, transparent 1px 10px),
@@ -185,7 +186,7 @@ input[type=range]::-webkit-slider-thumb{
 </head>
 <body>
 <canvas data-materia data-carta="1b3a52" data-ombra="0a1721" data-luce="cfe6f2" data-rilievo="13" data-fibra="0.06" data-calore="0.10"></canvas>
-<div class="reticolo"></div>
+<div class="reticolo" data-scorre></div>
 
 <main>
 <div class="foglio">

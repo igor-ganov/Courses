@@ -22,7 +22,7 @@ jobs:
       - name: Собрать сайт
         run: |
           mkdir -p _site
-          cp -r design/fonts design/mockups design/materia.js _site/
+          cp -r design/fonts design/mockups design/materia.js design/grana.png design/piega.png _site/
           cp design/mostra.html _site/index.html
           touch _site/.nojekyll
 

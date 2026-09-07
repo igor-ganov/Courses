@@ -25,7 +25,8 @@
   --мел-зелёный:#93c9a1;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html{height:100%}
+body{min-height:100%;position:relative}
 body{
   margin:0;color:var(--мел);
   font-family:'Literata',Georgia,serif;font-size:max(calc(16px*var(--кегль)),var(--пол));line-height:26px;
@@ -35,7 +36,7 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
 
 /* Следы губки: широкие дуги, оставшиеся от того, кто стирал. */
 .spugna{
-  position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;opacity:.5;
   background:
     radial-gradient(ellipse 460px 90px at 22% 18%, rgba(234,230,220,.10), transparent 70%),
     radial-gradient(ellipse 520px 70px at 78% 42%, rgba(234,230,220,.075), transparent 70%),
@@ -182,7 +183,7 @@ input[type=range]::-webkit-slider-thumb{
 </head>
 <body>
 <canvas data-materia data-carta="243029" data-ombra="0d130f" data-luce="fff3d4" data-rilievo="14" data-fibra="0.07" data-calore="0.09"></canvas>
-<div class="spugna"></div>
+<div class="spugna" data-scorre></div>
 
 <main>
   <header class="testata">

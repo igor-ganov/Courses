@@ -55,7 +55,10 @@ function scope(css, dir) {
       .split(',')
       .map((s) => s.trim())
       .map((s) => {
-        if (s === ':root' || s === 'html,body' || s === 'html' || s === 'body') return `.direzione[data-dir="${dir}"]`;
+        // html в макете задаёт высоту окна — в витрине окно одно на пятерых,
+        // и эту роль играет оболочка, а не направление.
+        if (s === 'html') return null;
+        if (s === ':root' || s === 'html,body' || s === 'body') return `.direzione[data-dir="${dir}"]`;
         if (s === '*') return `.direzione[data-dir="${dir}"] *`;
         if (s.startsWith('canvas[data-materia]')) return null;
         return `.direzione[data-dir="${dir}"] ${s}`;
@@ -91,8 +94,13 @@ const chips = parts
 const html = `<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Пять почерков</title>
-<link rel="stylesheet" href="fonts/caratteri.css">
 <style>
+/* Начертания объявлены прямо здесь: отдельный файл стилей блокирует
+   отрисовку на лишний оборот сети, а весит объявление пять килобайт.
+   Сами файлы шрифтов тянутся отдельно и кэшируются — и только те, что
+   нужны видимому направлению. */
+${readFileSync('design/fonts/caratteri.css', 'utf8').replace(/\.\.\/fonts\//g, 'fonts/')}
+
 /* ═══════════════════════════════════════════════════════════════
    ВИТРИНА
    Оболочка намеренно молчит: пять материалов внутри — это и есть
@@ -173,7 +181,8 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
   .scelta{transition:none}
 }
 
-${parts.map((p) => `/* ── ${p.dir} ─────────────────────────── */\n${p.css}`).join('\n\n')}
+/* ── ${parts[0].dir} ─────────────────────────── */
+${parts[0].css}
 
 /* Панель стоит внизу — освобождаем под неё место в каждом направлении. */
 .direzione[data-dir] main{padding-bottom:var(--низ)}
@@ -181,9 +190,20 @@ ${parts.map((p) => `/* ── ${p.dir} ─────────────�
 
 <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas>
 
-${parts.map((p, i) => `<div class="direzione" data-dir="${p.dir}"${i === 0 ? '' : ' hidden'}>${p.markup}</div>`).join('\n')}
+${parts
+  .map((p, i) =>
+    i === 0
+      ? `<div class="direzione" data-dir="${p.dir}">${p.markup}</div>`
+      : /* Невидимые направления лежат в template — вместе со своими стилями.
+           Разметки и таблиц стилей тут на пятерых, и если держать их в
+           документе, браузер разбирает и раскладывает четыре страницы,
+           которых никто не видит. Содержимое template инертно: ни стили, ни
+           разметка не считаются, пока направление не выбрали. */
+        `<template data-dir="${p.dir}"><style>${p.css}</style>${p.markup}</template>`,
+  )
+  .join('\n')}
 
-<div class="pannello">
+<div class="pannello" data-fisso>
   <div class="scelte" role="group" aria-label="Направление">
 ${chips}
   </div>
@@ -199,7 +219,22 @@ ${chips}
   var STOCKS = ${JSON.stringify(Object.fromEntries(parts.map((p) => [p.dir, p.palette])), null, 2)};
   var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-scelta]'));
 
+  function apri(dir) {
+    var gia = document.querySelector('.direzione[data-dir="' + dir + '"]');
+    if (gia) return gia;
+    var tpl = document.querySelector('template[data-dir="' + dir + '"]');
+    if (!tpl) return null;
+    var blocco = document.createElement('div');
+    blocco.className = 'direzione';
+    blocco.dataset.dir = dir;
+    blocco.appendChild(tpl.content.cloneNode(true));
+    // Лист лежит внутри .foglio — туда же кладём и развёрнутое направление.
+    (document.querySelector('.foglio') || document.body).appendChild(blocco);
+    return blocco;
+  }
+
   function choose(dir) {
+    apri(dir);
     document.querySelectorAll('.direzione').forEach(function (block) {
       block.hidden = block.dataset.dir !== dir;
     });
@@ -208,7 +243,10 @@ ${chips}
     });
     var stock = STOCKS[dir];
     document.body.style.background = '#' + stock.carta;
-    if (window.materia) window.materia.setStock(stock);
+    if (window.materia) {
+      window.materia.setStock(stock);
+      window.materia.rileggi();
+    }
     window.scrollTo({ top: 0 });
   }
 

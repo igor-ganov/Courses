@@ -24,7 +24,8 @@
   --знак:9.6px;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html{height:100%}
+body{min-height:100%;position:relative}
 body{
   margin:0;color:var(--лента);
   font-family:'PT Mono',monospace;font-size:max(calc(15px*var(--кегль)),var(--пол));line-height:22px;
@@ -34,7 +35,7 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
 
 /* Перфолента: край рулона с пробитыми отверстиями. */
 .nastro{
-  position:fixed;left:0;top:0;bottom:0;width:52px;z-index:-1;pointer-events:none;
+  position:absolute;left:0;top:0;height:100vh;width:52px;z-index:-1;pointer-events:none;
   background:
     linear-gradient(var(--штрих),var(--штрих)) left 51px top 0/1px 100% no-repeat,
     radial-gradient(circle 3.4px at 26px 11px, rgba(0,0,0,.42) 96%, transparent 100%) 0 0/52px 22px repeat-y,
@@ -168,7 +169,7 @@ input[type=range]::-webkit-slider-thumb{
 </head>
 <body>
 <canvas data-materia data-carta="efe7d6" data-ombra="9c907a" data-luce="fff4dd" data-rilievo="10" data-fibra="0.05" data-calore="0.045"></canvas>
-<div class="nastro"></div>
+<div class="nastro" data-scorre></div>
 
 <main>
   <div class="intestazione">

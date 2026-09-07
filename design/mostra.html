@@ -1,8 +1,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Пять почерков</title>
-<link rel="stylesheet" href="fonts/caratteri.css">
 <style>
+/* Начертания объявлены прямо здесь: отдельный файл стилей блокирует
+   отрисовку на лишний оборот сети, а весит объявление пять килобайт.
+   Сами файлы шрифтов тянутся отдельно и кэшируются — и только те, что
+   нужны видимому направлению. */
+@font-face{font-family:'Caveat';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/caveat-600-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/caveat-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/caveat-700-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/caveat-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Literata';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/literata-400-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Literata';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/literata-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Literata';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/literata-400i-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Literata';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/literata-400i-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Literata';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/literata-600-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Literata';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/literata-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'PT Mono';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/pt-mono-400-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'PT Mono';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/pt-mono-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/oswald-400-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/oswald-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/oswald-600-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/oswald-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/playfair-display-700-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/playfair-display-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Playfair Display';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/playfair-display-400i-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Playfair Display';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/playfair-display-400i-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+
+
 /* ═══════════════════════════════════════════════════════════════
    ВИТРИНА
    Оболочка намеренно молчит: пять материалов внутри — это и есть
@@ -97,21 +122,21 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
   --шаг:26px;
 }
 .direzione[data-dir="quaderno"] *{box-sizing:border-box}
-.direzione[data-dir="quaderno"],.direzione[data-dir="quaderno"]{height:100%}
+.direzione[data-dir="quaderno"]{min-height:100%;position:relative}
 .direzione[data-dir="quaderno"]{
   margin:0;color:var(--текст);
   font-family:'Literata',Georgia,serif;font-size:max(calc(16.5px*var(--кегль)),var(--пол));line-height:var(--шаг);
   -webkit-font-smoothing:antialiased;
 }
 .direzione[data-dir="quaderno"] .griglia{
-  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;
   background:
     repeating-linear-gradient(to right, color-mix(in srgb, var(--клетка) 78%, transparent) 0 1px, transparent 1px var(--шаг)),
     repeating-linear-gradient(to bottom, color-mix(in srgb, var(--клетка) 78%, transparent) 0 1px, transparent 1px var(--шаг));
   mask-image:radial-gradient(130% 100% at 50% 25%, #000 72%, transparent 100%);
 }
 .direzione[data-dir="quaderno"] .margine{
-  position:fixed;top:0;bottom:0;left:calc(50% - 430px);width:2px;z-index:-1;pointer-events:none;
+  position:absolute;top:0;height:100vh;left:calc(50% - 430px);width:2px;z-index:-1;pointer-events:none;
   background:linear-gradient(var(--поле),var(--поле)) left 0 top 0/1.1px 100% no-repeat,
              linear-gradient(var(--поле),var(--поле)) left 3px top 12px/1px calc(100% - 40px) no-repeat;
   opacity:.5;
@@ -237,8 +262,118 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
 .direzione[data-dir="quaderno"] svg.schema,.direzione[data-dir="quaderno"] svg.grafico{min-width:min(820px,200vw)}
 .direzione[data-dir="quaderno"] button{min-height:44px}}
 
-/* ── cianotipia ─────────────────────────── */
-.direzione[data-dir="cianotipia"]{--кегль:1;--пол:0px;
+/* Панель стоит внизу — освобождаем под неё место в каждом направлении. */
+.direzione[data-dir] main{padding-bottom:var(--низ)}
+</style>
+
+<canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas>
+
+<div class="direzione" data-dir="quaderno">
+
+<div class="griglia" data-scorre></div>
+<div class="margine" data-scorre></div>
+
+<main>
+  <header class="testata">
+    <div class="marchio">Кибернетика<sup> курс</sup></div>
+    <div class="grado">
+      <span class="barra"><i></i></span>
+      Регулятор
+    </div>
+  </header>
+
+  <p class="riga-corso">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и предел усиления</h1>
+  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
+
+  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="nota">душ с длинной трубой — тот же контур,<br>и ведёт он себя точно так же</p>
+
+  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
+  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
+  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение и начинает
+  его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 620 150" role="img" aria-label="Схема контура с запаздыванием">
+      <g fill="none" stroke="#1b3a6b" stroke-width="1.6" stroke-linecap="round">
+        <path d="M28,46 C64,43 96,44 122,46 C130,47 132,52 131,60 C130,70 129,74 122,76 C96,79 60,78 30,76 C22,75 20,69 21,60 C22,51 23,48 29,46.6"/>
+        <path d="M186,46 C222,43 254,44 280,46 C288,47 290,52 289,60 C288,70 287,74 280,76 C254,79 218,78 188,76 C180,75 178,69 179,60 C180,51 181,48 187,46.6"/>
+        <path d="M344,46 C380,43 412,44 438,46 C446,47 448,52 447,60 C446,70 445,74 438,76 C412,79 376,78 346,76 C338,75 336,69 337,60 C338,51 339,48 345,46.6"/>
+        <path d="M502,46 C538,43 570,44 596,46 C604,47 606,52 605,60 C604,70 603,74 596,76 C570,79 534,78 504,76 C496,75 494,69 495,60 C496,51 497,48 503,46.6"/>
+        <path d="M133,61 C148,60 162,61 176,61 M168,57 L177,61 L168,65"/>
+        <path d="M291,61 C306,60 320,61 334,61 M326,57 L335,61 L326,65"/>
+        <path d="M449,61 C464,60 478,61 492,61 M484,57 L493,61 L484,65"/>
+        <path d="M556,79 C555,96 554,108 552,118 C550,126 542,128 528,128 C400,131 200,130 96,128 C82,127.6 76,120 75,110 C74,98 74,88 75,79 M79,88 L75,79 L71,88"/>
+      </g>
+      <g font-family="Caveat, cursive" font-size="19" fill="#1b3a6b" text-anchor="middle">
+        <text x="76" y="66">цель</text><text x="234" y="66">регулятор</text>
+        <text x="392" y="66">объект</text><text x="550" y="66">датчик</text>
+      </g>
+      <g font-family="Caveat, cursive" font-size="18" fill="#a8402f">
+        <text x="300" y="146">здесь теряется время</text>
+        <path d="M296,138 C286,132 278,130 272,129" fill="none" stroke="#a8402f" stroke-width="1.3" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <figcaption>Обход круга занимает время — и в этом всё дело</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Ручка усиления и ручка запаздывания</p>
+    <p class="suggerimento">поставьте запаздывание на ноль и поднимите усиление до упора — спокойно;<br>верните усиление и медленно двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 560 170" role="img" aria-label="Переходный процесс">
+      <path d="M40,40 H548" stroke="#3f6b4a" stroke-width="1.2" stroke-dasharray="7 6" fill="none" opacity=".8"/>
+      <text x="548" y="32" font-family="Caveat, cursive" font-size="17" fill="#3f6b4a" text-anchor="end">уставка</text>
+      <path d="M40,150 C58,148 66,120 80,74 C92,34 104,14 118,26 C132,38 138,84 152,96 C168,110 180,72 196,58 C214,42 226,60 244,68 C264,77 278,54 300,52 C330,49 360,58 392,54 C430,49 470,52 548,51"
+            fill="none" stroke="#1b3a6b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M40,150 C60,150 78,148 100,140 C126,131 150,120 190,112 C240,102 300,96 548,92"
+            fill="none" stroke="#5c6068" stroke-width="1.4" stroke-dasharray="4 5" opacity=".7"/>
+      <path d="M40,12 C39,60 40,120 40,158 M34,152 C50,151 120,152 548,151" fill="none" stroke="#5c6068" stroke-width="1.2" stroke-linecap="round"/>
+      <text x="546" y="110" font-family="Caveat, cursive" font-size="17" fill="#5c6068" text-anchor="end">усилие регулятора</text>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>статическая ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулирование</b><span>34%</span></span>
+      <span class="quadrante"><b>время установления</b><span>—</span></span>
+      <span class="quadrante bene"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">1.</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">а</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">в</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+</div>
+<template data-dir="cianotipia"><style>.direzione[data-dir="cianotipia"]{--кегль:1;--пол:0px;
   --лазурь:#1b3a52;
   --лазурь-тень:#122938;
   --линия:#dbe9f2;
@@ -249,7 +384,7 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
   --сетка:#2d5871;
 }
 .direzione[data-dir="cianotipia"] *{box-sizing:border-box}
-.direzione[data-dir="cianotipia"],.direzione[data-dir="cianotipia"]{height:100%}
+.direzione[data-dir="cianotipia"]{min-height:100%;position:relative}
 .direzione[data-dir="cianotipia"]{
   margin:0;color:var(--линия);
   font-family:'Oswald',"Helvetica Neue",sans-serif;font-weight:400;
@@ -257,7 +392,7 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
   -webkit-font-smoothing:antialiased;
 }
 .direzione[data-dir="cianotipia"] .reticolo{
-  position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;opacity:.5;
   background:
     repeating-linear-gradient(to right, color-mix(in srgb,var(--сетка) 70%, transparent) 0 1px, transparent 1px 10px),
     repeating-linear-gradient(to bottom, color-mix(in srgb,var(--сетка) 70%, transparent) 0 1px, transparent 1px 10px),
@@ -367,10 +502,119 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
     overflow-x:auto;overscroll-behavior-x:contain;
   }
 .direzione[data-dir="cianotipia"] svg.schema,.direzione[data-dir="cianotipia"] svg.grafico{min-width:min(820px,200vw)}
-.direzione[data-dir="cianotipia"] button{min-height:44px}}
+.direzione[data-dir="cianotipia"] button{min-height:44px}}</style>
 
-/* ── telescrivente ─────────────────────────── */
-.direzione[data-dir="telescrivente"]{--кегль:1;--пол:0px;
+<div class="reticolo" data-scorre></div>
+
+<main>
+<div class="foglio">
+  <div class="cartiglio">
+    <span class="cella"><b>курс</b><span class="grande">Кибернетика</span></span>
+    <span class="cella"><b>лист</b><span>07 / 17</span></span>
+    <span class="cella"><b>виток</b><span>второй</span></span>
+    <span class="cella"><b>разряд</b><span>Регулятор</span></span>
+  </div>
+
+  <h1>Запаздывание и предел усиления</h1>
+  <p class="sotto">Обратная связь · уровень 2</p>
+
+  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="postilla">душ с длинной трубой — тот же контур</p>
+
+  <p>Регулятор всегда исправляет прошлое. Коррекция, рассчитанная для состояния «полминуты назад»,
+  приходит, когда система уже в другом состоянии, и оказывается воздействием не в ту сторону.
+  При достаточном усилении она перестаёт гасить отклонение и начинает его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 700 170" role="img" aria-label="Схема контура">
+      <g fill="none" stroke="#dbe9f2" stroke-width="1.2" stroke-linecap="round">
+        <path d="M24,40 L154,40 L154,74 L24,74 L24,41"/>
+        <path d="M198,40 L328,40 L328,74 L198,74 L198,41"/>
+        <path d="M372,40 L502,40 L502,74 L372,74 L372,41"/>
+        <path d="M546,40 L676,40 L676,74 L546,74 L546,41"/>
+        <path d="M155,57 L196,57 M188,53 L197,57 L188,61"/>
+        <path d="M329,57 L370,57 M362,53 L371,57 L362,61"/>
+        <path d="M503,57 L544,57 M536,53 L545,57 L536,61"/>
+        <path d="M611,75 L611,122 L89,122 L89,76 M85,84 L89,76 L93,84"/>
+      </g>
+      <g font-family="Oswald, sans-serif" font-size="13" fill="#eaf3f8" text-anchor="middle" letter-spacing="1.5">
+        <text x="89" y="62">ЦЕЛЬ</text><text x="263" y="62">РЕГУЛЯТОР</text>
+        <text x="437" y="62">ОБЪЕКТ</text><text x="611" y="62">ДАТЧИК</text>
+      </g>
+      <!-- размерная линия на участке запаздывания -->
+      <g stroke="#e8b04a" stroke-width="1" fill="none">
+        <path d="M300,134 L300,150 M420,134 L420,150 M300,142 L420,142 M308,138 L300,142 L308,146 M412,138 L420,142 L412,146"/>
+      </g>
+      <text x="360" y="164" font-family="Oswald, sans-serif" font-size="11" fill="#e8b04a" text-anchor="middle" letter-spacing="1.6">ЗАПАЗДЫВАНИЕ 0,60 с</text>
+    </svg>
+    <figcaption>рис. 4 — контур с транспортным запаздыванием в цепи измерения</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Стенд · усиление и запаздывание</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно. Верните усиление и двигайте запаздывание.</p>
+
+    <svg class="grafico" viewBox="0 0 640 168" role="img" aria-label="Переходный процесс">
+      <g stroke="#2d5871" stroke-width="1" fill="none" opacity=".8">
+        <path d="M46,20 H628 M46,52 H628 M46,84 H628 M46,116 H628"/>
+        <path d="M150,14 V150 M280,14 V150 M410,14 V150 M540,14 V150"/>
+      </g>
+      <path d="M46,44 H628" stroke="#e8b04a" stroke-width="1" stroke-dasharray="8 6" fill="none"/>
+      <text x="626" y="36" font-family="Oswald, sans-serif" font-size="11" fill="#e8b04a" text-anchor="end" letter-spacing="1.4">УСТАВКА</text>
+      <path d="M46,148 C66,146 74,116 90,74 C104,34 118,14 134,26 C150,38 156,86 172,98 C190,112 204,72 222,58 C242,42 256,62 276,70 C298,79 314,54 340,52 C374,49 410,58 448,54 C492,49 540,52 628,50"
+            fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M46,148 C68,148 88,146 112,138 C142,129 170,118 214,110 C270,100 338,94 628,90"
+            fill="none" stroke="#8fb0c6" stroke-width="1.1" stroke-dasharray="5 5"/>
+      <path d="M46,10 V152 M42,150 H630" stroke="#dbe9f2" stroke-width="1.1" fill="none"/>
+      <g font-family="PT Mono, monospace" font-size="10" fill="#8fb0c6">
+        <text x="40" y="48" text-anchor="end">1,0</text><text x="40" y="152" text-anchor="end">0</text>
+        <text x="150" y="164" text-anchor="middle">5</text><text x="280" y="164" text-anchor="middle">10</text>
+        <text x="410" y="164" text-anchor="middle">15</text><text x="540" y="164" text-anchor="middle">20</text>
+      </g>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>стат. ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулир.</b><span>34 %</span></span>
+      <span class="quadrante"><b>установление</b><span>—</span></span>
+      <span class="quadrante"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6.0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0.50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0.60 c</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">01</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</div>
+</main>
+
+</template>
+<template data-dir="telescrivente"><style>.direzione[data-dir="telescrivente"]{--кегль:1;--пол:0px;
   --рулон:#efe7d6;
   --лента:#2a2622;
   --лента-слабо:#6b6459;
@@ -379,14 +623,14 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
   --знак:9.6px;
 }
 .direzione[data-dir="telescrivente"] *{box-sizing:border-box}
-.direzione[data-dir="telescrivente"],.direzione[data-dir="telescrivente"]{height:100%}
+.direzione[data-dir="telescrivente"]{min-height:100%;position:relative}
 .direzione[data-dir="telescrivente"]{
   margin:0;color:var(--лента);
   font-family:'PT Mono',monospace;font-size:max(calc(15px*var(--кегль)),var(--пол));line-height:22px;
   -webkit-font-smoothing:antialiased;
 }
 .direzione[data-dir="telescrivente"] .nastro{
-  position:fixed;left:0;top:0;bottom:0;width:52px;z-index:-1;pointer-events:none;
+  position:absolute;left:0;top:0;height:100vh;width:52px;z-index:-1;pointer-events:none;
   background:
     linear-gradient(var(--штрих),var(--штрих)) left 51px top 0/1px 100% no-repeat,
     radial-gradient(circle 3.4px at 26px 11px, rgba(0,0,0,.42) 96%, transparent 100%) 0 0/52px 22px repeat-y,
@@ -480,10 +724,99 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
     overflow-x:auto;overscroll-behavior-x:contain;
   }
 .direzione[data-dir="telescrivente"] svg.schema,.direzione[data-dir="telescrivente"] svg.grafico{min-width:min(820px,200vw)}
-.direzione[data-dir="telescrivente"] button{min-height:44px}}
+.direzione[data-dir="telescrivente"] button{min-height:44px}}</style>
 
-/* ── lavagna ─────────────────────────── */
-.direzione[data-dir="lavagna"]{--кегль:1;--пол:0px;
+<div class="nastro" data-scorre></div>
+
+<main>
+  <div class="intestazione">
+    <span><b>курс</b> КИБЕРНЕТИКА</span>
+    <span><b>лист</b> 07/17</span>
+    <span><b>разряд</b> РЕГУЛЯТОР</span>
+    <span class="fine"><b>опыт</b> 640</span>
+  </div>
+
+  <p class="sotto">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и <mark>предел усиления</mark></h1>
+
+  <p class="battuta">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="correzione">душ с длинной трубой — тот же контур!</p>
+
+  <p class="battuta">Регулятор всегда исправляет прошлое. Коррекция, рассчитанная для состояния
+  «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается воздействием
+  не в ту сторону. При достаточном усилении она перестаёт гасить отклонение и начинает его
+  поддерживать.</p>
+
+  <figure>
+<pre class="schema-testo">   +----------+     +------------+     +----------+     +----------+
+   |   ЦЕЛЬ   |---->| РЕГУЛЯТОР  |---->|  ОБЪЕКТ  |---->|  ДАТЧИК  |
+   +----------+     +------------+     +----------+     +----------+
+        ^                                                     |
+        |                                                     v
+        +-----------------------&lt;&lt;&lt;-----------------------------+
+                        <b>здесь теряется время</b></pre>
+    <figcaption>рис. 4 — контур с запаздыванием в цепи измерения</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Стенд · усиление и запаздывание</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно; верните усиление и двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 640 150" role="img" aria-label="Переходный процесс">
+      <path d="M40,40 H630" stroke="#6b6459" stroke-width="1" stroke-dasharray="2 4" fill="none"/>
+      <text x="630" y="33" font-family="PT Mono, monospace" font-size="10" fill="#6b6459" text-anchor="end">УСТАВКА</text>
+      <path d="M40,132 C60,130 68,100 84,60 C98,22 112,4 128,16 C144,28 150,74 166,86 C184,100 198,60 216,46 C236,30 250,50 270,58 C292,67 308,42 334,40 C368,37 404,46 442,42 C486,37 540,40 630,38"
+            fill="none" stroke="#2a2622" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M40,132 C62,132 82,130 106,122 C136,113 164,102 208,94 C264,84 332,78 630,74"
+            fill="none" stroke="#a3352a" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <path d="M40,6 V136 M36,134 H632" stroke="#2a2622" stroke-width="1.1" fill="none"/>
+      <g font-family="PT Mono, monospace" font-size="10" fill="#6b6459">
+        <text x="34" y="44" text-anchor="end">1.0</text><text x="34" y="136" text-anchor="end">0</text>
+        <text x="628" y="148" text-anchor="end">СЕК</text>
+      </g>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>СТАТИЧЕСКАЯ ОШИБКА</b><i></i><span>0.182</span></span>
+      <span class="quadrante male"><b>ПЕРЕРЕГУЛИРОВАНИЕ</b><i></i><span>34 %</span></span>
+      <span class="quadrante"><b>ВРЕМЯ УСТАНОВЛЕНИЯ</b><i></i><span>—</span></span>
+      <span class="quadrante"><b>ПЕРЕСЕЧЕНИЙ УСТАВКИ</b><i></i><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>УСИЛЕНИЕ P</label><input type="range" min="0" max="16" value="6"><output>6.0</output></span>
+      <span class="manopola"><label>ИНТЕГРАЛ I</label><input type="range" min="0" max="4" step=".05" value="0.5"><output>0.50</output></span>
+      <span class="manopola"><label>ЗАПАЗДЫВАНИЕ</label><input type="range" min="0" max="40" value="12"><output>0.60c</output></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda">01. Контур с заметным запаздыванием реагирует вяло. Инженер увеличивает усиление
+  вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А.</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б.</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В.</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+</template>
+<template data-dir="lavagna"><style>.direzione[data-dir="lavagna"]{--кегль:1;--пол:0px;
   --доска:#243029;
   --мел:#eae6dc;
   --мел-тихий:#9aa79c;
@@ -493,14 +826,14 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
   --мел-зелёный:#93c9a1;
 }
 .direzione[data-dir="lavagna"] *{box-sizing:border-box}
-.direzione[data-dir="lavagna"],.direzione[data-dir="lavagna"]{height:100%}
+.direzione[data-dir="lavagna"]{min-height:100%;position:relative}
 .direzione[data-dir="lavagna"]{
   margin:0;color:var(--мел);
   font-family:'Literata',Georgia,serif;font-size:max(calc(16px*var(--кегль)),var(--пол));line-height:26px;
   -webkit-font-smoothing:antialiased;
 }
 .direzione[data-dir="lavagna"] .spugna{
-  position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;opacity:.5;
   background:
     radial-gradient(ellipse 460px 90px at 22% 18%, rgba(234,230,220,.10), transparent 70%),
     radial-gradient(ellipse 520px 70px at 78% 42%, rgba(234,230,220,.075), transparent 70%),
@@ -606,10 +939,108 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
     overflow-x:auto;overscroll-behavior-x:contain;
   }
 .direzione[data-dir="lavagna"] svg.schema,.direzione[data-dir="lavagna"] svg.grafico{min-width:min(820px,200vw)}
-.direzione[data-dir="lavagna"] button{min-height:44px}}
+.direzione[data-dir="lavagna"] button{min-height:44px}}</style>
 
-/* ── incisione ─────────────────────────── */
-.direzione[data-dir="incisione"]{--кегль:1;--пол:0px;
+<div class="spugna" data-scorre></div>
+
+<main>
+  <header class="testata">
+    <div class="marchio">Кибернетика</div>
+    <div class="grado"><span class="barra"></span>Регулятор</div>
+  </header>
+
+  <p class="riga-corso">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и предел усиления</h1>
+  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
+
+  <p>На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так не работают.
+  Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты, данные по
+  инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="replica">душ с длинной трубой — тот же контур,<br>и ведёт себя точно так же</p>
+
+  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
+  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
+  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение
+  и начинает его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 640 155" role="img" aria-label="Схема контура">
+      <g fill="none" stroke="#eae6dc" stroke-width="2" stroke-linecap="round" stroke-dasharray="70 3 50 3 90">
+        <path d="M28,44 C70,41 108,42 132,44 C140,45 142,50 141,59 C140,70 139,74 131,76 C106,79 66,78 32,76 C24,75 22,68 23,59 C24,50 25,46 30,44.6"/>
+        <path d="M196,44 C238,41 276,42 300,44 C308,45 310,50 309,59 C308,70 307,74 299,76 C274,79 234,78 200,76 C192,75 190,68 191,59 C192,50 193,46 198,44.6"/>
+        <path d="M364,44 C406,41 444,42 468,44 C476,45 478,50 477,59 C476,70 475,74 467,76 C442,79 402,78 368,76 C360,75 358,68 359,59 C360,50 361,46 366,44.6"/>
+        <path d="M520,44 C562,41 600,42 624,44 C632,45 634,50 633,59 C632,70 631,74 623,76 C598,79 558,78 524,76 C516,75 514,68 515,59 C516,50 517,46 522,44.6"/>
+      </g>
+      <g fill="none" stroke="#eae6dc" stroke-width="1.8" stroke-linecap="round">
+        <path d="M143,60 L192,60 M184,56 L193,60 L184,64"/>
+        <path d="M311,60 L360,60 M352,56 L361,60 L352,64"/>
+        <path d="M479,60 L514,60 M506,56 L515,60 L506,64"/>
+      </g>
+      <path d="M578,78 C577,98 576,112 574,122 C572,130 564,132 550,132 C400,135 190,134 96,132 C84,131.6 78,124 77,114 C76,100 76,90 77,78 M81,88 L77,78 L73,88"
+            fill="none" stroke="#8fb8d8" stroke-width="2" stroke-linecap="round" stroke-dasharray="120 4 90 3 140"/>
+      <g font-family="Caveat, cursive" font-size="21" fill="#f6f2e8" text-anchor="middle">
+        <text x="82" y="66">цель</text><text x="250" y="66">регулятор</text>
+        <text x="418" y="66">объект</text><text x="574" y="66">датчик</text>
+      </g>
+      <text x="330" y="151" font-family="Caveat, cursive" font-size="20" fill="#d98878" text-anchor="middle">здесь теряется время</text>
+    </svg>
+    <figcaption>обход круга занимает время — и в этом всё дело</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Ручка усиления и ручка запаздывания</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно;<br>верните усиление и медленно двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 600 165" role="img" aria-label="Переходный процесс">
+      <path d="M44,42 H588" stroke="#93c9a1" stroke-width="1.8" stroke-dasharray="9 7" fill="none" opacity=".9"/>
+      <text x="588" y="34" font-family="Caveat, cursive" font-size="19" fill="#93c9a1" text-anchor="end">уставка</text>
+      <path d="M44,146 C62,144 70,114 86,72 C100,32 114,12 130,24 C146,36 152,84 168,96 C186,110 200,70 218,56 C238,40 252,60 272,68 C294,77 310,52 336,50 C370,47 406,56 444,52 C488,47 540,50 588,48"
+            fill="none" stroke="#eae6dc" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M44,146 C66,146 86,144 110,136 C140,127 168,116 212,108 C268,98 336,92 588,88"
+            fill="none" stroke="#8fb8d8" stroke-width="1.6" stroke-dasharray="6 5" opacity=".8"/>
+      <path d="M44,10 V150 M40,148 H590" fill="none" stroke="#9aa79c" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="90 4 60"/>
+      <text x="586" y="106" font-family="Caveat, cursive" font-size="18" fill="#8fb8d8" text-anchor="end">усилие регулятора</text>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>статическая ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулирование</b><span>34%</span></span>
+      <span class="quadrante"><b>время установления</b><span>—</span></span>
+      <span class="quadrante bene"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">1.</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">а</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">в</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+</template>
+<template data-dir="incisione"><style>.direzione[data-dir="incisione"]{--кегль:1;--пол:0px;
   --бумага:#efe6d3;
   --краска:#231f1c;
   --краска-слабо:#6f665c;
@@ -617,7 +1048,7 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
   --поле:#c9bda3;
 }
 .direzione[data-dir="incisione"] *{box-sizing:border-box}
-.direzione[data-dir="incisione"],.direzione[data-dir="incisione"]{height:100%}
+.direzione[data-dir="incisione"]{min-height:100%;position:relative}
 .direzione[data-dir="incisione"]{
   margin:0;color:var(--краска);
   font-family:'Literata',Georgia,serif;font-size:max(calc(16.5px*var(--кегль)),var(--пол));line-height:27px;
@@ -747,425 +1178,7 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
     overflow-x:auto;overscroll-behavior-x:contain;
   }
 .direzione[data-dir="incisione"] svg.schema,.direzione[data-dir="incisione"] svg.grafico{min-width:min(820px,200vw)}
-.direzione[data-dir="incisione"] button{min-height:44px}}
-
-/* Панель стоит внизу — освобождаем под неё место в каждом направлении. */
-.direzione[data-dir] main{padding-bottom:var(--низ)}
-</style>
-
-<canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas>
-
-<div class="direzione" data-dir="quaderno">
-
-<div class="griglia"></div>
-<div class="margine"></div>
-
-<main>
-  <header class="testata">
-    <div class="marchio">Кибернетика<sup> курс</sup></div>
-    <div class="grado">
-      <span class="barra"><i></i></span>
-      Регулятор
-    </div>
-  </header>
-
-  <p class="riga-corso">Обратная связь · второй виток</p>
-  <h1>Запаздывание<br>и предел усиления</h1>
-  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
-
-  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
-  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
-  данные по инфляции приходят через месяц и потом пересматриваются.</p>
-
-  <p class="nota">душ с длинной трубой — тот же контур,<br>и ведёт он себя точно так же</p>
-
-  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
-  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
-  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение и начинает
-  его поддерживать.</p>
-
-  <figure>
-    <svg class="schema" viewBox="0 0 620 150" role="img" aria-label="Схема контура с запаздыванием">
-      <g fill="none" stroke="#1b3a6b" stroke-width="1.6" stroke-linecap="round">
-        <path d="M28,46 C64,43 96,44 122,46 C130,47 132,52 131,60 C130,70 129,74 122,76 C96,79 60,78 30,76 C22,75 20,69 21,60 C22,51 23,48 29,46.6"/>
-        <path d="M186,46 C222,43 254,44 280,46 C288,47 290,52 289,60 C288,70 287,74 280,76 C254,79 218,78 188,76 C180,75 178,69 179,60 C180,51 181,48 187,46.6"/>
-        <path d="M344,46 C380,43 412,44 438,46 C446,47 448,52 447,60 C446,70 445,74 438,76 C412,79 376,78 346,76 C338,75 336,69 337,60 C338,51 339,48 345,46.6"/>
-        <path d="M502,46 C538,43 570,44 596,46 C604,47 606,52 605,60 C604,70 603,74 596,76 C570,79 534,78 504,76 C496,75 494,69 495,60 C496,51 497,48 503,46.6"/>
-        <path d="M133,61 C148,60 162,61 176,61 M168,57 L177,61 L168,65"/>
-        <path d="M291,61 C306,60 320,61 334,61 M326,57 L335,61 L326,65"/>
-        <path d="M449,61 C464,60 478,61 492,61 M484,57 L493,61 L484,65"/>
-        <path d="M556,79 C555,96 554,108 552,118 C550,126 542,128 528,128 C400,131 200,130 96,128 C82,127.6 76,120 75,110 C74,98 74,88 75,79 M79,88 L75,79 L71,88"/>
-      </g>
-      <g font-family="Caveat, cursive" font-size="19" fill="#1b3a6b" text-anchor="middle">
-        <text x="76" y="66">цель</text><text x="234" y="66">регулятор</text>
-        <text x="392" y="66">объект</text><text x="550" y="66">датчик</text>
-      </g>
-      <g font-family="Caveat, cursive" font-size="18" fill="#a8402f">
-        <text x="300" y="146">здесь теряется время</text>
-        <path d="M296,138 C286,132 278,130 272,129" fill="none" stroke="#a8402f" stroke-width="1.3" stroke-linecap="round"/>
-      </g>
-    </svg>
-    <figcaption>Обход круга занимает время — и в этом всё дело</figcaption>
-  </figure>
-
-  <div class="strumento">
-    <p class="titolo-strumento">Ручка усиления и ручка запаздывания</p>
-    <p class="suggerimento">поставьте запаздывание на ноль и поднимите усиление до упора — спокойно;<br>верните усиление и медленно двигайте запаздывание</p>
-
-    <svg class="grafico" viewBox="0 0 560 170" role="img" aria-label="Переходный процесс">
-      <path d="M40,40 H548" stroke="#3f6b4a" stroke-width="1.2" stroke-dasharray="7 6" fill="none" opacity=".8"/>
-      <text x="548" y="32" font-family="Caveat, cursive" font-size="17" fill="#3f6b4a" text-anchor="end">уставка</text>
-      <path d="M40,150 C58,148 66,120 80,74 C92,34 104,14 118,26 C132,38 138,84 152,96 C168,110 180,72 196,58 C214,42 226,60 244,68 C264,77 278,54 300,52 C330,49 360,58 392,54 C430,49 470,52 548,51"
-            fill="none" stroke="#1b3a6b" stroke-width="2" stroke-linecap="round"/>
-      <path d="M40,150 C60,150 78,148 100,140 C126,131 150,120 190,112 C240,102 300,96 548,92"
-            fill="none" stroke="#5c6068" stroke-width="1.4" stroke-dasharray="4 5" opacity=".7"/>
-      <path d="M40,12 C39,60 40,120 40,158 M34,152 C50,151 120,152 548,151" fill="none" stroke="#5c6068" stroke-width="1.2" stroke-linecap="round"/>
-      <text x="546" y="110" font-family="Caveat, cursive" font-size="17" fill="#5c6068" text-anchor="end">усилие регулятора</text>
-    </svg>
-
-    <div class="quadranti">
-      <span class="quadrante male"><b>статическая ошибка</b><span>0,182</span></span>
-      <span class="quadrante male"><b>перерегулирование</b><span>34%</span></span>
-      <span class="quadrante"><b>время установления</b><span>—</span></span>
-      <span class="quadrante bene"><b>пересечений</b><span>7</span></span>
-    </div>
-
-    <div class="manopole">
-      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
-      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
-      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
-    </div>
-  </div>
-
-  <div class="pastiglie">
-    <button class="pastiglia" aria-pressed="true">только P</button>
-    <button class="pastiglia" aria-pressed="false">PI</button>
-    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
-    <button class="pastiglia" aria-pressed="false">запаздывание</button>
-  </div>
-
-  <p class="domanda"><span class="numero">1.</span>Контур с заметным запаздыванием реагирует вяло.
-  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
-  <div class="opzioni" role="radiogroup">
-    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">а</span>Система станет вдвое быстрее и точнее</button>
-    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
-    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">в</span>Ничего не изменится: запаздывание определяет всё</button>
-  </div>
-
-  <div class="azioni">
-    <button class="bottone bottone--pieno">Проверить</button>
-    <button class="bottone">Дальше</button>
-    <span class="legenda">попытки не штрафуются</span>
-  </div>
-</main>
-
-</div>
-<div class="direzione" data-dir="cianotipia" hidden>
-
-<div class="reticolo"></div>
-
-<main>
-<div class="foglio">
-  <div class="cartiglio">
-    <span class="cella"><b>курс</b><span class="grande">Кибернетика</span></span>
-    <span class="cella"><b>лист</b><span>07 / 17</span></span>
-    <span class="cella"><b>виток</b><span>второй</span></span>
-    <span class="cella"><b>разряд</b><span>Регулятор</span></span>
-  </div>
-
-  <h1>Запаздывание и предел усиления</h1>
-  <p class="sotto">Обратная связь · уровень 2</p>
-
-  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
-  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
-  данные по инфляции приходят через месяц и потом пересматриваются.</p>
-
-  <p class="postilla">душ с длинной трубой — тот же контур</p>
-
-  <p>Регулятор всегда исправляет прошлое. Коррекция, рассчитанная для состояния «полминуты назад»,
-  приходит, когда система уже в другом состоянии, и оказывается воздействием не в ту сторону.
-  При достаточном усилении она перестаёт гасить отклонение и начинает его поддерживать.</p>
-
-  <figure>
-    <svg class="schema" viewBox="0 0 700 170" role="img" aria-label="Схема контура">
-      <g fill="none" stroke="#dbe9f2" stroke-width="1.2" stroke-linecap="round">
-        <path d="M24,40 L154,40 L154,74 L24,74 L24,41"/>
-        <path d="M198,40 L328,40 L328,74 L198,74 L198,41"/>
-        <path d="M372,40 L502,40 L502,74 L372,74 L372,41"/>
-        <path d="M546,40 L676,40 L676,74 L546,74 L546,41"/>
-        <path d="M155,57 L196,57 M188,53 L197,57 L188,61"/>
-        <path d="M329,57 L370,57 M362,53 L371,57 L362,61"/>
-        <path d="M503,57 L544,57 M536,53 L545,57 L536,61"/>
-        <path d="M611,75 L611,122 L89,122 L89,76 M85,84 L89,76 L93,84"/>
-      </g>
-      <g font-family="Oswald, sans-serif" font-size="13" fill="#eaf3f8" text-anchor="middle" letter-spacing="1.5">
-        <text x="89" y="62">ЦЕЛЬ</text><text x="263" y="62">РЕГУЛЯТОР</text>
-        <text x="437" y="62">ОБЪЕКТ</text><text x="611" y="62">ДАТЧИК</text>
-      </g>
-      <!-- размерная линия на участке запаздывания -->
-      <g stroke="#e8b04a" stroke-width="1" fill="none">
-        <path d="M300,134 L300,150 M420,134 L420,150 M300,142 L420,142 M308,138 L300,142 L308,146 M412,138 L420,142 L412,146"/>
-      </g>
-      <text x="360" y="164" font-family="Oswald, sans-serif" font-size="11" fill="#e8b04a" text-anchor="middle" letter-spacing="1.6">ЗАПАЗДЫВАНИЕ 0,60 с</text>
-    </svg>
-    <figcaption>рис. 4 — контур с транспортным запаздыванием в цепи измерения</figcaption>
-  </figure>
-
-  <div class="strumento">
-    <p class="titolo-strumento">Стенд · усиление и запаздывание</p>
-    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно. Верните усиление и двигайте запаздывание.</p>
-
-    <svg class="grafico" viewBox="0 0 640 168" role="img" aria-label="Переходный процесс">
-      <g stroke="#2d5871" stroke-width="1" fill="none" opacity=".8">
-        <path d="M46,20 H628 M46,52 H628 M46,84 H628 M46,116 H628"/>
-        <path d="M150,14 V150 M280,14 V150 M410,14 V150 M540,14 V150"/>
-      </g>
-      <path d="M46,44 H628" stroke="#e8b04a" stroke-width="1" stroke-dasharray="8 6" fill="none"/>
-      <text x="626" y="36" font-family="Oswald, sans-serif" font-size="11" fill="#e8b04a" text-anchor="end" letter-spacing="1.4">УСТАВКА</text>
-      <path d="M46,148 C66,146 74,116 90,74 C104,34 118,14 134,26 C150,38 156,86 172,98 C190,112 204,72 222,58 C242,42 256,62 276,70 C298,79 314,54 340,52 C374,49 410,58 448,54 C492,49 540,52 628,50"
-            fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
-      <path d="M46,148 C68,148 88,146 112,138 C142,129 170,118 214,110 C270,100 338,94 628,90"
-            fill="none" stroke="#8fb0c6" stroke-width="1.1" stroke-dasharray="5 5"/>
-      <path d="M46,10 V152 M42,150 H630" stroke="#dbe9f2" stroke-width="1.1" fill="none"/>
-      <g font-family="PT Mono, monospace" font-size="10" fill="#8fb0c6">
-        <text x="40" y="48" text-anchor="end">1,0</text><text x="40" y="152" text-anchor="end">0</text>
-        <text x="150" y="164" text-anchor="middle">5</text><text x="280" y="164" text-anchor="middle">10</text>
-        <text x="410" y="164" text-anchor="middle">15</text><text x="540" y="164" text-anchor="middle">20</text>
-      </g>
-    </svg>
-
-    <div class="quadranti">
-      <span class="quadrante male"><b>стат. ошибка</b><span>0,182</span></span>
-      <span class="quadrante male"><b>перерегулир.</b><span>34 %</span></span>
-      <span class="quadrante"><b>установление</b><span>—</span></span>
-      <span class="quadrante"><b>пересечений</b><span>7</span></span>
-    </div>
-
-    <div class="manopole">
-      <span class="manopola"><label>усиление P <i>6.0</i></label><input type="range" min="0" max="16" value="6"></span>
-      <span class="manopola"><label>интеграл I <i>0.50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
-      <span class="manopola"><label>запаздывание <i>0.60 c</i></label><input type="range" min="0" max="40" value="12"></span>
-    </div>
-  </div>
-
-  <div class="pastiglie">
-    <button class="pastiglia" aria-pressed="true">только P</button>
-    <button class="pastiglia" aria-pressed="false">PI</button>
-    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
-    <button class="pastiglia" aria-pressed="false">запаздывание</button>
-  </div>
-
-  <p class="domanda"><span class="numero">01</span>Контур с заметным запаздыванием реагирует вяло.
-  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
-  <div class="opzioni" role="radiogroup">
-    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А</span>Система станет вдвое быстрее и точнее</button>
-    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
-    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В</span>Ничего не изменится: запаздывание определяет всё</button>
-  </div>
-
-  <div class="azioni">
-    <button class="bottone bottone--pieno">Проверить</button>
-    <button class="bottone">Дальше</button>
-    <span class="legenda">попытки не штрафуются</span>
-  </div>
-</div>
-</main>
-
-</div>
-<div class="direzione" data-dir="telescrivente" hidden>
-
-<div class="nastro"></div>
-
-<main>
-  <div class="intestazione">
-    <span><b>курс</b> КИБЕРНЕТИКА</span>
-    <span><b>лист</b> 07/17</span>
-    <span><b>разряд</b> РЕГУЛЯТОР</span>
-    <span class="fine"><b>опыт</b> 640</span>
-  </div>
-
-  <p class="sotto">Обратная связь · второй виток</p>
-  <h1>Запаздывание<br>и <mark>предел усиления</mark></h1>
-
-  <p class="battuta">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
-  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
-  данные по инфляции приходят через месяц и потом пересматриваются.</p>
-
-  <p class="correzione">душ с длинной трубой — тот же контур!</p>
-
-  <p class="battuta">Регулятор всегда исправляет прошлое. Коррекция, рассчитанная для состояния
-  «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается воздействием
-  не в ту сторону. При достаточном усилении она перестаёт гасить отклонение и начинает его
-  поддерживать.</p>
-
-  <figure>
-<pre class="schema-testo">   +----------+     +------------+     +----------+     +----------+
-   |   ЦЕЛЬ   |---->| РЕГУЛЯТОР  |---->|  ОБЪЕКТ  |---->|  ДАТЧИК  |
-   +----------+     +------------+     +----------+     +----------+
-        ^                                                     |
-        |                                                     v
-        +-----------------------&lt;&lt;&lt;-----------------------------+
-                        <b>здесь теряется время</b></pre>
-    <figcaption>рис. 4 — контур с запаздыванием в цепи измерения</figcaption>
-  </figure>
-
-  <div class="strumento">
-    <p class="titolo-strumento">Стенд · усиление и запаздывание</p>
-    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно; верните усиление и двигайте запаздывание</p>
-
-    <svg class="grafico" viewBox="0 0 640 150" role="img" aria-label="Переходный процесс">
-      <path d="M40,40 H630" stroke="#6b6459" stroke-width="1" stroke-dasharray="2 4" fill="none"/>
-      <text x="630" y="33" font-family="PT Mono, monospace" font-size="10" fill="#6b6459" text-anchor="end">УСТАВКА</text>
-      <path d="M40,132 C60,130 68,100 84,60 C98,22 112,4 128,16 C144,28 150,74 166,86 C184,100 198,60 216,46 C236,30 250,50 270,58 C292,67 308,42 334,40 C368,37 404,46 442,42 C486,37 540,40 630,38"
-            fill="none" stroke="#2a2622" stroke-width="1.7" stroke-linecap="round"/>
-      <path d="M40,132 C62,132 82,130 106,122 C136,113 164,102 208,94 C264,84 332,78 630,74"
-            fill="none" stroke="#a3352a" stroke-width="1.2" stroke-dasharray="4 4"/>
-      <path d="M40,6 V136 M36,134 H632" stroke="#2a2622" stroke-width="1.1" fill="none"/>
-      <g font-family="PT Mono, monospace" font-size="10" fill="#6b6459">
-        <text x="34" y="44" text-anchor="end">1.0</text><text x="34" y="136" text-anchor="end">0</text>
-        <text x="628" y="148" text-anchor="end">СЕК</text>
-      </g>
-    </svg>
-
-    <div class="quadranti">
-      <span class="quadrante male"><b>СТАТИЧЕСКАЯ ОШИБКА</b><i></i><span>0.182</span></span>
-      <span class="quadrante male"><b>ПЕРЕРЕГУЛИРОВАНИЕ</b><i></i><span>34 %</span></span>
-      <span class="quadrante"><b>ВРЕМЯ УСТАНОВЛЕНИЯ</b><i></i><span>—</span></span>
-      <span class="quadrante"><b>ПЕРЕСЕЧЕНИЙ УСТАВКИ</b><i></i><span>7</span></span>
-    </div>
-
-    <div class="manopole">
-      <span class="manopola"><label>УСИЛЕНИЕ P</label><input type="range" min="0" max="16" value="6"><output>6.0</output></span>
-      <span class="manopola"><label>ИНТЕГРАЛ I</label><input type="range" min="0" max="4" step=".05" value="0.5"><output>0.50</output></span>
-      <span class="manopola"><label>ЗАПАЗДЫВАНИЕ</label><input type="range" min="0" max="40" value="12"><output>0.60c</output></span>
-    </div>
-  </div>
-
-  <div class="pastiglie">
-    <button class="pastiglia" aria-pressed="true">только P</button>
-    <button class="pastiglia" aria-pressed="false">PI</button>
-    <button class="pastiglia" aria-pressed="false">сильное усиление</button>
-    <button class="pastiglia" aria-pressed="false">запаздывание</button>
-  </div>
-
-  <p class="domanda">01. Контур с заметным запаздыванием реагирует вяло. Инженер увеличивает усиление
-  вдвое. Что произойдёт с наибольшей вероятностью?</p>
-  <div class="opzioni" role="radiogroup">
-    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А.</span>Система станет вдвое быстрее и точнее</button>
-    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б.</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
-    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В.</span>Ничего не изменится: запаздывание определяет всё</button>
-  </div>
-
-  <div class="azioni">
-    <button class="bottone bottone--pieno">Проверить</button>
-    <button class="bottone">Дальше</button>
-    <span class="legenda">попытки не штрафуются</span>
-  </div>
-</main>
-
-</div>
-<div class="direzione" data-dir="lavagna" hidden>
-
-<div class="spugna"></div>
-
-<main>
-  <header class="testata">
-    <div class="marchio">Кибернетика</div>
-    <div class="grado"><span class="barra"></span>Регулятор</div>
-  </header>
-
-  <p class="riga-corso">Обратная связь · второй виток</p>
-  <h1>Запаздывание<br>и предел усиления</h1>
-  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
-
-  <p>На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так не работают.
-  Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты, данные по
-  инфляции приходят через месяц и потом пересматриваются.</p>
-
-  <p class="replica">душ с длинной трубой — тот же контур,<br>и ведёт себя точно так же</p>
-
-  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
-  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
-  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение
-  и начинает его поддерживать.</p>
-
-  <figure>
-    <svg class="schema" viewBox="0 0 640 155" role="img" aria-label="Схема контура">
-      <g fill="none" stroke="#eae6dc" stroke-width="2" stroke-linecap="round" stroke-dasharray="70 3 50 3 90">
-        <path d="M28,44 C70,41 108,42 132,44 C140,45 142,50 141,59 C140,70 139,74 131,76 C106,79 66,78 32,76 C24,75 22,68 23,59 C24,50 25,46 30,44.6"/>
-        <path d="M196,44 C238,41 276,42 300,44 C308,45 310,50 309,59 C308,70 307,74 299,76 C274,79 234,78 200,76 C192,75 190,68 191,59 C192,50 193,46 198,44.6"/>
-        <path d="M364,44 C406,41 444,42 468,44 C476,45 478,50 477,59 C476,70 475,74 467,76 C442,79 402,78 368,76 C360,75 358,68 359,59 C360,50 361,46 366,44.6"/>
-        <path d="M520,44 C562,41 600,42 624,44 C632,45 634,50 633,59 C632,70 631,74 623,76 C598,79 558,78 524,76 C516,75 514,68 515,59 C516,50 517,46 522,44.6"/>
-      </g>
-      <g fill="none" stroke="#eae6dc" stroke-width="1.8" stroke-linecap="round">
-        <path d="M143,60 L192,60 M184,56 L193,60 L184,64"/>
-        <path d="M311,60 L360,60 M352,56 L361,60 L352,64"/>
-        <path d="M479,60 L514,60 M506,56 L515,60 L506,64"/>
-      </g>
-      <path d="M578,78 C577,98 576,112 574,122 C572,130 564,132 550,132 C400,135 190,134 96,132 C84,131.6 78,124 77,114 C76,100 76,90 77,78 M81,88 L77,78 L73,88"
-            fill="none" stroke="#8fb8d8" stroke-width="2" stroke-linecap="round" stroke-dasharray="120 4 90 3 140"/>
-      <g font-family="Caveat, cursive" font-size="21" fill="#f6f2e8" text-anchor="middle">
-        <text x="82" y="66">цель</text><text x="250" y="66">регулятор</text>
-        <text x="418" y="66">объект</text><text x="574" y="66">датчик</text>
-      </g>
-      <text x="330" y="151" font-family="Caveat, cursive" font-size="20" fill="#d98878" text-anchor="middle">здесь теряется время</text>
-    </svg>
-    <figcaption>обход круга занимает время — и в этом всё дело</figcaption>
-  </figure>
-
-  <div class="strumento">
-    <p class="titolo-strumento">Ручка усиления и ручка запаздывания</p>
-    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно;<br>верните усиление и медленно двигайте запаздывание</p>
-
-    <svg class="grafico" viewBox="0 0 600 165" role="img" aria-label="Переходный процесс">
-      <path d="M44,42 H588" stroke="#93c9a1" stroke-width="1.8" stroke-dasharray="9 7" fill="none" opacity=".9"/>
-      <text x="588" y="34" font-family="Caveat, cursive" font-size="19" fill="#93c9a1" text-anchor="end">уставка</text>
-      <path d="M44,146 C62,144 70,114 86,72 C100,32 114,12 130,24 C146,36 152,84 168,96 C186,110 200,70 218,56 C238,40 252,60 272,68 C294,77 310,52 336,50 C370,47 406,56 444,52 C488,47 540,50 588,48"
-            fill="none" stroke="#eae6dc" stroke-width="2.4" stroke-linecap="round"/>
-      <path d="M44,146 C66,146 86,144 110,136 C140,127 168,116 212,108 C268,98 336,92 588,88"
-            fill="none" stroke="#8fb8d8" stroke-width="1.6" stroke-dasharray="6 5" opacity=".8"/>
-      <path d="M44,10 V150 M40,148 H590" fill="none" stroke="#9aa79c" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="90 4 60"/>
-      <text x="586" y="106" font-family="Caveat, cursive" font-size="18" fill="#8fb8d8" text-anchor="end">усилие регулятора</text>
-    </svg>
-
-    <div class="quadranti">
-      <span class="quadrante male"><b>статическая ошибка</b><span>0,182</span></span>
-      <span class="quadrante male"><b>перерегулирование</b><span>34%</span></span>
-      <span class="quadrante"><b>время установления</b><span>—</span></span>
-      <span class="quadrante bene"><b>пересечений</b><span>7</span></span>
-    </div>
-
-    <div class="manopole">
-      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
-      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
-      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
-    </div>
-  </div>
-
-  <div class="pastiglie">
-    <button class="pastiglia" aria-pressed="true">только P</button>
-    <button class="pastiglia" aria-pressed="false">PI</button>
-    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
-    <button class="pastiglia" aria-pressed="false">запаздывание</button>
-  </div>
-
-  <p class="domanda"><span class="numero">1.</span>Контур с заметным запаздыванием реагирует вяло.
-  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
-  <div class="opzioni" role="radiogroup">
-    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">а</span>Система станет вдвое быстрее и точнее</button>
-    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
-    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">в</span>Ничего не изменится: запаздывание определяет всё</button>
-  </div>
-
-  <div class="azioni">
-    <button class="bottone bottone--pieno">Проверить</button>
-    <button class="bottone">Дальше</button>
-    <span class="legenda">попытки не штрафуются</span>
-  </div>
-</main>
-
-</div>
-<div class="direzione" data-dir="incisione" hidden>
+.direzione[data-dir="incisione"] button{min-height:44px}}</style>
 
 
 <main>
@@ -1271,9 +1284,9 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
   </div>
 </main>
 
-</div>
+</template>
 
-<div class="pannello">
+<div class="pannello" data-fisso>
   <div class="scelte" role="group" aria-label="Направление">
       <button type="button" class="scelta" data-scelta="quaderno" aria-pressed="true">
         <b>Тетрадь</b><i>клетка, поля, паста</i>
@@ -1344,7 +1357,22 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
 };
   var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-scelta]'));
 
+  function apri(dir) {
+    var gia = document.querySelector('.direzione[data-dir="' + dir + '"]');
+    if (gia) return gia;
+    var tpl = document.querySelector('template[data-dir="' + dir + '"]');
+    if (!tpl) return null;
+    var blocco = document.createElement('div');
+    blocco.className = 'direzione';
+    blocco.dataset.dir = dir;
+    blocco.appendChild(tpl.content.cloneNode(true));
+    // Лист лежит внутри .foglio — туда же кладём и развёрнутое направление.
+    (document.querySelector('.foglio') || document.body).appendChild(blocco);
+    return blocco;
+  }
+
   function choose(dir) {
+    apri(dir);
     document.querySelectorAll('.direzione').forEach(function (block) {
       block.hidden = block.dataset.dir !== dir;
     });
@@ -1353,7 +1381,10 @@ canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
     });
     var stock = STOCKS[dir];
     document.body.style.background = '#' + stock.carta;
-    if (window.materia) window.materia.setStock(stock);
+    if (window.materia) {
+      window.materia.setStock(stock);
+      window.materia.rileggi();
+    }
     window.scrollTo({ top: 0 });
   }
 
