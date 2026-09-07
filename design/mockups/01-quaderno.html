@@ -14,7 +14,7 @@
    не смыкаются. Заголовки написаны от руки, набор — только там, где текст
    должен читаться долго. */
 
-:root{
+:root{--кегль:1;--пол:0px;
   --клетка:#a8c0d6;
   --поле:#d98b8b;
   --паста:#1b3a6b;
@@ -30,7 +30,7 @@
 html,body{height:100%}
 body{
   margin:0;color:var(--текст);
-  font-family:'Literata',Georgia,serif;font-size:16.5px;line-height:var(--шаг);
+  font-family:'Literata',Georgia,serif;font-size:max(calc(16.5px*var(--кегль)),var(--пол));line-height:var(--шаг);
   -webkit-font-smoothing:antialiased;
 }
 /* Освещённый лист живёт под всем; клетка печатается поверх него, как и
@@ -54,9 +54,9 @@ main{max-width:720px;margin:0 auto;padding:calc(var(--шаг)*2) 24px calc(var(-
 
 /* ── шапка ─────────────────────────────────────────────────── */
 .testata{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:calc(var(--шаг)*2)}
-.marchio{font-family:'Caveat',cursive;font-size:27px;font-weight:700;color:var(--паста);letter-spacing:.01em}
-.marchio sup{font-family:'Literata',serif;font-size:11px;font-weight:400;color:var(--тихий);letter-spacing:.08em;text-transform:uppercase}
-.grado{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:'Caveat',cursive;font-size:20px;color:var(--грифель)}
+.marchio{font-family:'Caveat',cursive;font-size:max(calc(27px*var(--кегль)),var(--пол));font-weight:700;color:var(--паста);letter-spacing:.01em}
+.marchio sup{font-family:'Literata',serif;font-size:max(calc(11px*var(--кегль)),var(--пол));font-weight:400;color:var(--тихий);letter-spacing:.08em;text-transform:uppercase}
+.grado{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:'Caveat',cursive;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--грифель)}
 /* Полоска опыта нарисована пастой: обводка не замыкается справа. */
 .barra{position:relative;width:110px;height:9px}
 .barra::before{
@@ -66,22 +66,22 @@ main{max-width:720px;margin:0 auto;padding:calc(var(--шаг)*2) 24px calc(var(-
 .barra i{position:absolute;left:2px;top:2px;height:5px;width:62%;background:var(--паста);opacity:.22;border-radius:1px}
 
 /* ── титул ─────────────────────────────────────────────────── */
-.riga-corso{font-family:'Caveat',cursive;font-size:21px;color:var(--тихий);margin:0 0 2px}
+.riga-corso{font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));color:var(--тихий);margin:0 0 2px}
 h1{
   font-family:'Caveat',cursive;font-weight:700;
   font-size:clamp(44px,8vw,68px);line-height:.94;letter-spacing:-.01em;
   margin:0 0 6px;color:var(--паста);text-wrap:balance;
 }
 .sottotitolo{
-  font-family:'Caveat',cursive;font-size:26px;color:var(--грифель);
+  font-family:'Caveat',cursive;font-size:max(calc(26px*var(--кегль)),var(--пол));color:var(--грифель);
   margin:0 0 calc(var(--шаг)*1.5);
 }
 p{margin:0 0 var(--шаг);max-width:62ch}
-.occhiello{font-size:18px;line-height:calc(var(--шаг)*1.15)}
+.occhiello{font-size:max(calc(18px*var(--кегль)),var(--пол));line-height:calc(var(--шаг)*1.15)}
 
 /* ── пометки на полях, карандашом ──────────────────────────── */
 .nota{
-  position:relative;font-family:'Caveat',cursive;font-size:19px;color:var(--грифель);
+  position:relative;font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--грифель);
   line-height:1.25;margin:0 0 var(--шаг);padding-left:14px;
 }
 .nota::before{content:"";position:absolute;left:0;top:5px;bottom:4px;width:2px;
@@ -98,7 +98,7 @@ p{margin:0 0 var(--шаг);max-width:62ch}
 /* ── схема контура, нарисованная от руки ───────────────────── */
 figure{margin:0 0 var(--шаг)}
 .schema{width:100%;height:auto;display:block}
-figcaption{font-family:'Caveat',cursive;font-size:19px;color:var(--тихий);margin-top:6px}
+figcaption{font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--тихий);margin-top:6px}
 
 /* ── прибор ────────────────────────────────────────────────── */
 /* Обводка прибора — один незамкнутый штрих: рука начала сверху слева,
@@ -111,22 +111,22 @@ figcaption{font-family:'Caveat',cursive;font-size:19px;color:var(--тихий);m
   content:"";position:absolute;inset:-6px -8px;pointer-events:none;
   background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200' preserveAspectRatio='none'><path d='M14,10 C90,5 210,7 288,11 C295,12 296,20 296,34 C297,90 296,150 295,178 C294,188 286,190 274,190 C190,193 90,191 22,190 C11,189 7,182 7,170 C5,120 6,50 7,26 C7,16 11,12 22,11' fill='none' stroke='%231b3a6b' stroke-width='1.5' stroke-linecap='round' opacity='.55'/></svg>") no-repeat center/100% 100%;
 }
-.titolo-strumento{font-family:'Caveat',cursive;font-size:23px;color:var(--паста);margin:0 0 2px}
-.suggerimento{font-family:'Caveat',cursive;font-size:18px;color:var(--тихий);margin:0 0 14px;line-height:1.2}
+.titolo-strumento{font-family:'Caveat',cursive;font-size:max(calc(23px*var(--кегль)),var(--пол));color:var(--паста);margin:0 0 2px}
+.suggerimento{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--тихий);margin:0 0 14px;line-height:1.2}
 
 /* график на клетчатой основе */
 .grafico{display:block;width:100%;height:auto;margin-bottom:12px}
 
 .quadranti{display:flex;flex-wrap:wrap;gap:6px 26px;margin-bottom:14px}
-.quadrante b{display:block;font-family:'Caveat',cursive;font-size:17px;font-weight:500;color:var(--тихий);line-height:1.1}
-.quadrante span{font-family:'Literata',serif;font-size:17px;font-variant-numeric:tabular-nums;color:var(--текст)}
+.quadrante b{display:block;font-family:'Caveat',cursive;font-size:max(calc(17px*var(--кегль)),var(--пол));font-weight:500;color:var(--тихий);line-height:1.1}
+.quadrante span{font-family:'Literata',serif;font-size:max(calc(17px*var(--кегль)),var(--пол));font-variant-numeric:tabular-nums;color:var(--текст)}
 .quadrante.male span{color:var(--красный)}
 .quadrante.bene span{color:var(--зелёный)}
 
 .manopole{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .manopola{display:grid;gap:3px}
-.manopola label{font-family:'Caveat',cursive;font-size:18px;color:var(--грифель);display:flex;justify-content:space-between;gap:8px}
-.manopola label i{font-style:normal;font-family:'Literata',serif;font-size:15px;color:var(--паста);font-variant-numeric:tabular-nums}
+.manopola label{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--грифель);display:flex;justify-content:space-between;gap:8px}
+.manopola label i{font-style:normal;font-family:'Literata',serif;font-size:max(calc(15px*var(--кегль)),var(--пол));color:var(--паста);font-variant-numeric:tabular-nums}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:none;cursor:grab}
 input[type=range]::-webkit-slider-runnable-track{
   height:3px;border-radius:2px;
@@ -141,7 +141,7 @@ input[type=range]::-webkit-slider-thumb{
 .pastiglie{display:flex;flex-wrap:wrap;gap:8px 12px;margin:0 0 var(--шаг)}
 .pastiglia{
   position:relative;border:0;background:none;cursor:pointer;padding:5px 12px;
-  font-family:'Caveat',cursive;font-size:19px;color:var(--грифель);
+  font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--грифель);
 }
 .pastiglia[aria-pressed=true]{color:var(--паста)}
 .pastiglia[aria-pressed=true]::before{
@@ -150,15 +150,15 @@ input[type=range]::-webkit-slider-thumb{
 }
 
 /* ── вопрос ────────────────────────────────────────────────── */
-.domanda{margin:0 0 10px;font-size:17px}
-.numero{font-family:'Caveat',cursive;font-size:23px;color:var(--паста);margin-right:6px}
+.domanda{margin:0 0 10px;font-size:max(calc(17px*var(--кегль)),var(--пол))}
+.numero{font-family:'Caveat',cursive;font-size:max(calc(23px*var(--кегль)),var(--пол));color:var(--паста);margin-right:6px}
 .opzioni{display:grid;gap:2px;margin:0 0 var(--шаг);padding:0;list-style:none}
 .opzione{
   position:relative;display:flex;gap:12px;align-items:baseline;width:100%;text-align:left;
   border:0;background:none;cursor:pointer;padding:7px 8px 7px 6px;
-  font:inherit;font-size:16.5px;color:var(--текст);
+  font:inherit;font-size:max(calc(16.5px*var(--кегль)),var(--пол));color:var(--текст);
 }
-.opzione .lettera{font-family:'Caveat',cursive;font-size:21px;color:var(--тихий);min-width:18px}
+.opzione .lettera{font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));color:var(--тихий);min-width:18px}
 .opzione:hover .lettera{color:var(--паста)}
 /* Выбранный ответ обведён «галочкой» пастой, а не залит цветом. */
 .opzione[aria-checked=true]::before{
@@ -172,7 +172,7 @@ input[type=range]::-webkit-slider-thumb{
 .azioni{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .bottone{
   position:relative;border:0;background:none;cursor:pointer;
-  font-family:'Caveat',cursive;font-size:22px;color:var(--паста);
+  font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));color:var(--паста);
   padding:9px 22px;
   /* Свет один на всю страницу: сдвиг тени берётся из --luce-dx/dy. */
   transform:translateY(calc(var(--premuto,0) * .7px));
@@ -188,7 +188,28 @@ input[type=range]::-webkit-slider-thumb{
   background:var(--паста);
 }
 .bottone:active{transform:translateY(1.2px)}
-.legenda{font-family:'Caveat',cursive;font-size:18px;color:var(--тихий)}
+.legenda{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--тихий)}
+
+/* ── ТЕЛЕФОН ──────────────────────────────────────────────────
+   У кегля появляется пол: подпись в 9 px становится 15 px, а
+   крупное растёт всего на десятую — иначе в ладони страница
+   превращается в серую полосу. Схемы не ужимаются до нечитаемого,
+   а уезжают вбок под палец; кнопке дают 44 px, чтобы попасть в
+   неё в поезде. */
+@media (max-width:640px){
+  :root{--кегль:1.12;--пол:15px}
+  main{padding-left:16px;padding-right:16px}
+  /* Схема не ужимается до нечитаемого, а уезжает вбок в своей рамке:
+     подписи в ней набраны под настольный размер, поэтому дешевле возить
+     её пальцем, чем пытаться прочесть восьмипиксельную ось. Рамкой
+     работает тот элемент, в котором схема лежит, — у графика это не
+     figure, поэтому берём его через :has(). */
+  figure, *:has(> svg.schema), *:has(> svg.grafico), pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+  svg.schema, svg.grafico{min-width:min(820px,200vw)}
+  button{min-height:44px}
+}
 </style>
 </head>
 <body>

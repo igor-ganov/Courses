@@ -1,8 +1,7 @@
 /* МАТЕРИЯ — освещённая поверхность под страницей.
  *
- * Не тень и не картинка текстуры. Строится поле высот (коробление листа,
- * пучки волокон, зерно), из него берётся нормаль в каждом пикселе, и по
- * нормали считается свет:
+ * Не тень и не картинка текстуры. Строится поле высот, из него берётся
+ * нормаль в каждом пикселе, и по нормали считается свет:
  *
  *   — Орен–Найар вместо Ламберта, потому что бумага шероховатая: она не
  *     гаснет по косинусу, как пластик, а держит яркость до самого края.
@@ -18,8 +17,13 @@
  * сжимается, а вытесняется. Нормаль считается уже от продавленной высоты,
  * поэтому блик сам огибает вмятину. В этом весь смысл затеи.
  *
- * Каждый макет задаёт свой сорт материала атрибутами data-*.
- * Перерисовка идёт только пока пружины не успокоились.
+ * РАЗДЕЛЕНИЕ ПО ЧАСТОТАМ — из-за него всё это едет на телефоне.
+ * Свет отвечает только на медленное коробление листа: его и считает шейдер,
+ * вполовину разрешения, потому что поле гладкое и растягивание незаметно.
+ * Волокна и зерно от лампы почти не зависят, поэтому они печатаются один раз
+ * в бесшовную плитку и умножаются поверх в полном разрешении: резко и даром.
+ * Раньше шейдер брал ~49 выборок шума на пиксель в полном разрешении, теперь
+ * ~9 на пиксель в половине — и только пока пружины не успокоились.
  */
 
 (function () {
@@ -36,18 +40,14 @@
     'precision highp float;\n' +
     'uniform vec2 uRes; uniform vec2 uPointer; uniform float uPress; uniform float uPresence;\n' +
     'uniform vec3 uPaper; uniform vec3 uShade; uniform vec3 uLight;\n' +
-    'uniform float uRelief; uniform float uFibre; uniform float uWarm;\n' +
+    'uniform float uRelief; uniform float uWarm;\n' +
     'out vec4 fragColor;\n' +
     'float hash(vec2 p){ p = fract(p*vec2(443.897,441.423)); p += dot(p,p.yx+19.19); return fract((p.x+p.y)*p.x); }\n' +
     'float vnoise(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.-2.*f);\n' +
     '  return mix(mix(hash(i),hash(i+vec2(1,0)),u.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x), u.y); }\n' +
-    'float fbm(vec2 p, int oct){ float s=0., a=.5; for(int i=0;i<6;i++){ if(i>=oct) break; s+=a*vnoise(p); p*=2.03; a*=.5; } return s; }\n' +
-    // Лист: медленное коробление от рук, пучки волокон в двух направлениях, зерно.
-    'float sheet(vec2 p){\n' +
-    '  float cockle = fbm(p*5.5, 4);\n' +
-    '  float fa = fbm(vec2(p.x*3.0, p.y*230.), 2);\n' +
-    '  float fb = fbm(vec2(p.x*250., p.y*2.6), 2);\n' +
-    '  return cockle*.34 + (fa+fb)*uFibre + vnoise(p*620.)*.03; }\n' +
+    // Коробление от рук — единственное, что здесь отвечает на движение лампы.
+    'float sheet(vec2 p){ float s=0., a=.5; p*=5.5;\n' +
+    '  for(int i=0;i<3;i++){ s+=a*vnoise(p); p*=2.03; a*=.5; } return s*.26; }\n' +
     // Палец не сминает бумагу, а вытесняет её: ямка плюс валик.
     'float dent(vec2 p, vec2 c, float amt){ float d=length(p-c);\n' +
     '  return amt*(exp(-((d-.115)*(d-.115))/.0026)*.28 - exp(-(d*d)/.0090)); }\n' +
@@ -64,11 +64,13 @@
     'void main(){\n' +
     '  vec2 uv = gl_FragCoord.xy/uRes; float asp = uRes.x/max(uRes.y,1.);\n' +
     '  vec2 p = vec2(uv.x*asp, uv.y); vec2 ptr = vec2(uPointer.x*asp, uPointer.y);\n' +
+    // Разность вперёд, а не центральная: три выборки поля вместо пяти,
+    // на гладком короблении разницы не видно.
     '  float h = surf(p, ptr, uPress);\n' +
-    '  vec2 e = vec2(1.4/uRes.y, 0.);\n' +
-    '  float hx = surf(p+e.xy,ptr,uPress) - surf(p-e.xy,ptr,uPress);\n' +
-    '  float hy = surf(p+e.yx,ptr,uPress) - surf(p-e.yx,ptr,uPress);\n' +
-    '  vec3 n = normalize(vec3(-hx*uRelief, -hy*uRelief, 1.));\n' +
+    '  float e = 1.6/uRes.y;\n' +
+    '  float hx = surf(p+vec2(e,0.),ptr,uPress) - h;\n' +
+    '  float hy = surf(p+vec2(0.,e),ptr,uPress) - h;\n' +
+    '  vec3 n = normalize(vec3(-hx*uRelief*2., -hy*uRelief*2., 1.));\n' +
     '  vec3 view = vec3(0.,0.,1.);\n' +
     '  vec3 key = normalize(vec3(-.42,.55,.72));\n' +
     '  vec3 toP = vec3(ptr-p, .30); float dP = length(toP); vec3 dirP = toP/max(dP,1e-4);\n' +
@@ -78,14 +80,10 @@
     '  float through = pow(max(0.,(dot(n,key)+.55)/1.55), 2.2)*.30;\n' +
     '  float ao = clamp(.80 + h*.55 - max(0.,-dent(p,ptr,uPress))*1.5, .45, 1.10);\n' +
     '  float sheen = ggx(n,key,view,.55)*.030 + ggx(n,dirP,view,.45)*.045*fall;\n' +
-    '  float mottle = fbm(p*3.1+11., 3) - .5;\n' +
-    '  float speck = smoothstep(.990,.999, vnoise(p*760.));\n' +
     '  float expo = .93 + (lit-.55)*.42 + through*.30;\n' +
     '  expo *= mix(1., ao, .45);\n' +
     '  vec3 c = uPaper * clamp(expo, .70, 1.12);\n' +
     '  c = mix(c, uShade, clamp((1.-clamp(expo,0.,1.))*.55, 0., .45));\n' +
-    '  c *= 1. + mottle*.022;\n' +
-    '  c = mix(c, uShade, speck*.14);\n' +
     '  c += uLight*sheen + uLight*fall*uWarm;\n' +
     '  vec2 ctr = uv-.5; c *= 1. - dot(ctr,ctr)*.16;\n' +
     '  fragColor = vec4(c,1.); }';
@@ -108,11 +106,68 @@
     ];
   }
 
+  /* ── ВОЛОКНА И ЗЕРНО ───────────────────────────────────────────────
+     Печатаются один раз в бесшовную плитку 160×160 и умножаются поверх
+     света. Шум взят с обёрнутой решёткой (индексы по модулю периода),
+     поэтому стык плитки не виден. Пучки идут в двух направлениях —
+     это и отличает бумагу от штукатурки. */
+
+  function tileHash(x, y) {
+    var h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+    return h - Math.floor(h);
+  }
+
+  function wrapped(x, y, px, py) {
+    var x0 = Math.floor(x), y0 = Math.floor(y);
+    var fx = x - x0, fy = y - y0;
+    var ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
+    var a = tileHash(((x0 % px) + px) % px, ((y0 % py) + py) % py);
+    var b = tileHash((((x0 + 1) % px) + px) % px, ((y0 % py) + py) % py);
+    var c = tileHash(((x0 % px) + px) % px, (((y0 + 1) % py) + py) % py);
+    var d = tileHash((((x0 + 1) % px) + px) % px, (((y0 + 1) % py) + py) % py);
+    return (a + (b - a) * ux) + ((c + (d - c) * ux) - (a + (b - a) * ux)) * uy;
+  }
+
+  function grainTile(fibre) {
+    var N = 160;
+    var cv = document.createElement('canvas');
+    cv.width = N;
+    cv.height = N;
+    var ctx = cv.getContext('2d');
+    var img = ctx.createImageData(N, N);
+    for (var y = 0; y < N; y++) {
+      for (var x = 0; x < N; x++) {
+        var u = x / N, v = y / N;
+        // Пучки идут в двух направлениях, но слабо: если дать им волю,
+        // бумага становится мешковиной. Основной тон держит зерно.
+        var fa = wrapped(u * 5, v * 40, 5, 40);
+        var fb = wrapped(u * 36, v * 5, 36, 5);
+        var grain = tileHash(x, y);
+        var dark = (1 - fa) * fibre * 0.5 + (1 - fb) * fibre * 0.5 + (1 - grain) * 0.035;
+        var value = Math.round(255 * Math.max(0, 1 - dark));
+        // Зерно чуть тёплое: нейтрально-серое умножение выпивает из бумаги
+        // цвет и оставляет бетон.
+        var i = (y * N + x) * 4;
+        img.data[i] = Math.min(255, value + 4);
+        img.data[i + 1] = value;
+        img.data[i + 2] = Math.max(0, value - 5);
+        img.data[i + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return cv.toDataURL('image/png');
+  }
+
   /* Затухающая пружина: у материала есть масса, поэтому свет догоняет
      курсор, а вмятина возвращается не мгновенно. */
   var calm =
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* На тачскрине лампу за пальцем не водят: палец приходит и уходит, а не
+     скользит, и каждое движение — это скролл. Свет стоит, вмятина от касания. */
+  var coarse =
+    typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
 
   function step(s, target, dt, k, c) {
     if (calm) {
@@ -162,12 +217,21 @@
     var paper = rgb(d.carta, 'f3ece0');
     var shade = rgb(d.ombra, '8f8474');
     var light = rgb(d.luce, 'fff6e2');
-    var relief = parseFloat(d.rilievo || '26');
-    var fibre = parseFloat(d.fibra || '0.13');
+    var relief = parseFloat(d.rilievo || '11');
+    var fibre = parseFloat(d.fibra || '0.055');
     var warm = parseFloat(d.calore || '0.06');
 
+    var grana = document.createElement('div');
+    grana.className = 'grana';
+    grana.setAttribute('aria-hidden', 'true');
+    grana.style.cssText =
+      'position:fixed;inset:0;z-index:-1;pointer-events:none;' +
+      'background-repeat:repeat;background-size:160px 160px;mix-blend-mode:multiply';
+    grana.style.backgroundImage = 'url(' + grainTile(fibre) + ')';
+    document.body.appendChild(grana);
+
     var u = {};
-    ['uRes', 'uPointer', 'uPress', 'uPresence', 'uPaper', 'uShade', 'uLight', 'uRelief', 'uFibre', 'uWarm'].forEach(
+    ['uRes', 'uPointer', 'uPress', 'uPresence', 'uPaper', 'uShade', 'uLight', 'uRelief', 'uWarm'].forEach(
       function (name) {
         u[name] = gl.getUniformLocation(prog, name);
       },
@@ -194,9 +258,21 @@
       gl.uniform3fv(u.uShade, shade);
       gl.uniform3fv(u.uLight, light);
       gl.uniform1f(u.uRelief, relief);
-      gl.uniform1f(u.uFibre, fibre);
       gl.uniform1f(u.uWarm, warm);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    /* Свет один на всю страницу: те же координаты уходят в CSS-переменные,
+       поэтому тени карточек и блик на кнопке знают, где лампа. Пишутся они
+       только вместе с кадром — иначе пересчёт стилей всей страницы идёт
+       вхолостую шестьдесят раз в секунду. */
+    function vars() {
+      var root = document.documentElement.style;
+      root.setProperty('--luce-x', sx.x.toFixed(3));
+      root.setProperty('--luce-y', (1 - sy.x).toFixed(3));
+      root.setProperty('--luce-dx', (sx.x - 0.5).toFixed(3));
+      root.setProperty('--luce-dy', (0.5 - sy.x).toFixed(3));
+      root.setProperty('--premuto', sp.x.toFixed(3));
     }
 
     function tick(now) {
@@ -207,6 +283,7 @@
       step(sp, pressed ? 1 : 0, dt, 420, 26);
       step(sPresence, present, dt, 120, 22);
       draw();
+      vars();
       var busy =
         Math.abs(sx.x - tx) > 1e-3 ||
         Math.abs(sy.x - ty) > 1e-3 ||
@@ -223,25 +300,27 @@
       requestAnimationFrame(tick);
     }
 
+    /* Свет — поле гладкое, поэтому считается в неполном разрешении и
+       растягивается: вчетверо меньше пикселей, разницы не видно. Зерно
+       поверх идёт отдельной плиткой и остаётся резким. */
+    var wide = 0;
+    var high = 0;
+
     function resize() {
-      var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      canvas.width = Math.max(1, Math.floor(window.innerWidth * dpr));
-      canvas.height = Math.max(1, Math.floor(window.innerHeight * dpr));
-      canvas.style.width = window.innerWidth + 'px';
-      canvas.style.height = window.innerHeight + 'px';
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      // Адресная строка на телефоне ездит и меняет высоту — это не смена
+      // раскладки, пересчитывать под неё нечего.
+      if (w === wide && Math.abs(h - high) < 120) return;
+      wide = w;
+      high = h;
+      var scala = coarse ? 0.5 : 0.6;
+      canvas.width = Math.max(1, Math.floor(w * scala));
+      canvas.height = Math.max(1, Math.floor(h * scala));
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
       draw();
       wake();
-    }
-
-    /* Свет один на всю страницу: те же координаты уходят в CSS-переменные,
-       поэтому тени карточек и блик на кнопке знают, где лампа. */
-    function vars() {
-      var root = document.documentElement.style;
-      root.setProperty('--luce-x', sx.x.toFixed(4));
-      root.setProperty('--luce-y', (1 - sy.x).toFixed(4));
-      root.setProperty('--luce-dx', (sx.x - 0.5).toFixed(4));
-      root.setProperty('--luce-dy', (0.5 - sy.x).toFixed(4));
-      root.setProperty('--premuto', sp.x.toFixed(4));
     }
 
     /* Смена сорта бумаги: лампа та же, лист другой. */
@@ -251,33 +330,42 @@
         shade = rgb(stock.ombra, '8f8474');
         light = rgb(stock.luce, 'fff6e2');
         relief = parseFloat(stock.rilievo || relief);
-        fibre = parseFloat(stock.fibra || fibre);
         warm = parseFloat(stock.calore || warm);
+        var f = parseFloat(stock.fibra);
+        if (f === f && f !== fibre) {
+          fibre = f;
+          grana.style.backgroundImage = 'url(' + grainTile(fibre) + ')';
+        }
         draw();
       },
     };
 
+    if (!coarse) {
+      window.addEventListener(
+        'pointermove',
+        function (ev) {
+          tx = ev.clientX / Math.max(window.innerWidth, 1);
+          ty = 1 - ev.clientY / Math.max(window.innerHeight, 1);
+          present = 1;
+          wake();
+        },
+        { passive: true },
+      );
+    }
     window.addEventListener(
-      'pointermove',
+      'pointerdown',
       function (ev) {
         tx = ev.clientX / Math.max(window.innerWidth, 1);
         ty = 1 - ev.clientY / Math.max(window.innerHeight, 1);
         present = 1;
+        pressed = true;
         wake();
       },
       { passive: true },
     );
-    window.addEventListener('pointerdown', function () { pressed = true; wake(); }, { passive: true });
     window.addEventListener('pointerup', function () { pressed = false; wake(); }, { passive: true });
     document.addEventListener('pointerleave', function () { present = 0; pressed = false; wake(); });
-    window.addEventListener('resize', resize);
-
-    var loop = function (now) {
-      vars();
-      requestAnimationFrame(loop);
-      void now;
-    };
-    requestAnimationFrame(loop);
+    window.addEventListener('resize', resize, { passive: true });
 
     resize();
   }

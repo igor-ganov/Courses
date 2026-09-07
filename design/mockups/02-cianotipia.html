@@ -15,7 +15,7 @@
    они чёрные и единственные не-белые на листе.
    Тёмный сорт бумаги: читать в поезде вечером. */
 
-:root{
+:root{--кегль:1;--пол:0px;
   --лазурь:#1b3a52;
   --лазурь-тень:#122938;
   --линия:#dbe9f2;
@@ -30,7 +30,7 @@ html,body{height:100%}
 body{
   margin:0;color:var(--линия);
   font-family:'Oswald',"Helvetica Neue",sans-serif;font-weight:400;
-  font-size:15px;line-height:1.62;letter-spacing:.012em;
+  font-size:max(calc(15px*var(--кегль)),var(--пол));line-height:1.62;letter-spacing:.012em;
   -webkit-font-smoothing:antialiased;
 }
 canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
@@ -62,22 +62,22 @@ main{max-width:800px;margin:0 auto;padding:34px 26px 90px}
 }
 .cella{padding:7px 14px;border-right:1px solid color-mix(in srgb,var(--линия) 30%, transparent)}
 .cella:last-child{border-right:0;margin-left:auto}
-.cella b{display:block;font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--линия-тихая);font-weight:400}
-.cella span{font-size:15px;color:var(--линия)}
-.cella .grande{font-size:19px;letter-spacing:.04em}
+.cella b{display:block;font-size:max(calc(9.5px*var(--кегль)),var(--пол));letter-spacing:.22em;text-transform:uppercase;color:var(--линия-тихая);font-weight:400}
+.cella span{font-size:max(calc(15px*var(--кегль)),var(--пол));color:var(--линия)}
+.cella .grande{font-size:max(calc(19px*var(--кегль)),var(--пол));letter-spacing:.04em}
 
 h1{
   margin:0 0 4px;font-family:'Oswald',sans-serif;font-weight:600;
   font-size:clamp(34px,5.6vw,54px);line-height:1.02;letter-spacing:.005em;
   text-transform:uppercase;color:#fff;text-wrap:balance;
 }
-.sotto{margin:0 0 26px;font-size:16px;color:var(--линия-тихая);letter-spacing:.06em;text-transform:uppercase}
+.sotto{margin:0 0 26px;font-size:max(calc(16px*var(--кегль)),var(--пол));color:var(--линия-тихая);letter-spacing:.06em;text-transform:uppercase}
 p{margin:0 0 17px;max-width:66ch;color:#e4eef5}
-.occhiello{font-size:16.5px}
+.occhiello{font-size:max(calc(16.5px*var(--кегль)),var(--пол))}
 
 /* Пометка конструктора: дописана после печати, поэтому чёрная и от руки. */
 .postilla{
-  font-family:'Caveat',cursive;font-size:21px;line-height:1.2;color:var(--карандаш);
+  font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));line-height:1.2;color:var(--карандаш);
   background:color-mix(in srgb,var(--бумага) 88%, transparent);
   display:inline-block;padding:4px 12px 6px;margin:0 0 20px;
   transform:rotate(-.7deg);
@@ -88,7 +88,7 @@ p{margin:0 0 17px;max-width:66ch;color:#e4eef5}
 figure{margin:0 0 24px}
 .schema{display:block;width:100%;height:auto}
 figcaption{
-  margin-top:8px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--линия-тихая);
+  margin-top:8px;font-size:max(calc(11px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:var(--линия-тихая);
 }
 
 /* ── прибор ────────────────────────────────────────────────── */
@@ -97,8 +97,8 @@ figcaption{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='240' preserveAspectRatio='none'><path d='M6,5 C120,2 300,3 393,6 C397,6.4 398,10 398,17 C399,90 398,200 397,232 C396.6,237 392,238 386,238 C260,241 120,240 12,238 C7,237.6 5,233 5,227 C3,160 4,40 5,14 C5,8 7,6 12,5.4' fill='none' stroke='%23dbe9f2' stroke-width='1.2' stroke-linecap='round' opacity='.7'/></svg>") no-repeat center/100% 100%;
 }
-.titolo-strumento{margin:0 0 2px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#fff}
-.suggerimento{margin:0 0 14px;font-size:13.5px;color:var(--линия-тихая);letter-spacing:.03em}
+.titolo-strumento{margin:0 0 2px;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:#fff}
+.suggerimento{margin:0 0 14px;font-size:max(calc(13.5px*var(--кегль)),var(--пол));color:var(--линия-тихая);letter-spacing:.03em}
 .grafico{display:block;width:100%;height:auto;margin-bottom:12px}
 
 .quadranti{display:flex;flex-wrap:wrap;gap:2px 0;margin-bottom:16px;
@@ -106,13 +106,13 @@ figcaption{
   border-bottom:1px solid color-mix(in srgb,var(--линия) 28%, transparent)}
 .quadrante{flex:1 1 130px;padding:8px 12px 7px;border-right:1px solid color-mix(in srgb,var(--линия) 18%, transparent)}
 .quadrante:last-child{border-right:0}
-.quadrante b{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--линия-тихая);font-weight:400}
-.quadrante span{font-family:'PT Mono',monospace;font-size:17px;color:#fff}
+.quadrante b{display:block;font-size:max(calc(9px*var(--кегль)),var(--пол));letter-spacing:.18em;text-transform:uppercase;color:var(--линия-тихая);font-weight:400}
+.quadrante span{font-family:'PT Mono',monospace;font-size:max(calc(17px*var(--кегль)),var(--пол));color:#fff}
 .quadrante.male span{color:var(--правка)}
 
 .manopole{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
-.manopola label{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая)}
-.manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:13px;letter-spacing:0;color:#fff}
+.manopola label{display:flex;justify-content:space-between;font-size:max(calc(10.5px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая)}
+.manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:0;color:#fff}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:crosshair;margin-top:2px}
 input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--линия-тихая)}
 input[type=range]::-webkit-slider-thumb{
@@ -124,21 +124,21 @@ input[type=range]::-webkit-slider-thumb{
 .pastiglie{display:flex;flex-wrap:wrap;gap:0 22px;margin:0 0 24px}
 .pastiglia{
   border:0;background:none;cursor:pointer;padding:4px 0;
-  font:inherit;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая);
+  font:inherit;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая);
 }
 .pastiglia[aria-pressed=true]{color:#fff}
 .pastiglia[aria-pressed=true]::before{content:"[ "}
 .pastiglia[aria-pressed=true]::after{content:" ]"}
 
 /* ── вопрос ────────────────────────────────────────────────── */
-.domanda{margin:0 0 12px;font-size:16px;color:#eaf3f8}
+.domanda{margin:0 0 12px;font-size:max(calc(16px*var(--кегль)),var(--пол));color:#eaf3f8}
 .numero{font-family:'PT Mono',monospace;color:var(--линия-тихая);margin-right:8px}
 .opzioni{display:grid;gap:1px;margin:0 0 26px;padding:0;list-style:none}
 .opzione{
   display:flex;gap:14px;align-items:baseline;width:100%;text-align:left;
-  border:0;background:none;cursor:pointer;padding:9px 10px 9px 0;font:inherit;font-size:15px;color:#dce8f0;
+  border:0;background:none;cursor:pointer;padding:9px 10px 9px 0;font:inherit;font-size:max(calc(15px*var(--кегль)),var(--пол));color:#dce8f0;
 }
-.opzione .lettera{font-family:'PT Mono',monospace;font-size:13px;color:var(--линия-тихая)}
+.opzione .lettera{font-family:'PT Mono',monospace;font-size:max(calc(13px*var(--кегль)),var(--пол));color:var(--линия-тихая)}
 .opzione:hover{color:#fff}
 .opzione[aria-checked=true]{color:#fff}
 /* Отмечено как на чертеже: выноска с крестиком. */
@@ -149,7 +149,7 @@ input[type=range]::-webkit-slider-thumb{
 .azioni{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
 .bottone{
   position:relative;border:0;background:none;cursor:pointer;
-  font:inherit;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#fff;
+  font:inherit;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:#fff;
   padding:11px 24px;transform:translateY(calc(var(--premuto,0) * .6px));
 }
 .bottone::before{
@@ -159,7 +159,28 @@ input[type=range]::-webkit-slider-thumb{
 .bottone--pieno{color:var(--лазурь)}
 .bottone--pieno::after{content:"";position:absolute;inset:3px 4px;z-index:-1;background:var(--линия)}
 .bottone:active{transform:translateY(1px)}
-.legenda{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая)}
+.legenda{font-size:max(calc(11px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая)}
+
+/* ── ТЕЛЕФОН ──────────────────────────────────────────────────
+   У кегля появляется пол: подпись в 9 px становится 15 px, а
+   крупное растёт всего на десятую — иначе в ладони страница
+   превращается в серую полосу. Схемы не ужимаются до нечитаемого,
+   а уезжают вбок под палец; кнопке дают 44 px, чтобы попасть в
+   неё в поезде. */
+@media (max-width:640px){
+  :root{--кегль:1.12;--пол:15px}
+  main{padding-left:16px;padding-right:16px}
+  /* Схема не ужимается до нечитаемого, а уезжает вбок в своей рамке:
+     подписи в ней набраны под настольный размер, поэтому дешевле возить
+     её пальцем, чем пытаться прочесть восьмипиксельную ось. Рамкой
+     работает тот элемент, в котором схема лежит, — у графика это не
+     figure, поэтому берём его через :has(). */
+  figure, *:has(> svg.schema), *:has(> svg.grafico), pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+  svg.schema, svg.grafico{min-width:min(820px,200vw)}
+  button{min-height:44px}
+}
 </style>
 </head>
 <body>

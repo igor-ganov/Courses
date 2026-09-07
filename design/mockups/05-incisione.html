@@ -15,7 +15,7 @@
    и никаких серых заливок — только плотность штриха.
    Наборные линейки вместо рамок, спусковая полоса вместо «шапки». */
 
-:root{
+:root{--кегль:1;--пол:0px;
   --бумага:#efe6d3;
   --краска:#231f1c;
   --краска-слабо:#6f665c;
@@ -26,7 +26,7 @@
 html,body{height:100%}
 body{
   margin:0;color:var(--краска);
-  font-family:'Literata',Georgia,serif;font-size:16.5px;line-height:27px;
+  font-family:'Literata',Georgia,serif;font-size:max(calc(16.5px*var(--кегль)),var(--пол));line-height:27px;
   -webkit-font-smoothing:antialiased;
 }
 canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
@@ -48,10 +48,10 @@ main{max-width:700px;margin:0 auto;padding:44px 26px 96px}
 }
 .testata::after{content:"";display:block;width:100%;height:1px;background:var(--краска);margin-top:3px}
 .marchio{
-  font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:19px;
+  font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:max(calc(19px*var(--кегль)),var(--пол));
   letter-spacing:.24em;text-transform:uppercase;
 }
-.grado{margin-left:auto;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--краска-слабо)}
+.grado{margin-left:auto;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:var(--краска-слабо)}
 /* Полоса опыта набрана штриховкой, а не залита. */
 .barra{display:inline-block;width:96px;height:9px;margin-left:10px;border:1px solid var(--краска);vertical-align:-1px}
 .barra i{display:block;height:100%;width:62%;
@@ -59,7 +59,7 @@ main{max-width:700px;margin:0 auto;padding:44px 26px 96px}
 
 /* ── титул ─────────────────────────────────────────────────── */
 .riga-corso{
-  margin:26px 0 8px;font-size:11.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--краска-слабо);
+  margin:26px 0 8px;font-size:max(calc(11.5px*var(--кегль)),var(--пол));letter-spacing:.3em;text-transform:uppercase;color:var(--краска-слабо);
   text-align:center;
 }
 h1{
@@ -68,7 +68,7 @@ h1{
 }
 .sottotitolo{
   margin:0 0 6px;text-align:center;font-family:'Playfair Display',Georgia,serif;
-  font-style:italic;font-weight:400;font-size:20px;color:var(--краска-слабо);
+  font-style:italic;font-weight:400;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--краска-слабо);
 }
 /* Виньетка: наборный орнамент между титулом и текстом. */
 .fregio{
@@ -79,7 +79,7 @@ p{margin:0 0 24px}
 /* Буквица: первая литера набрана крупно, как в книге. */
 .occhiello::first-letter{
   float:left;font-family:'Playfair Display',Georgia,serif;font-weight:700;
-  font-size:60px;line-height:.82;padding:4px 9px 0 0;
+  font-size:max(calc(60px*var(--кегль)),var(--пол));line-height:.82;padding:4px 9px 0 0;
 }
 
 /* Подчёркивание — наборная линейка под словом, а не блок в потоке. */
@@ -88,7 +88,7 @@ p{margin:0 0 24px}
 
 /* Замечание на поле: курсив, отбито линейкой. */
 .marginale{
-  font-family:'Playfair Display',serif;font-style:italic;font-size:17px;color:var(--сангина);
+  font-family:'Playfair Display',serif;font-style:italic;font-size:max(calc(17px*var(--кегль)),var(--пол));color:var(--сангина);
   border-left:2px solid var(--сангина);padding-left:14px;margin:0 0 24px;line-height:1.45;
 }
 
@@ -96,7 +96,7 @@ p{margin:0 0 24px}
 figure{margin:0 0 26px}
 .schema{display:block;width:100%;height:auto}
 figcaption{
-  margin-top:9px;text-align:center;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  margin-top:9px;text-align:center;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;
   color:var(--краска-слабо);
 }
 
@@ -107,22 +107,22 @@ figcaption{
   box-shadow:inset 0 3px 0 -2px var(--краска), inset 0 -3px 0 -2px var(--краска);
 }
 .titolo-strumento{
-  margin:0 0 3px;font-family:'Playfair Display',serif;font-weight:700;font-size:17px;
+  margin:0 0 3px;font-family:'Playfair Display',serif;font-weight:700;font-size:max(calc(17px*var(--кегль)),var(--пол));
   letter-spacing:.03em;
 }
-.suggerimento{margin:0 0 14px;font-size:14px;color:var(--краска-слабо);font-style:italic;font-family:'Playfair Display',serif}
+.suggerimento{margin:0 0 14px;font-size:max(calc(14px*var(--кегль)),var(--пол));color:var(--краска-слабо);font-style:italic;font-family:'Playfair Display',serif}
 .grafico{display:block;width:100%;height:auto;margin-bottom:12px}
 
 .quadranti{display:flex;flex-wrap:wrap;gap:0;margin-bottom:16px;border-top:1px solid var(--поле)}
 .quadrante{flex:1 1 128px;padding:8px 12px;border-right:1px solid var(--поле);border-bottom:1px solid var(--поле)}
 .quadrante:last-child{border-right:0}
-.quadrante b{display:block;font-size:9.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--краска-слабо);font-weight:400}
-.quadrante span{font-family:'PT Mono',monospace;font-size:16px}
+.quadrante b{display:block;font-size:max(calc(9.5px*var(--кегль)),var(--пол));letter-spacing:.17em;text-transform:uppercase;color:var(--краска-слабо);font-weight:400}
+.quadrante span{font-family:'PT Mono',monospace;font-size:max(calc(16px*var(--кегль)),var(--пол))}
 .quadrante.male span{color:var(--сангина)}
 
 .manopole{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
-.manopola label{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--краска-слабо)}
-.manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:13.5px;letter-spacing:0;color:var(--краска)}
+.manopola label{display:flex;justify-content:space-between;font-size:max(calc(10.5px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase;color:var(--краска-слабо)}
+.manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:max(calc(13.5px*var(--кегль)),var(--пол));letter-spacing:0;color:var(--краска)}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:ew-resize;margin-top:3px}
 input[type=range]::-webkit-slider-runnable-track{height:5px;border:1px solid var(--краска);
   background:repeating-linear-gradient(90deg,var(--поле) 0 1px,transparent 1px 4px)}
@@ -136,7 +136,7 @@ input[type=range]::-webkit-slider-thumb{
 .pastiglie{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 28px}
 .pastiglia{
   border:1px solid var(--краска);background:none;cursor:pointer;padding:5px 12px;
-  font:inherit;font-family:'Playfair Display',serif;font-size:13.5px;
+  font:inherit;font-family:'Playfair Display',serif;font-size:max(calc(13.5px*var(--кегль)),var(--пол));
   letter-spacing:.1em;text-transform:uppercase;color:var(--краска-слабо);
 }
 .pastiglia[aria-pressed=true]{color:var(--бумага);
@@ -149,7 +149,7 @@ input[type=range]::-webkit-slider-thumb{
 .opzione{
   display:flex;gap:14px;align-items:baseline;width:100%;text-align:left;
   border:0;border-bottom:1px solid var(--поле);background:none;cursor:pointer;
-  padding:9px 4px;font:inherit;font-size:16px;color:var(--краска);
+  padding:9px 4px;font:inherit;font-size:max(calc(16px*var(--кегль)),var(--пол));color:var(--краска);
 }
 .opzione:last-child{border-bottom:0}
 .opzione .lettera{font-family:'Playfair Display',serif;font-weight:700;color:var(--краска-слабо)}
@@ -162,7 +162,7 @@ input[type=range]::-webkit-slider-thumb{
 .azioni{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .bottone{
   border:1.5px solid var(--краска);background:none;cursor:pointer;
-  font-family:'Playfair Display',serif;font-size:14px;letter-spacing:.18em;text-transform:uppercase;
+  font-family:'Playfair Display',serif;font-size:max(calc(14px*var(--кегль)),var(--пол));letter-spacing:.18em;text-transform:uppercase;
   color:var(--краска);padding:11px 24px;
   box-shadow:
     calc(var(--luce-dx,0) * -3px) calc(var(--luce-dy,0) * 3px + 2px) 0 -0.5px var(--поле),
@@ -174,7 +174,28 @@ input[type=range]::-webkit-slider-thumb{
   background:repeating-linear-gradient(45deg,var(--краска) 0 3px,rgba(35,31,28,.78) 3px 6px);
 }
 .bottone:active{transform:translateY(2px);box-shadow:none}
-.legenda{font-family:'Playfair Display',serif;font-style:italic;font-size:14px;color:var(--краска-слабо)}
+.legenda{font-family:'Playfair Display',serif;font-style:italic;font-size:max(calc(14px*var(--кегль)),var(--пол));color:var(--краска-слабо)}
+
+/* ── ТЕЛЕФОН ──────────────────────────────────────────────────
+   У кегля появляется пол: подпись в 9 px становится 15 px, а
+   крупное растёт всего на десятую — иначе в ладони страница
+   превращается в серую полосу. Схемы не ужимаются до нечитаемого,
+   а уезжают вбок под палец; кнопке дают 44 px, чтобы попасть в
+   неё в поезде. */
+@media (max-width:640px){
+  :root{--кегль:1.12;--пол:15px}
+  main{padding-left:16px;padding-right:16px}
+  /* Схема не ужимается до нечитаемого, а уезжает вбок в своей рамке:
+     подписи в ней набраны под настольный размер, поэтому дешевле возить
+     её пальцем, чем пытаться прочесть восьмипиксельную ось. Рамкой
+     работает тот элемент, в котором схема лежит, — у графика это не
+     figure, поэтому берём его через :has(). */
+  figure, *:has(> svg.schema), *:has(> svg.grafico), pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+  svg.schema, svg.grafico{min-width:min(820px,200vw)}
+  button{min-height:44px}
+}
 </style>
 </head>
 <body>

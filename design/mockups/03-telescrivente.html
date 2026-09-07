@@ -15,7 +15,7 @@
    и прокрашены неодинаково. Перфолента слева — это оглавление: дырки
    пробиты там, где уровень пройден. */
 
-:root{
+:root{--кегль:1;--пол:0px;
   --рулон:#efe7d6;
   --лента:#2a2622;
   --лента-слабо:#6b6459;
@@ -27,7 +27,7 @@
 html,body{height:100%}
 body{
   margin:0;color:var(--лента);
-  font-family:'PT Mono',monospace;font-size:15px;line-height:22px;
+  font-family:'PT Mono',monospace;font-size:max(calc(15px*var(--кегль)),var(--пол));line-height:22px;
   -webkit-font-smoothing:antialiased;
 }
 canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
@@ -52,7 +52,7 @@ main{max-width:74ch;margin:0 auto;padding:26px 26px 90px 78px}
 .intestazione{
   border-top:2px solid var(--лента);border-bottom:1px solid var(--лента);
   padding:6px 0 5px;margin-bottom:26px;display:flex;gap:16px;flex-wrap:wrap;
-  font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;
+  font-size:max(calc(12.5px*var(--кегль)),var(--пол));letter-spacing:.06em;text-transform:uppercase;
 }
 .intestazione b{font-weight:400;color:var(--лента-слабо)}
 .intestazione .fine{margin-left:auto}
@@ -63,33 +63,33 @@ h1{
   text-transform:uppercase;text-wrap:balance;
 }
 h1 mark{background:none;color:var(--красная)}
-.sotto{margin:0 0 26px;color:var(--лента-слабо);font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.sotto{margin:0 0 26px;color:var(--лента-слабо);font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase}
 p{margin:0 0 22px;max-width:70ch}
 
 /* Правка на полях: карандаш поверх машинописи. */
 .correzione{
-  font-family:'Caveat',cursive;font-size:21px;line-height:1.15;color:var(--красная);
+  font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));line-height:1.15;color:var(--красная);
   margin:-8px 0 22px;transform:rotate(-.5deg);
 }
 
 /* ── схема: набрана знаками, как на телетайпе ──────────────── */
 .schema-testo{
-  white-space:pre;overflow-x:auto;font-size:13.5px;line-height:19px;
+  white-space:pre;overflow-x:auto;font-size:max(calc(13.5px*var(--кегль)),var(--пол));line-height:19px;
   color:var(--лента);margin:0 0 8px;
 }
 .schema-testo b{font-weight:400;color:var(--красная)}
-figcaption{margin:0 0 26px;font-size:12px;color:var(--лента-слабо);letter-spacing:.08em;text-transform:uppercase}
+figcaption{margin:0 0 26px;font-size:max(calc(12px*var(--кегль)),var(--пол));color:var(--лента-слабо);letter-spacing:.08em;text-transform:uppercase}
 
 /* ── прибор: сводка, отбитая по знакоместам ────────────────── */
 .strumento{
   border-top:1px solid var(--лента);border-bottom:2px solid var(--лента);
   padding:14px 0 16px;margin:0 0 26px;
 }
-.titolo-strumento{margin:0 0 2px;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
-.suggerimento{margin:0 0 14px;font-size:13px;color:var(--лента-слабо)}
+.titolo-strumento{margin:0 0 2px;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase}
+.suggerimento{margin:0 0 14px;font-size:max(calc(13px*var(--кегль)),var(--пол));color:var(--лента-слабо)}
 .grafico{display:block;width:100%;height:auto;margin-bottom:10px}
 
-.quadranti{display:grid;gap:0;margin-bottom:14px;font-size:13.5px}
+.quadranti{display:grid;gap:0;margin-bottom:14px;font-size:max(calc(13.5px*var(--кегль)),var(--пол))}
 .quadrante{display:flex;gap:8px;align-items:baseline}
 .quadrante b{font-weight:400;color:var(--лента-слабо)}
 /* Точечная линия ведёт от подписи к числу — как в накладной. */
@@ -98,7 +98,7 @@ figcaption{margin:0 0 26px;font-size:12px;color:var(--лента-слабо);let
 .quadrante.male span{color:var(--красная)}
 
 .manopole{display:grid;gap:8px}
-.manopola{display:grid;grid-template-columns:16ch 1fr 7ch;gap:10px;align-items:center;font-size:13px}
+.manopola{display:grid;grid-template-columns:16ch 1fr 7ch;gap:10px;align-items:center;font-size:max(calc(13px*var(--кегль)),var(--пол))}
 .manopola label{color:var(--лента-слабо)}
 .manopola output{text-align:right;font-variant-numeric:tabular-nums}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:ew-resize}
@@ -112,7 +112,7 @@ input[type=range]::-webkit-slider-thumb{
 .pastiglie{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
 .pastiglia{
   border:1px solid var(--штрих);background:none;cursor:pointer;padding:5px 11px;
-  font:inherit;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--лента-слабо);
+  font:inherit;font-size:max(calc(12.5px*var(--кегль)),var(--пол));letter-spacing:.05em;text-transform:uppercase;color:var(--лента-слабо);
   border-radius:2px;
   box-shadow:calc(var(--luce-dx,0) * -2px) calc(var(--luce-dy,0) * 2px + 1.5px) 0 var(--штрих);
 }
@@ -123,7 +123,7 @@ input[type=range]::-webkit-slider-thumb{
 .opzioni{display:grid;gap:0;margin:0 0 26px;padding:0}
 .opzione{
   display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;
-  border:0;background:none;cursor:pointer;padding:5px 0;font:inherit;font-size:14.5px;color:var(--лента);
+  border:0;background:none;cursor:pointer;padding:5px 0;font:inherit;font-size:max(calc(14.5px*var(--кегль)),var(--пол));color:var(--лента);
 }
 .opzione .lettera{color:var(--лента-слабо)}
 .opzione[aria-checked=true] .lettera{color:var(--красная)}
@@ -135,14 +135,35 @@ input[type=range]::-webkit-slider-thumb{
 .azioni{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .bottone{
   border:1px solid var(--лента);background:var(--рулон);cursor:pointer;
-  font:inherit;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--лента);
+  font:inherit;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase;color:var(--лента);
   padding:10px 20px;border-radius:2px;
   box-shadow:calc(var(--luce-dx,0) * -3px) calc(var(--luce-dy,0) * 3px + 2.5px) 0 var(--лента-слабо);
   transform:translateY(calc(var(--premuto,0) * 1.6px));
 }
 .bottone--pieno{background:var(--лента);color:var(--рулон)}
 .bottone:active{transform:translateY(2.5px);box-shadow:none}
-.legenda{font-size:12px;color:var(--лента-слабо);text-transform:uppercase;letter-spacing:.08em}
+.legenda{font-size:max(calc(12px*var(--кегль)),var(--пол));color:var(--лента-слабо);text-transform:uppercase;letter-spacing:.08em}
+
+/* ── ТЕЛЕФОН ──────────────────────────────────────────────────
+   У кегля появляется пол: подпись в 9 px становится 15 px, а
+   крупное растёт всего на десятую — иначе в ладони страница
+   превращается в серую полосу. Схемы не ужимаются до нечитаемого,
+   а уезжают вбок под палец; кнопке дают 44 px, чтобы попасть в
+   неё в поезде. */
+@media (max-width:640px){
+  :root{--кегль:1.12;--пол:15px}
+  main{padding-left:16px;padding-right:16px}
+  /* Схема не ужимается до нечитаемого, а уезжает вбок в своей рамке:
+     подписи в ней набраны под настольный размер, поэтому дешевле возить
+     её пальцем, чем пытаться прочесть восьмипиксельную ось. Рамкой
+     работает тот элемент, в котором схема лежит, — у графика это не
+     figure, поэтому берём его через :has(). */
+  figure, *:has(> svg.schema), *:has(> svg.grafico), pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+  svg.schema, svg.grafico{min-width:min(820px,200vw)}
+  button{min-height:44px}
+}
 </style>
 </head>
 <body>
