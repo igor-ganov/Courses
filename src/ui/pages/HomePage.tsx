@@ -82,7 +82,7 @@ export function HomePage() {
 
       <section>
         <h2>Курсы</h2>
-        <div className="grid">
+        <div className="grid grid--courses">
           {graph.courses.map((course) => {
             const path = graph.spiralPath(course.id);
             const doneCount = path.filter((key) => completed.has(key)).length;

@@ -280,6 +280,12 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 }
 
+/* A catalogue of two or three courses should not look like a row of stubs:
+   let each card grow, but not past a comfortable reading width. */
+.grid--courses {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 560px));
+}
+
 /* ------------------------------------------------------------ lecture body */
 
 .lecture {
