@@ -110,7 +110,16 @@
 
   /* Затухающая пружина: у материала есть масса, поэтому свет догоняет
      курсор, а вмятина возвращается не мгновенно. */
+  var calm =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   function step(s, target, dt, k, c) {
+    if (calm) {
+      s.x = target;
+      s.v = 0;
+      return s;
+    }
     var remaining = Math.min(dt, 0.25);
     while (remaining > 0) {
       var h = Math.min(1 / 240, remaining);
@@ -234,6 +243,19 @@
       root.setProperty('--luce-dy', (0.5 - sy.x).toFixed(4));
       root.setProperty('--premuto', sp.x.toFixed(4));
     }
+
+    /* Смена сорта бумаги: лампа та же, лист другой. */
+    window.materia = {
+      setStock: function (stock) {
+        paper = rgb(stock.carta, 'f3ece0');
+        shade = rgb(stock.ombra, '8f8474');
+        light = rgb(stock.luce, 'fff6e2');
+        relief = parseFloat(stock.rilievo || relief);
+        fibre = parseFloat(stock.fibra || fibre);
+        warm = parseFloat(stock.calore || warm);
+        draw();
+      },
+    };
 
     window.addEventListener(
       'pointermove',
