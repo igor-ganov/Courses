@@ -13,6 +13,7 @@ import { textBlocks } from './text';
 import { learningBlocks } from './learning';
 import { controlLoopLabBlock } from '@/widgets/ControlLoopLab';
 import { feedbackDiagramBlock } from '@/widgets/FeedbackDiagram';
+import { phasePlaneBlock } from '@/widgets/PhasePlane';
 import { loopBuilderBlock } from '@/widgets/LoopBuilder';
 import { blackBoxBlock, requisiteVarietyBlock, varietyExplosionBlock } from '@/widgets/AshbyWidgets';
 import { channelLabBlock, entropyLabBlock } from '@/widgets/InformationWidgets';
@@ -22,6 +23,7 @@ import { threeBlocks } from '@/widgets/three';
 export const interactiveBlocks: readonly BlockDefinition<any>[] = [
   controlLoopLabBlock,
   feedbackDiagramBlock,
+  phasePlaneBlock,
   loopBuilderBlock,
   requisiteVarietyBlock,
   blackBoxBlock,

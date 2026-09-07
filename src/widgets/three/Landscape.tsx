@@ -4,8 +4,9 @@
  * "Equilibrium", "basin of attraction" and "a disturbance large enough to change
  * the regime" are three of the hardest words in the course, and all three become
  * obvious the moment they are a surface with valleys and a ball rolling on it.
- * Drag the ball, release it, watch where it settles; deepen one valley and watch
- * the boundary between basins move. Resilience stops being a metaphor.
+ * Release the ball from different points and watch where it settles; deepen or
+ * flatten a valley and watch the boundary between basins move. Resilience stops
+ * being a metaphor and becomes the depth of a hole you can see.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';

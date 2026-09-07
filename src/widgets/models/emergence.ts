@@ -137,13 +137,6 @@ export function toggleCell(grid: Grid, x: number, y: number): Grid {
   return next;
 }
 
-export function setCell(grid: Grid, x: number, y: number, value: 0 | 1): Grid {
-  if (x < 0 || y < 0 || x >= grid.w || y >= grid.h) return grid;
-  const next: Grid = { w: grid.w, h: grid.h, cells: Uint8Array.from(grid.cells) };
-  next.cells[y * grid.w + x] = value;
-  return next;
-}
-
 export interface LifePattern {
   id: string;
   title: string;
