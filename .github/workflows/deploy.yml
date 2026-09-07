@@ -2,7 +2,9 @@ name: CI и публикация на GitHub Pages
 
 on:
   push:
-    branches: [main]
+    # The repository has no default branch yet, so the feature branch publishes
+    # too. Once it is merged, `main` becomes the only source that matters.
+    branches: [main, claude/cybernetics-interactive-platform-j5tbo7]
   pull_request:
   workflow_dispatch:
 
@@ -45,7 +47,7 @@ jobs:
   deploy:
     name: Публикация
     needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
