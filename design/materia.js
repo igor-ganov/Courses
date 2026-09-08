@@ -13,11 +13,22 @@
  *   — Затенение складок берётся из самого поля высот, а не рисуется.
  *
  * Курсор здесь одновременно лампа и палец: он подсвечивает лист вблизи и
- * продавливает его. Прогиб не рисуется тенью — он смещает сами пиксели
- * страницы через feDisplacementMap, поэтому едут буквы, линейки и клетка.
- * Поле прогиба общее у шейдера и у карты смещения, так что свет и текст
- * гнутся согласованно: нормаль считается уже от продавленной высоты, и блик
- * сам огибает провал. В этом весь смысл затеи.
+ * продавливает его.
+ *
+ * КАК ГНЁТСЯ БУМАГА. Она нерастяжима: растянуть лист примерно в (L/h)² ≈ 10⁵
+ * раз дороже, чем согнуть, а изгиб сохраняет гауссову кривизну — у плоского
+ * листа она нулевая, значит и после нажатия нулевая всюду. Ямок и чаш бумага
+ * не делает: для них нужна двойная кривизна, то есть растяжение. Получается
+ * развёртывающийся конус, z(ρ,θ) = ρ·ψ(θ): вдоль каждого луча из точки
+ * касания лист прямой, вся кривизна поперёк лучей, а сектор шириной 139°
+ * отходит от опоры. На границах сектора ψ ломается — оттуда рёбра, на
+ * которых ломается свет, и они-то и видны.
+ *
+ * Прогиб не рисуется тенью: то же поле смещает сами пиксели страницы через
+ * feDisplacementMap, поэтому едут буквы, линейки и клетка. Свет и текст
+ * гнутся согласованно, потому что поле у них одно.
+ *
+ * Схемы, числа и источники — /geometria.html и /tocchi.html.
  *
  * РАЗДЕЛЕНИЕ ПО ЧАСТОТАМ — из-за него всё это едет на телефоне.
  * Свет отвечает только на медленное коробление листа: его и считает шейдер,
@@ -44,6 +55,7 @@
     'uniform float uScorrimento;\n' +
     'uniform vec3 uPaper; uniform vec3 uShade; uniform vec3 uLight;\n' +
     'uniform float uRelief; uniform float uWarm;\n' +
+    'uniform float uAsse; uniform float uRaggio; uniform float uAffondo; uniform float uPiega;\n' +
     'out vec4 fragColor;\n' +
     'float hash(vec2 p){ p = fract(p*vec2(443.897,441.423)); p += dot(p,p.yx+19.19); return fract((p.x+p.y)*p.x); }\n' +
     'float vnoise(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.-2.*f);\n' +
@@ -51,22 +63,41 @@
     // Коробление от рук — единственное, что здесь отвечает на движение лампы.
     'float sheet(vec2 p){ float s=0., a=.5; p*=5.5;\n' +
     '  for(int i=0;i<3;i++){ s+=a*vnoise(p); p*=2.03; a*=.5; } return s*.26; }\n' +
-    // Прогиб. Не ямка в идеальном круге: лист под пальцем ведёт себя как
-    // защемлённая по краям пластина — просаживается на всю ширину и спадает
-    // к краям. Вдоль волокон бумага жёстче, поэтому пятно вытянуто, а линия
-    // схода рваная: радиус гуляет по углу. То же поле печатается в
-    // design/piega.png и смещает им саму страницу, поэтому свет и буквы
-    // гнутся заодно.
-    'float piega(vec2 p, vec2 c, float amt, float raggio){\n' +
-    '  if (amt < .001) return 0.;\n' +
-    '  vec2 d = (p-c)/raggio; d.y *= 1.34;\n' +
-    '  float r = length(d); if (r > 1.4) return 0.;\n' +
-    '  float a = atan(d.y, d.x);\n' +
-    '  float R = .72 + .42*vnoise(vec2(cos(a)*2.4+9., sin(a)*2.4+4.));\n' +
-    '  float t = clamp(1.-r/R, 0., 1.);\n' +
-    '  float w = t*t*(3.-2.*t) * (.82 + .34*vnoise(d*3.6 + vec2(21.,13.)));\n' +
-    '  return -amt*w*.19; }\n' +
-    'float surf(vec2 p, vec2 c, float amt, float raggio){ return sheet(p) + piega(p,c,amt,raggio); }\n' +
+    // ── КОНУС ────────────────────────────────────────────────────────
+    // Бумага нерастяжима, поэтому под пальцем она складывается в
+    // развёртывающийся конус: z(ρ,θ) = ρ·ψ(θ). Вдоль каждого луча из точки
+    // касания лист ПРЯМОЙ, вся кривизна поперёк лучей. Сектор шириной 139°
+    // отходит от опоры, и на его границах ψ ломается — оттуда рёбра, на
+    // которых ломается свет. Ямки с двойной кривизной у бумаги не бывает:
+    // для неё нужно растяжение, а оно на пять порядков дороже изгиба.
+    // Подробности и источники — /geometria.html.
+    'const float SETT = 2.42601;\n' +
+    'const float KLIFT = 1.15;\n' +
+    // Косинус, а не его квадрат: на границе сектора нужен излом, иначе
+    // ребра не будет.
+    // У границы лист держат — деформация туда не доходит.
+    'float tenuta(float t){ return 1. - smoothstep(1., 1.35, t); }\n' +
+    // Ядро: у вершины точного конуса кривизна расходится, поэтому там
+    // бумага тянется и форма скругляется. R_c ~ h^⅓R^⅔ — примерно
+    // десятая часть радиуса. Заодно это снимает алиасинг в вершине.
+    'float nucleo(float t){ return smoothstep(0., .12, t); }\n' +
+    // Высота и наклон одним заходом: atan и приведение угла стоят дороже
+    // всего остального, а нужны они обоим.
+    'vec3 cono(vec2 p, vec2 c, float amt, float raggio){\n' +
+    '  if (amt < .001) return vec3(0.);\n' +
+    '  vec2 d = p - c; float rho = max(length(d), 1e-4);\n' +
+    '  float t = rho/raggio; if (t > 1.35) return vec3(0.);\n' +
+    '  float a = atan(d.y,d.x) - uAsse;\n' +
+    '  a = mod(a + 3.14159265, 6.2831853) - 3.14159265;\n' +
+    '  float dentro = step(abs(a), SETT*.5);\n' +
+    '  float w = 3.14159265*a/SETT;\n' +
+    '  float pa = 1. + KLIFT*cos(w)*dentro;\n' +
+    '  float pd = -KLIFT*(3.14159265/SETT)*sin(w)*dentro;\n' +
+    '  float psi0 = amt*uAffondo;\n' +
+    '  float g = tenuta(t)*nucleo(t);\n' +
+    '  vec2 rad = d/rho; vec2 tng = vec2(-rad.y, rad.x);\n' +
+    '  vec2 grad = (rad*psi0*pa + tng*psi0*pd)*g;\n' +
+    '  return vec3(psi0*(rho*pa - raggio)*tenuta(t), grad); }\n' +
     'float orenNayar(vec3 n, vec3 l, vec3 v, float r){\n' +
     '  float nl=dot(n,l), nv=dot(n,v); if(nl<=0.) return 0.;\n' +
     '  float s2=r*r; float A=1.-.5*(s2/(s2+.33)); float B=.45*(s2/(s2+.09));\n' +
@@ -82,14 +113,14 @@
     // только экран, но выборку сдвигаем на прокрутку — коробление, волокна
     // и зерно оказываются приклеены к странице, а не к окну.
     '  vec2 p = vec2(uv.x*asp, uv.y + uScorrimento); vec2 ptr = vec2(uPointer.x*asp, uPointer.y + uScorrimento);\n' +
-    // Разность вперёд, а не центральная: три выборки поля вместо пяти,
-    // на гладком короблении разницы не видно.
-    '  float raggio = .95*asp;\n' +
-    '  float h = surf(p, ptr, uPress, raggio);\n' +
+    // Коробление даёт нормаль разностью вперёд — три выборки вместо пяти,
+    // на гладком поле разницы не видно. Конус приходит готовым наклоном.
+    '  float h = sheet(p);\n' +
     '  float e = 1.6/uRes.y;\n' +
-    '  float hx = surf(p+vec2(e,0.),ptr,uPress,raggio) - h;\n' +
-    '  float hy = surf(p+vec2(0.,e),ptr,uPress,raggio) - h;\n' +
-    '  vec3 n = normalize(vec3(-hx*uRelief*2., -hy*uRelief*2., 1.));\n' +
+    '  float hx = sheet(p+vec2(e,0.)) - h;\n' +
+    '  float hy = sheet(p+vec2(0.,e)) - h;\n' +
+    '  vec3 cn = cono(p, ptr, uPress, uRaggio); float hc = cn.x; vec2 gc = cn.yz;\n' +
+    '  vec3 n = normalize(vec3(-(hx*uRelief*2.+gc.x*uPiega), -(hy*uRelief*2.+gc.y*uPiega), 1.));\n' +
     '  vec3 view = vec3(0.,0.,1.);\n' +
     '  vec3 key = normalize(vec3(-.42,.55,.72));\n' +
     '  vec3 toP = vec3(ptr-p, .30); float dP = length(toP); vec3 dirP = toP/max(dP,1e-4);\n' +
@@ -97,7 +128,7 @@
     '  float rough = .86;\n' +
     '  float lit = orenNayar(n,key,view,rough)*.72 + orenNayar(n,dirP,view,rough)*fall*.85;\n' +
     '  float through = pow(max(0.,(dot(n,key)+.55)/1.55), 2.2)*.30;\n' +
-    '  float ao = clamp(.80 + h*.55 + piega(p,ptr,uPress,raggio)*1.5, .45, 1.10);\n' +
+    '  float ao = clamp(.80 + h*.55 + hc*1.6, .45, 1.10);\n' +
     '  float sheen = ggx(n,key,view,.55)*.030 + ggx(n,dirP,view,.45)*.045*fall;\n' +
     '  float expo = .93 + (lit-.55)*.42 + through*.30;\n' +
     '  expo *= mix(1., ao, .45);\n' +
@@ -137,29 +168,116 @@
   var src = document.currentScript && document.currentScript.src;
   var БАЗА = src ? src.slice(0, src.lastIndexOf('/') + 1) : '';
   var GRANA = БАЗА + 'grana.png';
-  var MAPPA = БАЗА + 'piega.png';
 
   /* ── ПРОГИБ ───────────────────────────────────────────────────────
      Страница гнётся по-настоящему: feDisplacementMap смещает уже
-     нарисованные пиксели — буквы, линейки, клетку, зерно, — а не рисует
-     тень под ними. Вектор смещения берётся из design/piega.png, из того же
-     поля, по которому шейдер считает свет, поэтому блик и текст едут
-     согласованно.
+     нарисованные пиксели — буквы, линейки, клетку, — а не рисует тень под
+     ними. Поле то же, по которому шейдер считает свет, поэтому блик и текст
+     гнутся согласованно.
+
+     Карта не испечена на сборке, а считается под каждое нажатие: масштаб
+     конуса задаёт расстояние до ближайшего края, сектор разворачивается
+     туда, где листу есть куда уйти. Нажатие у края и нажатие посередине —
+     разные деформации, одной картинкой их не покрыть.
+
+     Смещение чисто радиальное: бумага нерастяжима, поэтому точка, лежавшая
+     в ρ от вершины, остаётся в ρ от неё — но вдоль наклонённой генератрисы,
+     и сверху это ρ·cos φ(θ). Поперёк луча не смещается ничего.
 
      feFlood под картой обязателен: за её пределами каналы были бы нулевыми,
      то есть смещением на половину масштаба, и вся остальная страница поехала
-     бы вбок. Серый 128 — это ноль.
+     бы вбок. Серый 128 — это ноль. Область фильтра держится в пределах
+     экрана, иначе браузер растрирует под фильтр весь лист во всю длину. */
 
-     Область фильтра задаётся вручную и держится в пределах экрана: иначе
-     браузер растрирует под фильтр весь лист во всю длину документа, и первый
-     кадр нажатия спотыкается на этом. За пределами области фильтр обрезает,
-     но там всё равно то, что за краем окна. */
+  var SETTORE = (139 * Math.PI) / 180;
+  var KLIFT = 1.15;
+  /* Глубина под пальцем постоянна — палец жмёт одинаково, — а вот ψ = Δ/R
+     зависит от того, где нажали: у края конус вчетверо круче, чем посреди
+     страницы. Тридцать пикселей — это уже щедро: в настоящей бумаге при
+     таком радиусе смещение печати было бы долей пикселя, и видно было бы
+     только светотень. */
+  var ГЛУБИНА = 30;
+
+  function psiA(a) {
+    var t = ((((a + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
+    if (Math.abs(t) > SETTORE / 2) return 1;
+    return 1 + KLIFT * Math.cos((Math.PI * t) / SETTORE);
+  }
+
+  function tenuta(t) {
+    if (t <= 1) return 1;
+    if (t >= 1.35) return 0;
+    var u = (t - 1) / 0.35;
+    return 1 - u * u * (3 - 2 * u);
+  }
+
+  /* Лист держат боковые края окна; верх и низ свободны — там страница
+     продолжается прокруткой. Отсюда масштаб конуса и разворот сектора. */
+  function opora(x, y, w, h) {
+    var R = Math.max(Math.min(x, w - x), 24);
+    var su = Math.max(y, 1);
+    var giu = Math.max(h - y, 1);
+    var asse = 1 / (giu * giu) >= 1 / (su * su) ? Math.PI / 2 : -Math.PI / 2;
+    return { R: R, asse: asse };
+  }
+
+  /* Карта смещения под конкретное нажатие. 64×64 хватает: поле гладкое,
+     а рёбра всё равно рисует свет, а не сдвиг пикселей. */
+  var СЕТКА = 48;
+  var холст = null;
+  /* Поле зависит только от радиуса и разворота сектора, поэтому радиус
+     округляется до четверти сотни пикселей и карты переиспользуются:
+     пересчёт стоит несколько миллисекунд, а нажатий много. */
+  var кэш = {};
+
+  function mappaCono(R, asse, psi0) {
+    var ключ = Math.round(R / 24) + ':' + (asse > 0 ? 'g' : 's');
+    if (кэш[ключ]) return кэш[ключ];
+    if (!холст) {
+      холст = document.createElement('canvas');
+      холст.width = СЕТКА;
+      холст.height = СЕТКА;
+    }
+    var ctx = холст.getContext('2d');
+    var img = ctx.createImageData(СЕТКА, СЕТКА);
+    var L = R * 1.35;
+    var поле = new Float32Array(СЕТКА * СЕТКА * 2);
+    var пик = 1e-6;
+    for (var j = 0; j < СЕТКА; j++) {
+      for (var i = 0; i < СЕТКА; i++) {
+        var dx = (((i + 0.5) / СЕТКА) * 2 - 1) * L;
+        var dy = (((j + 0.5) / СЕТКА) * 2 - 1) * L;
+        var rho = Math.sqrt(dx * dx + dy * dy);
+        var o = (j * СЕТКА + i) * 2;
+        if (rho > 1e-3) {
+          var psi = psi0 * psiA(Math.atan2(dy, dx) - asse);
+          // Печать съезжает к вершине на ρ(1−cos φ). Карта читается наоборот
+          // — пиксель берётся со сдвигом, — поэтому пишем вектор наружу.
+          var k = (1 - Math.cos(Math.atan(psi))) * tenuta(rho / R);
+          поле[o] = dx * k;
+          поле[o + 1] = dy * k;
+          пик = Math.max(пик, Math.abs(поле[o]), Math.abs(поле[o + 1]));
+        }
+      }
+    }
+    for (var q = 0; q < СЕТКА * СЕТКА; q++) {
+      var b = q * 4;
+      img.data[b] = Math.round(128 + (127 * поле[q * 2]) / пик);
+      img.data[b + 1] = Math.round(128 + (127 * поле[q * 2 + 1]) / пик);
+      img.data[b + 2] = 128;
+      img.data[b + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    кэш[ключ] = { url: холст.toDataURL('image/png'), пик: пик, сторона: 2 * L };
+    return кэш[ключ];
+  }
+
   function filtro(id) {
     return (
       '<filter id="' + id + '" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" ' +
       'x="0" y="0" width="0" height="0" color-interpolation-filters="sRGB">' +
       '<feFlood flood-color="#808080" result="zero"/>' +
-      '<feImage href="' + MAPPA + '" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="mappa"/>' +
+      '<feImage x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="mappa"/>' +
       '<feMerge result="campo"><feMergeNode in="zero"/><feMergeNode in="mappa"/></feMerge>' +
       '<feDisplacementMap in="SourceGraphic" in2="campo" scale="0" ' +
       'xChannelSelector="R" yChannelSelector="G"/>' +
@@ -280,10 +398,9 @@
     var relief = parseFloat(d.rilievo || '11');
     var fibre = parseFloat(d.fibra || '0.055');
     var warm = parseFloat(d.calore || '0.06');
-
-    // Карту прогиба греем заранее: иначе первый же кадр нажатия ждёт,
-    // пока картинка раскодируется, и спотыкается.
-    new Image().src = MAPPA;
+    // Насколько наклон конуса разворачивает нормаль: коробление приходит
+    // разностью высот, конус — готовым наклоном, их надо привести к одному.
+    var piegaLuce = parseFloat(d.piega || '0.28');
 
     /* Печатная подложка — клетка, сетка синьки, лента телетайпа — часть листа
        и едет с текстом. Но растягивать её на всю длину документа нельзя:
@@ -301,7 +418,7 @@
 
     var u = {};
     ['uRes', 'uPointer', 'uPress', 'uPresence', 'uPaper', 'uShade', 'uLight', 'uRelief', 'uWarm',
-      'uScorrimento'].forEach(
+      'uScorrimento', 'uAsse', 'uRaggio', 'uAffondo', 'uPiega'].forEach(
       function (name) {
         u[name] = gl.getUniformLocation(prog, name);
       },
@@ -320,6 +437,10 @@
     var scorrimento = 0;
     var pressoX = 0.5;
     var pressoY = 0.5;
+    var raggio = 0.5; // радиус конуса в высотах окна
+    var asse = -Math.PI / 2; // куда развёрнут сектор отрыва
+    var campo = { url: '', пик: 1, сторона: 0 };
+    var affondo = 0.1; // ψ0 = Δ/R — наклон генератрисы в секторе контакта
 
     var scena = parti.scena;
     var foglio = parti.foglio;
@@ -375,17 +496,16 @@
         return;
       }
       var w = window.innerWidth;
-      var lato = w * 1.9;
-      var cx = pressoX * w;
-      var cy = pressoY * window.innerHeight;
       var h = window.innerHeight;
+      var cx = pressoX * w;
+      var cy = pressoY * h;
       regione('piega-foglio', 0, window.scrollY - 40, w, h + 80);
       regione('piega-grana', 0, 0, w, h);
-      posa(mappaFoglio, cx, cy + window.scrollY, lato);
-      posa(mappaGrana, cx, cy, lato);
-      // Масштаб — полный размах смещения: ±0,85% ширины окна на пике.
-      // Больше — и буквы рвутся в клочья, меньше — прогиб не читается.
-      var forza = (2 * 0.012 * w * d).toFixed(2);
+      posa(mappaFoglio, cx, cy + window.scrollY, campo.сторона);
+      posa(mappaGrana, cx, cy, campo.сторона);
+      // Размах — из самого поля: пик смещения в пикселях, умноженный на два,
+      // потому что карта кодирует диапазон ±½ масштаба.
+      var forza = (2 * campo.пик * d).toFixed(2);
       scalaFoglio.setAttribute('scale', forza);
       scalaGrana.setAttribute('scale', forza);
       foglio.style.filter = 'url(#piega-foglio)';
@@ -407,6 +527,10 @@
       gl.uniform1f(u.uRelief, relief);
       gl.uniform1f(u.uWarm, warm);
       gl.uniform1f(u.uScorrimento, scorrimento);
+      gl.uniform1f(u.uAsse, asse);
+      gl.uniform1f(u.uRaggio, raggio);
+      gl.uniform1f(u.uAffondo, affondo);
+      gl.uniform1f(u.uPiega, piegaLuce);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
@@ -509,6 +633,21 @@
         { passive: true },
       );
     }
+    /* Новое касание — новое поле: и масштаб конуса, и разворот сектора
+       зависят от того, где нажали. Считается один раз на нажатие: 64×64
+       выборки и упаковка в PNG — около трёх миллисекунд. */
+    function nuovoCampo() {
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      var op = opora(pressoX * w, pressoY * h, w, h);
+      affondo = ГЛУБИНА / op.R;
+      campo = mappaCono(op.R, op.asse, affondo);
+      mappaFoglio.setAttribute('href', campo.url);
+      mappaGrana.setAttribute('href', campo.url);
+      raggio = op.R / Math.max(h, 1);
+      asse = -op.asse; // в шейдере ось Y смотрит вверх
+    }
+
     function mira(ev) {
       tx = ev.clientX / Math.max(window.innerWidth, 1);
       ty = 1 - ev.clientY / Math.max(window.innerHeight, 1);
@@ -527,6 +666,7 @@
       function (ev) {
         giu = { x: ev.clientX, y: ev.clientY, t: performance.now() };
         mira(ev);
+        nuovoCampo();
         if (!coarse) pressed = true;
         wake();
       },
@@ -545,6 +685,7 @@
         giu = null;
         if (tocco) {
           mira(ev);
+          nuovoCampo();
           pressed = true;
           setTimeout(function () { pressed = false; wake(); }, 90);
         }
@@ -584,6 +725,7 @@
     rileggi();
     resize();
     scorri();
+    nuovoCampo();
   }
 
   function appenaLibero(fn) {
