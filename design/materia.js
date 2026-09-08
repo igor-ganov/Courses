@@ -197,6 +197,12 @@
      таком радиусе смещение печати было бы долей пикселя, и видно было бы
      только светотень. */
   var ГЛУБИНА = 30;
+  /* Но ψ = Δ/R нельзя отпускать на волю: у края R маленькое, и получается
+     наклон в тридцать градусов — в лист шириной в ладонь вдавлено три
+     сантиметра. У настоящей бумаги ψ порядка 0,05; держим в этих пределах,
+     иначе печать не гнётся, а рвётся. */
+  var ПОЛОГО = 0.03;
+  var КРУТО = 0.16;
 
   function psiA(a) {
     var t = ((((a + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -223,7 +229,7 @@
 
   /* Карта смещения под конкретное нажатие. 64×64 хватает: поле гладкое,
      а рёбра всё равно рисует свет, а не сдвиг пикселей. */
-  var СЕТКА = 48;
+  var СЕТКА = 96;
   var холст = null;
   /* Поле зависит только от радиуса и разворота сектора, поэтому радиус
      округляется до четверти сотни пикселей и карты переиспользуются:
@@ -357,7 +363,12 @@
     var regole = document.createElement('style');
     regole.textContent =
       '.scena{perspective:900px;perspective-origin:var(--presso-x,50%) var(--presso-y,50%)}' +
-      '.foglio{position:relative;min-height:100%;transform-origin:50% 50%}';
+      '.foglio{position:relative;min-height:100%;transform-origin:50% 50%;' +
+      // Долгое нажатие на телефоне — это выделение текста и меню «копировать».
+      // Лист трогают, а не читают буфером обмена, поэтому выделение с него
+      // снимаем: в самой платформе его придётся возвращать точечно — на
+      // цитаты, формулы и код.
+      '-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}';
     document.head.appendChild(regole);
 
     return { scena: scena, foglio: foglio, grana: grana, svg: difese };
@@ -641,7 +652,7 @@
       var w = window.innerWidth;
       var h = window.innerHeight;
       var op = opora(pressoX * w, pressoY * h, w, h);
-      affondo = ГЛУБИНА / op.R;
+      affondo = Math.max(ПОЛОГО, Math.min(КРУТО, ГЛУБИНА / op.R));
       campo = mappaCono(op.R, op.asse, affondo);
       mappaFoglio.setAttribute('href', campo.url);
       mappaGrana.setAttribute('href', campo.url);
@@ -658,37 +669,69 @@
     }
 
     /* На тачскрине нажатие начинается одинаково и для касания, и для
-       прокрутки, поэтому лист гнётся не по нажатию, а по состоявшемуся
-       касанию: палец опустился и поднялся, не уехав. Иначе страница
-       кланялась бы на каждом свайпе. */
+       прокрутки, поэтому лист гнётся не сразу: через сто миллисекунд, если
+       палец не уехал. Тогда и короткий тап, и удержание дают прогиб, а свайп
+       не даёт ничего — иначе страница кланялась бы на каждой прокрутке. */
     var giu = null;
+    var mosso = false;
+    var attesa = null;
+
+    function molla() {
+      if (attesa) clearTimeout(attesa);
+      attesa = null;
+    }
+
     window.addEventListener(
       'pointerdown',
       function (ev) {
         giu = { x: ev.clientX, y: ev.clientY, t: performance.now() };
+        mosso = false;
         mira(ev);
         nuovoCampo();
-        if (!coarse) pressed = true;
+        molla();
+        if (coarse) {
+          attesa = setTimeout(function () {
+            if (!mosso) {
+              pressed = true;
+              wake();
+            }
+          }, 100);
+        } else {
+          pressed = true;
+        }
         wake();
       },
       { passive: true },
     );
+
+    /* Уехал палец — значит это прокрутка, а не нажатие. */
+    window.addEventListener(
+      'pointermove',
+      function (ev) {
+        if (!coarse || !giu || mosso) return;
+        if (Math.abs(ev.clientX - giu.x) < 12 && Math.abs(ev.clientY - giu.y) < 12) return;
+        mosso = true;
+        molla();
+        pressed = false;
+        wake();
+      },
+      { passive: true },
+    );
+
     window.addEventListener(
       'pointerup',
       function (ev) {
-        pressed = false;
-        var tocco =
-          coarse &&
-          giu &&
-          Math.abs(ev.clientX - giu.x) < 12 &&
-          Math.abs(ev.clientY - giu.y) < 12 &&
-          performance.now() - giu.t < 600;
+        molla();
+        // Короткий тап палец отпускает раньше, чем лист успел согнуться, —
+        // тогда прогиб делается импульсом, чтобы касание всё-таки чувствовалось.
+        var tap = coarse && giu && !mosso && !pressed && performance.now() - giu.t < 260;
         giu = null;
-        if (tocco) {
+        if (tap) {
           mira(ev);
-          nuovoCampo();
           pressed = true;
-          setTimeout(function () { pressed = false; wake(); }, 90);
+          setTimeout(function () { pressed = false; wake(); }, 110);
+        } else {
+          pressed = false;
         }
         wake();
       },
@@ -696,7 +739,7 @@
     );
     window.addEventListener(
       'pointercancel',
-      function () { giu = null; pressed = false; wake(); },
+      function () { molla(); giu = null; mosso = true; wake(); },
       { passive: true },
     );
     document.addEventListener('pointerleave', function () { present = 0; pressed = false; wake(); });
