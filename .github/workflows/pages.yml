@@ -25,6 +25,7 @@ jobs:
           cp -r design/fonts design/mockups design/materia.js design/grana.png design/piega.png _site/
           cp design/mostra.html _site/index.html
           cp design/geometria.html _site/geometria.html
+          cp design/tocchi.html _site/tocchi.html
           touch _site/.nojekyll
 
       # Pages здесь классические, из ветки: токен Actions не имеет права
