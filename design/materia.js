@@ -486,11 +486,20 @@
       img.setAttribute('height', lato.toFixed(1));
     }
 
+    /* Фильтр во весь экран — самое дорогое, что здесь есть, а при ведении
+       пальцем он пересчитывается каждый кадр. На тачскрине обновляем его
+       через кадр: отставание в шестнадцать миллисекунд под движущимся
+       пальцем не видно, а стоит это вдвое дешевле. */
+    var кадр = 0;
+
     function piega(finito) {
       var d = sp.x;
+      кадр += 1;
       // Наклон всего листа остаётся: смещение пикселей даёт сам прогиб, а
       // поворот — то, что лист при этом уходит от глаза целиком.
-      foglio.style.transform = finito
+      // Наклон всего листа — мышиная роскошь: на тачскрине он стоит четыре
+      // миллисекунды на кадр, а под ведомым пальцем его не разглядеть.
+      foglio.style.transform = finito || coarse
         ? ''
         : 'translateZ(' + -22 * d + 'px)' +
           'rotateX(' + (0.5 - pressoY) * 2.2 * d + 'deg)' +
@@ -506,6 +515,9 @@
         grana.style.filter = '';
         return;
       }
+      foglio.style.filter = 'url(#piega-foglio)';
+      foglio.style.willChange = 'transform,filter';
+      if (coarse && кадр % 2) return;
       var w = window.innerWidth;
       var h = window.innerHeight;
       var cx = pressoX * w;
@@ -519,11 +531,12 @@
       var forza = (2 * campo.пик * d).toFixed(2);
       scalaFoglio.setAttribute('scale', forza);
       scalaGrana.setAttribute('scale', forza);
-      foglio.style.filter = 'url(#piega-foglio)';
-      foglio.style.willChange = 'transform,filter';
       // Зерно живёт в координатах окна, поэтому у него своя копия фильтра с
-      // той же картой, но поставленной по экрану, а не по документу.
-      grana.style.filter = 'url(#piega-grana)';
+      // той же картой, но поставленной по экрану, а не по документу. На
+      // тачскрине его не гнём: второй фильтр во весь экран стоит столько же,
+      // сколько первый, а ведут прогиб там пальцем — по движущемуся кадру
+      // зерно всё равно не прочесть.
+      if (!coarse) grana.style.filter = 'url(#piega-grana)';
     }
 
     function draw() {
@@ -648,16 +661,21 @@
     /* Новое касание — новое поле: и масштаб конуса, и разворот сектора
        зависят от того, где нажали. Считается один раз на нажатие: 64×64
        выборки и упаковка в PNG — около трёх миллисекунд. */
+    var ключПоля = '';
+
     function nuovoCampo() {
       var w = window.innerWidth;
       var h = window.innerHeight;
       var op = opora(pressoX * w, pressoY * h, w, h);
+      var ключ = Math.round(op.R / 24) + ':' + (op.asse > 0 ? 'g' : 's');
+      raggio = op.R / Math.max(h, 1);
+      asse = -op.asse;
+      if (ключ === ключПоля) return;
+      ключПоля = ключ;
       affondo = Math.max(ПОЛОГО, Math.min(КРУТО, ГЛУБИНА / op.R));
       campo = mappaCono(op.R, op.asse, affondo);
       mappaFoglio.setAttribute('href', campo.url);
       mappaGrana.setAttribute('href', campo.url);
-      raggio = op.R / Math.max(h, 1);
-      asse = -op.asse; // в шейдере ось Y смотрит вверх
     }
 
     function mira(ev) {
@@ -668,81 +686,86 @@
       present = 1;
     }
 
-    /* На тачскрине нажатие начинается одинаково и для касания, и для
-       прокрутки, поэтому лист гнётся не сразу: через сто миллисекунд, если
-       палец не уехал. Тогда и короткий тап, и удержание дают прогиб, а свайп
-       не даёт ничего — иначе страница кланялась бы на каждой прокрутке. */
-    var giu = null;
-    var mosso = false;
-    var attesa = null;
+    /* ── ПАЛЕЦ ────────────────────────────────────────────────────────
+       На тачскрине лист гнётся сразу по касанию и ведёт прогиб за пальцем,
+       в том числе на свайпе. Одна тонкость: как только начинается прокрутка,
+       система забирает указатель себе и шлёт pointercancel — pointer-события
+       после этого не приходят вовсе. А touchmove продолжает идти, поэтому на
+       тачскрине палец слушаем именно им.
 
-    function molla() {
-      if (attesa) clearTimeout(attesa);
-      attesa = null;
+       На мыши всё проще: pointer-события никто не отнимает. */
+
+    var giu = null;
+
+    function tenere(x, y) {
+      mira({ clientX: x, clientY: y });
+      nuovoCampo();
+      pressed = true;
+      wake();
     }
 
-    window.addEventListener(
-      'pointerdown',
-      function (ev) {
-        giu = { x: ev.clientX, y: ev.clientY, t: performance.now() };
-        mosso = false;
-        mira(ev);
-        nuovoCampo();
-        molla();
-        if (coarse) {
-          attesa = setTimeout(function () {
-            if (!mosso) {
-              pressed = true;
-              wake();
-            }
-          }, 100);
-        } else {
-          pressed = true;
-        }
-        wake();
-      },
-      { passive: true },
-    );
+    function lasciare() {
+      giu = null;
+      pressed = false;
+      wake();
+    }
 
-    /* Уехал палец — значит это прокрутка, а не нажатие. */
-    window.addEventListener(
-      'pointermove',
-      function (ev) {
-        if (!coarse || !giu || mosso) return;
-        if (Math.abs(ev.clientX - giu.x) < 12 && Math.abs(ev.clientY - giu.y) < 12) return;
-        mosso = true;
-        molla();
-        pressed = false;
-        wake();
-      },
-      { passive: true },
-    );
-
-    window.addEventListener(
-      'pointerup',
-      function (ev) {
-        molla();
-        // Короткий тап палец отпускает раньше, чем лист успел согнуться, —
-        // тогда прогиб делается импульсом, чтобы касание всё-таки чувствовалось.
-        var tap = coarse && giu && !mosso && !pressed && performance.now() - giu.t < 260;
+    if (coarse) {
+      window.addEventListener(
+        'touchstart',
+        function (ev) {
+          var t = ev.touches[0];
+          if (!t) return;
+          giu = performance.now();
+          tenere(t.clientX, t.clientY);
+        },
+        { passive: true },
+      );
+      window.addEventListener(
+        'touchmove',
+        function (ev) {
+          var t = ev.touches[0];
+          if (!t || giu === null) return;
+          tenere(t.clientX, t.clientY);
+        },
+        { passive: true },
+      );
+      var отпустить = function () {
+        if (giu === null) return;
+        // Совсем короткое касание не успевает согнуть лист: придерживаем
+        // прогиб, чтобы тап чувствовался так же, как удержание.
+        var коротко = performance.now() - giu < 120;
         giu = null;
-        if (tap) {
-          mira(ev);
-          pressed = true;
-          setTimeout(function () { pressed = false; wake(); }, 110);
-        } else {
-          pressed = false;
-        }
-        wake();
-      },
-      { passive: true },
-    );
-    window.addEventListener(
-      'pointercancel',
-      function () { molla(); giu = null; mosso = true; wake(); },
-      { passive: true },
-    );
-    document.addEventListener('pointerleave', function () { present = 0; pressed = false; wake(); });
+        if (коротко) setTimeout(lasciare, 110);
+        else lasciare();
+      };
+      window.addEventListener('touchend', отпустить, { passive: true });
+      window.addEventListener('touchcancel', отпустить, { passive: true });
+    } else {
+      window.addEventListener(
+        'pointermove',
+        function (ev) {
+          tx = ev.clientX / Math.max(window.innerWidth, 1);
+          ty = 1 - ev.clientY / Math.max(window.innerHeight, 1);
+          present = 1;
+          if (pressed) {
+            pressoX = tx;
+            pressoY = ev.clientY / Math.max(window.innerHeight, 1);
+            nuovoCampo();
+          }
+          wake();
+        },
+        { passive: true },
+      );
+      window.addEventListener(
+        'pointerdown',
+        function (ev) { tenere(ev.clientX, ev.clientY); },
+        { passive: true },
+      );
+      window.addEventListener('pointerup', lasciare, { passive: true });
+      document.addEventListener('pointerleave', function () { present = 0; lasciare(); });
+    }
+
     window.addEventListener('resize', resize, { passive: true });
 
     /* Прокрутка не анимируется пружиной: лист приклеен к тексту намертво,
