@@ -48,102 +48,120 @@
     'const vec2 Q[3] = vec2[3](vec2(-1.,-1.), vec2(3.,-1.), vec2(-1.,3.));\n' +
     'void main(){ gl_Position = vec4(Q[gl_VertexID], 0., 1.); }';
 
+  /* Шейдер считает ровно то, что есть в расчёте, и ничего сверх того.
+     Никакого шума «для живости»: у плоского листа под ровным светом ровный
+     тон, и это правда. Тень появляется только там, где лист согнут, и имеет
+     форму конуса — клинья с рёбрами, а не пятно.
+
+     Лампа одна и неподвижная, сверху слева. Шара света, ездящего за
+     пальцем, нет: палец не светится. */
   var FRAG =
     '#version 300 es\n' +
     'precision highp float;\n' +
-    'uniform vec2 uRes; uniform vec2 uPointer; uniform float uPress; uniform float uPresence;\n' +
+    'uniform vec2 uRes; uniform vec2 uPointer; uniform float uPress;\n' +
     'uniform float uScorrimento;\n' +
-    'uniform vec3 uPaper; uniform vec3 uShade; uniform vec3 uLight;\n' +
-    'uniform float uRelief; uniform float uWarm;\n' +
-    'uniform float uAsse; uniform float uRaggio; uniform float uAffondo; uniform float uPiega;\n' +
+    'uniform vec3 uPaper; uniform vec3 uShade;\n' +
+    'uniform float uAsse; uniform float uRaggio; uniform float uProfondo; uniform float uPiega;\n' +
+    'const float PIATTO = .03; const float RIPIDO = .16;\n' +
+    'uniform vec3 uBordi;\n' +
     'out vec4 fragColor;\n' +
-    'float hash(vec2 p){ p = fract(p*vec2(443.897,441.423)); p += dot(p,p.yx+19.19); return fract((p.x+p.y)*p.x); }\n' +
-    'float vnoise(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.-2.*f);\n' +
-    '  return mix(mix(hash(i),hash(i+vec2(1,0)),u.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x), u.y); }\n' +
-    // Коробление от рук — единственное, что здесь отвечает на движение лампы.
-    'float sheet(vec2 p){ float s=0., a=.5; p*=5.5;\n' +
-    '  for(int i=0;i<3;i++){ s+=a*vnoise(p); p*=2.03; a*=.5; } return s*.26; }\n' +
     // ── КОНУС ────────────────────────────────────────────────────────
     // Бумага нерастяжима, поэтому под пальцем она складывается в
     // развёртывающийся конус: z(ρ,θ) = ρ·ψ(θ). Вдоль каждого луча из точки
     // касания лист ПРЯМОЙ, вся кривизна поперёк лучей. Сектор шириной 139°
     // отходит от опоры, и на его границах ψ ломается — оттуда рёбра, на
-    // которых ломается свет. Ямки с двойной кривизной у бумаги не бывает:
-    // для неё нужно растяжение, а оно на пять порядков дороже изгиба.
-    // Подробности и источники — /geometria.html.
+    // которых ломается свет. Подробности и источники — /geometria.html.
     'const float SETT = 2.42601;\n' +
     'const float KLIFT = 1.15;\n' +
-    // Косинус, а не его квадрат: на границе сектора нужен излом, иначе
-    // ребра не будет.
-    // У границы лист держат — деформация туда не доходит.
-    'float tenuta(float t){ return 1. - smoothstep(1., 1.35, t); }\n' +
-    // Ядро: у вершины точного конуса кривизна расходится, поэтому там
-    // бумага тянется и форма скругляется. R_c ~ h^⅓R^⅔ — примерно
-    // десятая часть радиуса. Заодно это снимает алиасинг в вершине.
-    'float nucleo(float t){ return smoothstep(0., .12, t); }\n' +
+    // Докуда идёт деформация вдоль луча. Лист держат боковые поля страницы —
+    // это уходит в uBordi.xy; сверху и снизу края нет вовсе, там страница
+    // продолжается прокруткой, поэтому вдоль полосы прогиб гаснет сам, на
+    // длине порядка ширины листа (uBordi.z). Круглой кромки здесь нет ни в
+    // одном месте: она бы и читалась как шар.
+    'float bordo(vec2 c, vec2 dir){\n' +
+    '  float t = uBordi.z;\n' +
+    '  if (dir.x >  1e-5) t = min(t, (uBordi.y - c.x)/dir.x);\n' +
+    '  else if (dir.x < -1e-5) t = min(t, (uBordi.x - c.x)/dir.x);\n' +
+    '  return max(t, 1e-3); }\n' +
+    // Затухание к краю — гладкое от самой вершины. Если гасить только у самой
+    // границы, на ней вырастает светлое кольцо; (1−t²)² сходит на нет вместе
+    // со своим наклоном, и кольца нет.
+    'float tenuta(float t){ float u = 1. - t*t; return u*u; }\n' +
     // Высота и наклон одним заходом: atan и приведение угла стоят дороже
     // всего остального, а нужны они обоим.
     'vec3 cono(vec2 p, vec2 c, float amt, float raggio){\n' +
     '  if (amt < .001) return vec3(0.);\n' +
     '  vec2 d = p - c; float rho = max(length(d), 1e-4);\n' +
-    '  float t = rho/raggio; if (t > 1.35) return vec3(0.);\n' +
+    '  vec2 rad = d/rho;\n' +
+    '  float b = bordo(c, rad);\n' +
+    '  float t = rho/b; if (t >= 1.) return vec3(0.);\n' +
     '  float a = atan(d.y,d.x) - uAsse;\n' +
     '  a = mod(a + 3.14159265, 6.2831853) - 3.14159265;\n' +
     '  float dentro = step(abs(a), SETT*.5);\n' +
     '  float w = 3.14159265*a/SETT;\n' +
     '  float pa = 1. + KLIFT*cos(w)*dentro;\n' +
     '  float pd = -KLIFT*(3.14159265/SETT)*sin(w)*dentro;\n' +
-    '  float psi0 = amt*uAffondo;\n' +
-    '  float g = tenuta(t)*nucleo(t);\n' +
-    '  vec2 rad = d/rho; vec2 tng = vec2(-rad.y, rad.x);\n' +
-    '  vec2 grad = (rad*psi0*pa + tng*psi0*pd)*g;\n' +
-    '  return vec3(psi0*(rho*pa - raggio)*tenuta(t), grad); }\n' +
+    // ψ = Δ/b, и b своё в каждую сторону: палец продавлен на Δ, а лист
+    // прихвачен там, где кончается. Оттого к близкому краю конус круче, к
+    // далёкому положе — форма перестаёт быть круглой сама, без подгонки.
+    '  float psi0 = amt*clamp(uProfondo/b, PIATTO, RIPIDO);\n' +
+    // Ядро: у вершины точного конуса кривизна расходится, там бумага тянется.
+    // Скругляем сам радиус, а не всё поле: если гасить поле, под пальцем
+    // пропадает и сама ямка — вместо неё получается блестящая пуговица.
+    '  float rc = .12*raggio;\n' +
+    '  float q = sqrt(rho*rho + rc*rc);\n' +
+    '  float rs = rho*rho/q;\n' +
+    '  float drs = rho*(rho*rho + 2.*rc*rc)/(q*q*q);\n' +
+    '  float T = tenuta(t); float dT = -4.*t*(1.-t*t)/b;\n' +
+    // Высота относительно плоского листа: под пальцем −Δ, у края ноль,
+    // а в секторе отрыва (pa>1) лист выходит выше плоскости.
+    '  float f = psi0*rs*pa - amt*uProfondo;\n' +
+    // Наклон вдоль луча — сам конус плюс возврат к плоскости у края; поперёк
+    // луча — излом ψ на границах сектора, оттуда и рёбра.
+    '  float gr = psi0*pa*drs*T + f*dT;\n' +
+    '  float gt = psi0*pd*rs*T/rho;\n' +
+    '  vec2 tng = vec2(-rad.y, rad.x);\n' +
+    '  return vec3(f*T, rad*gr + tng*gt); }\n' +
+    // Орен–Найар вместо Ламберта: бумага шероховатая и не гаснет по косинусу,
+    // как пластик. Именно ламбертова модель делает её похожей на картон.
     'float orenNayar(vec3 n, vec3 l, vec3 v, float r){\n' +
     '  float nl=dot(n,l), nv=dot(n,v); if(nl<=0.) return 0.;\n' +
     '  float s2=r*r; float A=1.-.5*(s2/(s2+.33)); float B=.45*(s2/(s2+.09));\n' +
     '  float al=acos(clamp(nl,-1.,1.)), av=acos(clamp(nv,-1.,1.));\n' +
     '  float alpha=max(al,av), beta=min(al,av);\n' +
-    '  vec3 lp=normalize(l-n*nl), vp=normalize(v-n*nv);\n' +
-    '  return nl*(A + B*max(0.,dot(lp,vp))*sin(alpha)*tan(beta)); }\n' +
+    // У плоского листа взгляд совпадает с нормалью, и проекция вида на
+    // касательную плоскость — нулевой вектор: normalize от него даёт NaN, а
+    // NaN протаскивается до самого цвета и сажает экспозицию на нижний упор.
+    // Ровный лист от этого красился ощутимо темнее согнутого — та самая
+    // «тень на фоне», которой неоткуда было взяться.
+    '  vec3 lp=l-n*nl, vp=v-n*nv; float ll=length(lp), lv=length(vp);\n' +
+    '  float cosfi = (ll>1e-4 && lv>1e-4) ? dot(lp,vp)/(ll*lv) : 0.;\n' +
+    '  return nl*(A + B*max(0.,cosfi)*sin(alpha)*tan(beta)); }\n' +
+    // Слабый широкий GGX — блеск каландрированной бумаги под скользящим углом.
     'float ggx(vec3 n, vec3 l, vec3 v, float r){ vec3 h=normalize(l+v); float a=r*r;\n' +
     '  float nh=max(dot(n,h),0.); float d=(nh*nh)*(a*a-1.)+1.; return (a*a)/(3.14159*d*d+1e-5); }\n' +
     'void main(){\n' +
     '  vec2 uv = gl_FragCoord.xy/uRes; float asp = uRes.x/max(uRes.y,1.);\n' +
-    // Лист не стоит под текстом, а едет вместе с ним: рисуем по-прежнему
-    // только экран, но выборку сдвигаем на прокрутку — коробление, волокна
-    // и зерно оказываются приклеены к странице, а не к окну.
-    //
-    // Знак важен: uv.y растёт вверх, а документ вниз, поэтому координата
-    // листа — это uScorrimento МИНУС uv.y. Со сложением бумага не
-    // приклеивалась, а плыла относительно текста с двойной скоростью, и это
-    // читалось как тень, висящая на экране.
+    // Лист едет вместе с текстом: рисуем только экран, но выборку сдвигаем на
+    // прокрутку. Знак важен: uv.y растёт вверх, документ вниз.
     '  vec2 p = vec2(uv.x*asp, uScorrimento - uv.y);\n' +
     '  vec2 ptr = vec2(uPointer.x*asp, uScorrimento - uPointer.y);\n' +
-    // Коробление даёт нормаль разностью вперёд — три выборки вместо пяти,
-    // на гладком поле разницы не видно. Конус приходит готовым наклоном.
-    '  float h = sheet(p);\n' +
-    '  float e = 1.6/uRes.y;\n' +
-    '  float hx = sheet(p+vec2(e,0.)) - h;\n' +
-    '  float hy = sheet(p+vec2(0.,e)) - h;\n' +
-    '  vec3 cn = cono(p, ptr, uPress, uRaggio); float hc = cn.x; vec2 gc = cn.yz;\n' +
-    '  vec3 n = normalize(vec3(-(hx*uRelief*2.+gc.x*uPiega), -(hy*uRelief*2.+gc.y*uPiega), 1.));\n' +
+    '  vec3 cn = cono(p, ptr, uPress, uRaggio);\n' +
+    '  vec3 n = normalize(vec3(-cn.y*uPiega, cn.z*uPiega, 1.));\n' +
     '  vec3 view = vec3(0.,0.,1.);\n' +
     '  vec3 key = normalize(vec3(-.42,.55,.72));\n' +
-    '  vec3 toP = vec3(ptr-p, .30); float dP = length(toP); vec3 dirP = toP/max(dP,1e-4);\n' +
-    '  float fall = uPresence/(1.+26.*dP*dP);\n' +
-    '  float rough = .86;\n' +
-    '  float lit = orenNayar(n,key,view,rough)*.72 + orenNayar(n,dirP,view,rough)*fall*.85;\n' +
+    '  float lit = orenNayar(n,key,view,.86);\n' +
+    // Просвет: тонкий лист пропускает свет сквозь себя, поэтому у сгиба
+    // тёмная сторона всё равно светится. Обёрнутый косинус.
     '  float through = pow(max(0.,(dot(n,key)+.55)/1.55), 2.2)*.30;\n' +
-    '  float ao = clamp(.80 + h*.55 + hc*1.6, .45, 1.10);\n' +
-    '  float sheen = ggx(n,key,view,.55)*.030 + ggx(n,dirP,view,.45)*.045*fall;\n' +
+    // Затенение берётся из самой глубины прогиба, а не рисуется.
+    '  float ao = clamp(1. + cn.x*.35, .80, 1.05);\n' +
+    '  float sheen = ggx(n,key,view,.55)*.030;\n' +
     '  float expo = .93 + (lit-.55)*.42 + through*.30;\n' +
     '  expo *= mix(1., ao, .45);\n' +
     '  vec3 c = uPaper * clamp(expo, .70, 1.12);\n' +
     '  c = mix(c, uShade, clamp((1.-clamp(expo,0.,1.))*.55, 0., .45));\n' +
-    '  c += uLight*sheen + uLight*fall*uWarm;\n' +
-    // Виньетки здесь не было и не будет: она считалась от координат окна, а
-    // не листа, и оставалась висеть на экране, пока бумага под ней уезжала.
-    // Спад к краям — дело лампы, он уже есть в fall.
+    '  c += vec3(1.) * sheen;\n' +
     '  fragColor = vec4(c,1.); }';
 
   function compile(gl, type, src) {
@@ -199,18 +217,22 @@
 
   var SETTORE = (139 * Math.PI) / 180;
   var KLIFT = 1.15;
-  /* Глубина под пальцем постоянна — палец жмёт одинаково, — а вот ψ = Δ/R
-     зависит от того, где нажали: у края конус вчетверо круче, чем посреди
-     страницы. Тридцать пикселей — это уже щедро: в настоящей бумаге при
-     таком радиусе смещение печати было бы долей пикселя, и видно было бы
-     только светотень. */
+  /* Глубина под пальцем постоянна — палец жмёт одинаково, — а наклон
+     генератрисы ψ = Δ/b свой в каждую сторону: b это расстояние до края
+     листа вдоль луча. К близкому краю конус круче, к далёкому положе,
+     и оттого форма выходит несимметричной сама собой. */
   var ГЛУБИНА = 30;
-  /* Но ψ = Δ/R нельзя отпускать на волю: у края R маленькое, и получается
-     наклон в тридцать градусов — в лист шириной в ладонь вдавлено три
-     сантиметра. У настоящей бумаги ψ порядка 0,05; держим в этих пределах,
-     иначе печать не гнётся, а рвётся. */
+  /* Но ψ нельзя отпускать на волю: у края b маленькое, и получается наклон
+     в тридцать градусов — в лист шириной в ладонь вдавлено три сантиметра.
+     У настоящей бумаги ψ порядка 0,05; держим в этих пределах, иначе печать
+     не гнётся, а рвётся. Те же числа стоят константами в шейдере. */
   var ПОЛОГО = 0.03;
   var КРУТО = 0.16;
+  /* Смещение печати честно ничтожно: при ψ=0,05 точка на полуметре съезжает
+     к вершине на ρ(1−cos φ) — доли пикселя. Прогиб был бы виден одной только
+     светотенью. Двигать буквы всё-таки хочется, поэтому смещение усилено
+     вчетверо — и это единственная неправда во всём поле. */
+  var УВЕЛ = 4;
 
   function psiA(a) {
     var t = ((((a + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -218,15 +240,29 @@
     return 1 + KLIFT * Math.cos((Math.PI * t) / SETTORE);
   }
 
+  /* Та же функция, что в шейдере, слово в слово: свет и смещение пикселей
+     обязаны считать одно и то же поле, иначе блик поедет отдельно от букв.
+     `t` — доля пути от точки касания до края листа вдоль луча. */
   function tenuta(t) {
-    if (t <= 1) return 1;
-    if (t >= 1.35) return 0;
-    var u = (t - 1) / 0.35;
-    return 1 - u * u * (3 - 2 * u);
+    var u = 1 - t * t;
+    return u * u;
   }
 
-  /* Лист держат боковые края окна; верх и низ свободны — там страница
-     продолжается прокруткой. Отсюда масштаб конуса и разворот сектора. */
+  /* Докуда идёт деформация вдоль луча. Лист держат боковые поля страницы;
+     сверху и снизу края нет вовсе — там страница продолжается прокруткой,
+     поэтому вдоль полосы прогиб гаснет сам, на длине порядка ширины листа.
+     Ни в одном направлении нет кружка вокруг пальца: он бы и читался шаром. */
+  var ПОЛОСА = 0.55;
+
+  function bordo(cx, cy, w, dx, dy) {
+    var t = ПОЛОСА * w;
+    if (dx > 1e-5) t = Math.min(t, (w - cx) / dx);
+    else if (dx < -1e-5) t = Math.min(t, -cx / dx);
+    return Math.max(t, 1);
+  }
+
+  /* Масштаб ядра и разворот сектора отрыва: лист держат боковые края, верх и
+     низ свободны, поэтому сектор уходит туда, где листу есть куда деться. */
   function opora(x, y, w, h) {
     var R = Math.max(Math.min(x, w - x), 24);
     var su = Math.max(y, 1);
@@ -235,18 +271,27 @@
     return { R: R, asse: asse };
   }
 
-  /* Карта смещения под конкретное нажатие. 64×64 хватает: поле гладкое,
-     а рёбра всё равно рисует свет, а не сдвиг пикселей. */
-  var СЕТКА = 96;
+  /* Карта смещения под конкретное нажатие. Плитка накрывает ровно тот
+     прямоугольник, куда доходит поле, — не квадрат вокруг пальца: конус
+     несимметричен, и квадрат пришлось бы брать вдвое больше, теряя вдвое
+     разрешение впустую. Клетка выходит около десятка пикселей, но поле
+     гладкое, а рёбра рисует свет, а не сдвиг пикселей. */
+  var СЕТКА = 128;
   var холст = null;
-  /* Поле зависит только от радиуса и разворота сектора, поэтому радиус
-     округляется до четверти сотни пикселей и карты переиспользуются:
-     пересчёт стоит несколько миллисекунд, а нажатий много. */
+  /* Форма зависит от того, где нажали, поэтому ключ — само место, огрублённое
+     до сорока пикселей, и размер окна. Больше десятка карт не держим: под
+     ведомым пальцем их иначе накопится на весь экран. */
   var кэш = {};
+  var кэшРазмер = 0;
 
-  function mappaCono(R, asse, psi0) {
-    var ключ = Math.round(R / 24) + ':' + (asse > 0 ? 'g' : 's');
+  function mappaCono(cx, cy, w, h, asse) {
+    var ключ =
+      Math.round(cx / 40) + ':' + Math.round(cy / 40) + ':' + Math.round(w / 40) + ':' + Math.round(h / 40);
     if (кэш[ключ]) return кэш[ключ];
+    if (кэшРазмер > 12) {
+      кэш = {};
+      кэшРазмер = 0;
+    }
     if (!холст) {
       холст = document.createElement('canvas');
       холст.width = СЕТКА;
@@ -254,24 +299,41 @@
     }
     var ctx = холст.getContext('2d');
     var img = ctx.createImageData(СЕТКА, СЕТКА);
-    var L = R * 1.35;
+    // Размах поля: вбок — до полей страницы, но не дальше длины затухания;
+    // вдоль полосы края нет, там только затухание.
+    var вдоль = ПОЛОСА * w;
+    var влево = Math.min(cx, вдоль);
+    var вправо = Math.min(w - cx, вдоль);
+    var x0 = cx - влево;
+    var y0 = cy - вдоль;
+    var ширина = влево + вправо;
+    var высота = 2 * вдоль;
+    // Масштаб ядра — тот же, что у шейдера: до ближайшего закреплённого края.
+    var R = Math.max(Math.min(cx, w - cx), 24);
     var поле = new Float32Array(СЕТКА * СЕТКА * 2);
     var пик = 1e-6;
     for (var j = 0; j < СЕТКА; j++) {
       for (var i = 0; i < СЕТКА; i++) {
-        var dx = (((i + 0.5) / СЕТКА) * 2 - 1) * L;
-        var dy = (((j + 0.5) / СЕТКА) * 2 - 1) * L;
+        var dx = x0 + ((i + 0.5) / СЕТКА) * ширина - cx;
+        var dy = y0 + ((j + 0.5) / СЕТКА) * высота - cy;
         var rho = Math.sqrt(dx * dx + dy * dy);
         var o = (j * СЕТКА + i) * 2;
-        if (rho > 1e-3) {
-          var psi = psi0 * psiA(Math.atan2(dy, dx) - asse);
-          // Печать съезжает к вершине на ρ(1−cos φ). Карта читается наоборот
-          // — пиксель берётся со сдвигом, — поэтому пишем вектор наружу.
-          var k = (1 - Math.cos(Math.atan(psi))) * tenuta(rho / R);
-          поле[o] = dx * k;
-          поле[o + 1] = dy * k;
-          пик = Math.max(пик, Math.abs(поле[o]), Math.abs(поле[o + 1]));
-        }
+        if (rho <= 1e-3) continue;
+        // Расстояние до края вдоль этого луча — то же, что в шейдере: и доля
+        // пути до края, и наклон генератрисы ψ = Δ/b берутся из него.
+        var b = bordo(cx, cy, w, dx / rho, dy / rho);
+        var t = rho / b;
+        if (t >= 1) continue;
+        var psi = Math.max(ПОЛОГО, Math.min(КРУТО, ГЛУБИНА / b)) * psiA(Math.atan2(dy, dx) - asse);
+        // Печать съезжает к вершине на ρ(1−cos φ). Карта читается наоборот
+        // — пиксель берётся со сдвигом, — поэтому пишем вектор наружу.
+        // Радиус скруглён ядром, как в шейдере, иначе у вершины смещение
+        // обрывается ступенькой в один тексель.
+        var rs = (rho * rho) / Math.sqrt(rho * rho + 0.0144 * R * R);
+        var k = (УВЕЛ * (1 - Math.cos(Math.atan(psi))) * tenuta(t) * rs) / rho;
+        поле[o] = dx * k;
+        поле[o + 1] = dy * k;
+        пик = Math.max(пик, Math.abs(поле[o]), Math.abs(поле[o + 1]));
       }
     }
     for (var q = 0; q < СЕТКА * СЕТКА; q++) {
@@ -282,7 +344,15 @@
       img.data[b + 3] = 255;
     }
     ctx.putImageData(img, 0, 0);
-    кэш[ключ] = { url: холст.toDataURL('image/png'), пик: пик, сторона: 2 * L };
+    кэш[ключ] = {
+      url: холст.toDataURL('image/png'),
+      пик: пик,
+      x: x0,
+      y: y0,
+      ширина: ширина,
+      высота: высота,
+    };
+    кэшРазмер += 1;
     return кэш[ключ];
   }
 
@@ -413,13 +483,13 @@
     var d = canvas.dataset;
     var paper = rgb(d.carta, 'f3ece0');
     var shade = rgb(d.ombra, '8f8474');
-    var light = rgb(d.luce, 'fff6e2');
-    var relief = parseFloat(d.rilievo || '11');
     var fibre = parseFloat(d.fibra || '0.055');
-    var warm = parseFloat(d.calore || '0.06');
     // Насколько наклон конуса разворачивает нормаль: коробление приходит
     // разностью высот, конус — готовым наклоном, их надо привести к одному.
-    var piegaLuce = parseFloat(d.piega || '0.28');
+    /* Наклон, с которым свет читает поле. Единица — правда: ψ у бумаги
+       порядка 0,05, и прогиб был бы виден на пределе различимого. Здесь он
+       усилен, как и смещение печати, иначе эффекта попросту не видно. */
+    var piegaLuce = parseFloat(d.piega || '2.0');
 
     /* Печатная подложка — клетка, сетка синьки, лента телетайпа — часть листа
        и едет с текстом. Но растягивать её на всю длину документа нельзя:
@@ -436,21 +506,15 @@
     grana.style.opacity = Math.min(1, fibre / СОРТ_ПЛИТКИ).toFixed(2);
 
     var u = {};
-    ['uRes', 'uPointer', 'uPress', 'uPresence', 'uPaper', 'uShade', 'uLight', 'uRelief', 'uWarm',
-      'uScorrimento', 'uAsse', 'uRaggio', 'uAffondo', 'uPiega'].forEach(
+    ['uRes', 'uPointer', 'uPress', 'uPaper', 'uShade',
+      'uScorrimento', 'uAsse', 'uRaggio', 'uProfondo', 'uPiega', 'uBordi'].forEach(
       function (name) {
         u[name] = gl.getUniformLocation(prog, name);
       },
     );
 
-    var sx = { x: 0.5, v: 0 };
-    var sy = { x: 0.7, v: 0 };
     var sp = { x: 0, v: 0 };
-    var sPresence = { x: 0, v: 0 };
-    var tx = 0.5;
-    var ty = 0.7;
     var pressed = false;
-    var present = 0;
     var last = 0;
     var running = false;
     var scorrimento = 0;
@@ -458,8 +522,8 @@
     var pressoY = 0.5;
     var raggio = 0.5; // радиус конуса в высотах окна
     var asse = -Math.PI / 2; // куда развёрнут сектор отрыва
-    var campo = { url: '', пик: 1, сторона: 0 };
-    var affondo = 0.1; // ψ0 = Δ/R — наклон генератрисы в секторе контакта
+    var campo = { url: '', пик: 1, x: 0, y: 0, ширина: 0, высота: 0 };
+    var profondo = 0.04; // Δ — насколько продавлен палец, в высотах окна
 
     var scena = parti.scena;
     var foglio = parti.foglio;
@@ -487,11 +551,11 @@
       f.setAttribute('height', h.toFixed(0));
     }
 
-    function posa(img, cx, cy, lato) {
-      img.setAttribute('x', (cx - lato / 2).toFixed(1));
-      img.setAttribute('y', (cy - lato / 2).toFixed(1));
-      img.setAttribute('width', lato.toFixed(1));
-      img.setAttribute('height', lato.toFixed(1));
+    function posa(img, dy) {
+      img.setAttribute('x', campo.x.toFixed(1));
+      img.setAttribute('y', (campo.y + dy).toFixed(1));
+      img.setAttribute('width', campo.ширина.toFixed(1));
+      img.setAttribute('height', campo.высота.toFixed(1));
     }
 
     /* Фильтр во весь экран — самое дорогое, что здесь есть, а при ведении
@@ -528,12 +592,13 @@
       if (coarse && кадр % 2) return;
       var w = window.innerWidth;
       var h = window.innerHeight;
-      var cx = pressoX * w;
-      var cy = pressoY * h;
       regione('piega-foglio', 0, window.scrollY - 40, w, h + 80);
       regione('piega-grana', 0, 0, w, h);
-      posa(mappaFoglio, cx, cy + window.scrollY, campo.сторона);
-      posa(mappaGrana, cx, cy, campo.сторона);
+      // Плитка стоит там, где её посчитали, а не под живым пальцем: карта
+      // считается на огрублённое место и переиспользуется, пока палец рядом.
+      // Лист живёт в координатах документа, зерно — в координатах окна.
+      posa(mappaFoglio, window.scrollY);
+      posa(mappaGrana, 0);
       // Размах — из самого поля: пик смещения в пикселях, умноженный на два,
       // потому что карта кодирует диапазон ±½ масштаба.
       var forza = (2 * campo.пик * d).toFixed(2);
@@ -550,50 +615,44 @@
     function draw() {
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(u.uRes, canvas.width, canvas.height);
-      gl.uniform2f(u.uPointer, sx.x, sy.x);
+      gl.uniform2f(u.uPointer, pressoX, 1 - pressoY);
       gl.uniform1f(u.uPress, sp.x);
-      gl.uniform1f(u.uPresence, sPresence.x);
       gl.uniform3fv(u.uPaper, paper);
       gl.uniform3fv(u.uShade, shade);
-      gl.uniform3fv(u.uLight, light);
-      gl.uniform1f(u.uRelief, relief);
-      gl.uniform1f(u.uWarm, warm);
       gl.uniform1f(u.uScorrimento, scorrimento);
       gl.uniform1f(u.uAsse, asse);
       gl.uniform1f(u.uRaggio, raggio);
-      gl.uniform1f(u.uAffondo, affondo);
+      gl.uniform1f(u.uProfondo, profondo);
       gl.uniform1f(u.uPiega, piegaLuce);
+      // Границы листа в тех же координатах, что и p: по горизонтали весь
+      // экран, по вертикали — окно, сдвинутое прокруткой.
+      var asp = canvas.width / Math.max(canvas.height, 1);
+      gl.uniform3f(u.uBordi, 0, asp, ПОЛОСА * asp);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
-    /* Свет один на всю страницу: те же координаты уходят в CSS-переменные,
-       поэтому тени карточек и блик на кнопке знают, где лампа. Пишутся они
-       только вместе с кадром — иначе пересчёт стилей всей страницы идёт
-       вхолостую шестьдесят раз в секунду. */
-    function vars() {
+    /* Лампа неподвижна — сверху слева, как в шейдере. Её положение уходит в
+       CSS один раз: тени карточек и фаски оттиска знают, откуда свет, и не
+       ездят за курсором. Меняется только --premuto. */
+    function lampada() {
       var root = document.documentElement.style;
-      root.setProperty('--luce-x', sx.x.toFixed(3));
-      root.setProperty('--luce-y', (1 - sy.x).toFixed(3));
-      root.setProperty('--luce-dx', (sx.x - 0.5).toFixed(3));
-      root.setProperty('--luce-dy', (0.5 - sy.x).toFixed(3));
-      root.setProperty('--premuto', sp.x.toFixed(3));
+      root.setProperty('--luce-x', '0.29');
+      root.setProperty('--luce-y', '0.22');
+      root.setProperty('--luce-dx', '-0.21');
+      root.setProperty('--luce-dy', '0.28');
+    }
+
+    function vars() {
+      document.documentElement.style.setProperty('--premuto', sp.x.toFixed(3));
     }
 
     function tick(now) {
       var dt = last === 0 ? 1 / 60 : (now - last) / 1000;
       last = now;
-      step(sx, tx, dt, 120, 22);
-      step(sy, ty, dt, 120, 22);
-      // Демпфирование заметно ниже критического (ζ≈0.36): лист проскакивает
+      // Демпфирование заметно ниже критического (ζ≈0.37): лист проскакивает
       // мимо покоя и дрожит, возвращаясь, — как настоящая бумага.
       step(sp, pressed ? 1 : 0, dt, 480, 16);
-      step(sPresence, present, dt, 120, 22);
-      var busy =
-        Math.abs(sx.x - tx) > 1e-3 ||
-        Math.abs(sy.x - ty) > 1e-3 ||
-        Math.abs(sp.x - (pressed ? 1 : 0)) > 1e-3 ||
-        Math.abs(sp.v) > 1e-3 ||
-        Math.abs(sPresence.x - present) > 1e-3;
+      var busy = Math.abs(sp.x - (pressed ? 1 : 0)) > 1e-3 || Math.abs(sp.v) > 1e-3;
       draw();
       vars();
       // Снимать деформацию можно только когда лист снова плоский, а не когда
@@ -642,9 +701,6 @@
       setStock: function (stock) {
         paper = rgb(stock.carta, 'f3ece0');
         shade = rgb(stock.ombra, '8f8474');
-        light = rgb(stock.luce, 'fff6e2');
-        relief = parseFloat(stock.rilievo || relief);
-        warm = parseFloat(stock.calore || warm);
         var f = parseFloat(stock.fibra);
         if (f === f) {
           fibre = f;
@@ -654,44 +710,31 @@
       },
     };
 
-    if (!coarse) {
-      window.addEventListener(
-        'pointermove',
-        function (ev) {
-          tx = ev.clientX / Math.max(window.innerWidth, 1);
-          ty = 1 - ev.clientY / Math.max(window.innerHeight, 1);
-          present = 1;
-          wake();
-        },
-        { passive: true },
-      );
-    }
-    /* Новое касание — новое поле: и масштаб конуса, и разворот сектора
-       зависят от того, где нажали. Считается один раз на нажатие: 64×64
-       выборки и упаковка в PNG — около трёх миллисекунд. */
+    /* Новое поле — на каждое новое место пальца: форма конуса зависит от того,
+       где нажали, потому что её задают края листа. Карта переиспользуется,
+       пока палец не ушёл дальше сорока пикселей. */
     var ключПоля = '';
 
     function nuovoCampo() {
       var w = window.innerWidth;
       var h = window.innerHeight;
-      var op = opora(pressoX * w, pressoY * h, w, h);
-      var ключ = Math.round(op.R / 24) + ':' + (op.asse > 0 ? 'g' : 's');
+      var cx = pressoX * w;
+      var cy = pressoY * h;
+      var op = opora(cx, cy, w, h);
+      var ключ = Math.round(cx / 40) + ':' + Math.round(cy / 40);
       raggio = op.R / Math.max(h, 1);
+      profondo = ГЛУБИНА / Math.max(h, 1);
       asse = -op.asse;
       if (ключ === ключПоля) return;
       ключПоля = ключ;
-      affondo = Math.max(ПОЛОГО, Math.min(КРУТО, ГЛУБИНА / op.R));
-      campo = mappaCono(op.R, op.asse, affondo);
+      campo = mappaCono(cx, cy, w, h, op.asse);
       mappaFoglio.setAttribute('href', campo.url);
       mappaGrana.setAttribute('href', campo.url);
     }
 
     function mira(ev) {
-      tx = ev.clientX / Math.max(window.innerWidth, 1);
-      ty = 1 - ev.clientY / Math.max(window.innerHeight, 1);
-      pressoX = tx;
+      pressoX = ev.clientX / Math.max(window.innerWidth, 1);
       pressoY = ev.clientY / Math.max(window.innerHeight, 1);
-      present = 1;
     }
 
     /* ── ПАЛЕЦ ────────────────────────────────────────────────────────
@@ -740,9 +783,6 @@
       );
       var отпустить = function () {
         if (giu === null) return;
-        // Палец ушёл — лампа гаснет. Иначе на экране остаётся светлое пятно
-        // там, где трогали, и оно не едет вместе с текстом.
-        present = 0;
         // Совсем короткое касание не успевает согнуть лист: придерживаем
         // прогиб, чтобы тап чувствовался так же, как удержание.
         var коротко = performance.now() - giu < 120;
@@ -753,17 +793,14 @@
       window.addEventListener('touchend', отпустить, { passive: true });
       window.addEventListener('touchcancel', отпустить, { passive: true });
     } else {
+      // Курсор без нажатия ничего не делает: лист гнётся, только когда его
+      // трогают.
       window.addEventListener(
         'pointermove',
         function (ev) {
-          tx = ev.clientX / Math.max(window.innerWidth, 1);
-          ty = 1 - ev.clientY / Math.max(window.innerHeight, 1);
-          present = 1;
-          if (pressed) {
-            pressoX = tx;
-            pressoY = ev.clientY / Math.max(window.innerHeight, 1);
-            nuovoCampo();
-          }
+          if (!pressed) return;
+          mira(ev);
+          nuovoCampo();
           wake();
         },
         { passive: true },
@@ -774,7 +811,7 @@
         { passive: true },
       );
       window.addEventListener('pointerup', lasciare, { passive: true });
-      document.addEventListener('pointerleave', function () { present = 0; lasciare(); });
+      document.addEventListener('pointerleave', lasciare);
     }
 
     window.addEventListener('resize', resize, { passive: true });
@@ -800,6 +837,7 @@
     }
     window.addEventListener('scroll', scorri, { passive: true });
 
+    lampada();
     rileggi();
     resize();
     scorri();
