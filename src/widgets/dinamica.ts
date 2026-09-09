@@ -22,6 +22,7 @@ import {
   attractorAt,
   distance,
   lorenzStep,
+  lorenzTrail,
   lyapunov,
   period,
   type LorenzPoint,
@@ -149,6 +150,11 @@ export class Logistica extends Widget<LogisticaProps> {
 
 /* ── Лоренц ─────────────────────────────────────────────────────────── */
 
+/** Сколько точек живого следа. Примерно пятнадцать секунд процесса. */
+const СЛЕД = 3000;
+/** Сколько точек у фона. Хватает, чтобы обе доли прорисовались плотно. */
+const ФОН = 9000;
+
 interface LorenzProps {
   readonly rho?: number;
   readonly title?: string;
@@ -172,8 +178,31 @@ export class Lorenz extends Widget<LorenzProps> {
   private b: LorenzPoint = { x: 1 + 1e-9, y: 1, z: 1 };
   private trailA: LorenzPoint[] = [];
   private trailB: LorenzPoint[] = [];
-  private angle = 0.6;
-  private tilt = 0.35;
+  /**
+   * Само множество — бледной нитью под живыми следами.
+   *
+   * Без него прибор показывает короткий обрывок кривой: две точки успевают
+   * пройти секунд за десять едва один виток, и никакой «бабочки» читатель не
+   * видит — он видит закорючку и вынужден верить на слово. Между тем весь
+   * смысл витка в том, что у хаоса ЕСТЬ структура: траектория непредсказуема,
+   * а множество, по которому она гуляет, устойчиво. Значит, структуру надо
+   * показать сразу, а не через двадцать пять секунд ожидания.
+   *
+   * Считается один раз при заходе и при смене ρ, из другого начального
+   * условия и с отброшенным разгоном: подмешивать его к живым следам нельзя —
+   * они как раз про то, как расходятся две близкие точки.
+   */
+  private sfondo: LorenzPoint[] = [];
+  /** Центр по вертикали и мера размера — отсюда берётся масштаб. */
+  private centro = 25;
+  private raggioXY = 21;
+  private altezza = 25;
+  /* Начальный вид — почти классический разрез xz, в котором «бабочка» и
+     узнаётся: при нулевом повороте взгляд идёт вдоль оси y. Небольшой угол
+     и наклон оставлены нарочно, чтобы с первого кадра было видно, что фигура
+     объёмная и её можно повернуть. */
+  private angle = 0.3;
+  private tilt = 0.1;
   private dragging = false;
   private lastX = 0;
   private lastY = 0;
@@ -182,6 +211,7 @@ export class Lorenz extends Widget<LorenzProps> {
     this.rho = this.props.rho ?? LORENZ.rho;
     this.running = true;
     this.spread = 0;
+    this.misura();
     this.stop = this.loop(() => {
       if (this.running) {
         const k = { ...LORENZ, rho: this.rho };
@@ -191,14 +221,43 @@ export class Lorenz extends Widget<LorenzProps> {
           this.trailA.push(this.a);
           this.trailB.push(this.b);
         }
-        if (this.trailA.length > 3000) {
-          this.trailA.splice(0, this.trailA.length - 3000);
-          this.trailB.splice(0, this.trailB.length - 3000);
+        if (this.trailA.length > СЛЕД) {
+          this.trailA.splice(0, this.trailA.length - СЛЕД);
+          this.trailB.splice(0, this.trailB.length - СЛЕД);
         }
         this.spread = distance(this.a, this.b);
       }
       this.disegna();
     });
+  }
+
+  /**
+   * Пересчитать фон и заодно измерить фигуру.
+   *
+   * Масштаб берётся из размеров самой фигуры, а не подобран числом: при ρ = 10
+   * аттрактор вырождается в точку, при ρ = 60 он вдвое выше, и постоянный
+   * множитель означал бы, что на одном конце движка смотреть не на что, а на
+   * другом фигура не помещается.
+   */
+  private misura(): void {
+    const k = { ...LORENZ, rho: this.rho };
+    /* Разгон отбрасывается: первые витки идут от произвольной точки к
+       множеству и к нему не принадлежат. */
+    let p: LorenzPoint = { x: -8, y: 7, z: 27 };
+    for (let i = 0; i < 2000; i += 1) p = lorenzStep(p, 0.006, k);
+    this.sfondo = lorenzTrail(p, ФОН, 0.006, k);
+
+    let zmin = Infinity;
+    let zmax = -Infinity;
+    let rxy = 1e-3;
+    for (const т of this.sfondo) {
+      if (т.z < zmin) zmin = т.z;
+      if (т.z > zmax) zmax = т.z;
+      rxy = Math.max(rxy, Math.hypot(т.x, т.y));
+    }
+    this.centro = (zmin + zmax) / 2;
+    this.altezza = Math.max((zmax - zmin) / 2, 1e-3);
+    this.raggioXY = rxy;
   }
 
   protected override ferma(): void {
@@ -209,7 +268,7 @@ export class Lorenz extends Widget<LorenzProps> {
   private project(p: LorenzPoint, W: number, H: number): [number, number, number] {
     const x = p.x;
     const y = p.y;
-    const z = p.z - 25;
+    const z = p.z - this.centro;
     const cos = Math.cos(this.angle);
     const sin = Math.sin(this.angle);
     const rx = x * cos - y * sin;
@@ -219,15 +278,18 @@ export class Lorenz extends Widget<LorenzProps> {
     const depth = ry * ct - z * st;
     const up = ry * st + z * ct;
     const k = 320 / (320 + depth);
-    return [W / 2 + rx * 7 * k, H / 2 - up * 7 * k, depth];
+    /* По горизонтали фигуру разворачивает поворот, поэтому мерой служит
+       радиус в плоскости xy, а не размах по одной оси. */
+    const м = Math.min((0.44 * W) / this.raggioXY, (0.44 * H) / this.altezza);
+    return [W / 2 + rx * м * k, H / 2 - up * м * k, depth];
   }
 
   private disegna(): void {
     this.canvas ??= this.renderRoot.querySelector('canvas') ?? undefined;
     const canvas = this.canvas;
     if (!canvas) return;
-    const W = 620;
-    const H = 340;
+    const W = 460;
+    const H = 380;
     if (canvas.width !== W) {
       canvas.width = W;
       canvas.height = H;
@@ -248,8 +310,10 @@ export class Lorenz extends Widget<LorenzProps> {
       ctx.stroke();
     };
 
-    линия(this.trailA, 'rgba(27,58,107,0.55)', 1.1);
-    линия(this.trailB, 'rgba(168,64,47,0.55)', 1.1);
+    /* Множество — под следами и почти незаметно: оно фон, а не предмет. */
+    линия(this.sfondo, 'rgba(92,96,104,0.16)', 0.8);
+    линия(this.trailA, 'rgba(27,58,107,0.75)', 1.2);
+    линия(this.trailB, 'rgba(168,64,47,0.75)', 1.2);
 
     for (const [p, colour] of [
       [this.a, '#1b3a6b'],
@@ -309,7 +373,13 @@ export class Lorenz extends Widget<LorenzProps> {
             max="60"
             step="0.5"
             .value=${String(this.rho)}
-            @input=${(e: Event) => (this.rho = Number((e.target as HTMLInputElement).value))} />
+            @input=${(e: Event) => {
+              this.rho = Number((e.target as HTMLInputElement).value);
+              /* Другое ρ — другое множество и другой масштаб. Считается это
+                 на ходу, потому что движок крутят именно ради того, чтобы
+                 увидеть, как множество меняет вид. */
+              this.misura();
+            }} />
         </div>
       </div>
 
