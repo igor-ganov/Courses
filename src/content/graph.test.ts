@@ -13,9 +13,9 @@ beforeEach(() => {
   resetRegistry();
   defineBlock({
     kind: 'prose',
-    tag: 'cy-prose',
     label: 'Текст',
     schema: s.record({ kind: s.literal('prose'), text: s.text() }),
+    html: (b) => `<p>${b.text}</p>`,
   });
 });
 

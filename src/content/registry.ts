@@ -13,16 +13,37 @@
 
 import * as s from '~/core/schema';
 
+/** Что известно блоку при отрисовке: где он живёт и куда ведут короткие ссылки. */
+export interface RenderContext {
+  readonly base: string;
+  readonly course: string;
+}
+
 export interface BlockDefinition<T extends { kind: string } = { kind: string }> {
   /** Метка вида: она же ключ в данных лекции. */
   readonly kind: T['kind'];
-  /** Имя пользовательского элемента, которым блок рисуется: `<cy-prose>`. */
-  readonly tag: string;
   /** Человеческое имя — для галереи блоков и сообщений автору. */
   readonly label: string;
   /** Короткое пояснение для галереи: чем этот блок отличается от соседнего. */
   readonly note?: string;
   readonly schema: s.Schema<T>;
+
+  /* Ровно один из двух способов отрисовки.
+
+     Текст рисуется разметкой и не стоит ни байта скрипта: набор, выделение,
+     поиск по странице и печать работают сами. Заворачивать абзац в
+     пользовательский элемент с теневым корнем значило бы отрезать его от
+     общей типографики и от поиска ради ничего.
+
+     Интерактив — элемент Lit с теневым корнем, и вот там инкапсуляция как раз
+     к месту. Он грузится по появлению на экране, поэтому лекция без виджетов
+     не платит за них. */
+
+  /** Статический блок: разметка строится из данных и экранируется. */
+  readonly html?: (block: T, context: RenderContext) => string;
+  /** Интерактивный блок: имя элемента и его отложенная загрузка. */
+  readonly tag?: string;
+  readonly load?: () => Promise<unknown>;
 }
 
 /** Блок как его видит движок: метка вида плюс что угодно, что позволила схема. */
@@ -49,6 +70,16 @@ export function defineBlock<T extends { kind: string }>(
     throw new Error(
       `вид блока "${definition.kind}" уже занят: молчаливая подмена блока хуже падения`,
     );
+  }
+  const статический = typeof definition.html === 'function';
+  const интерактивный = typeof definition.tag === 'string';
+  if (статический === интерактивный) {
+    throw new Error(
+      `блок "${definition.kind}": нужен ровно один способ отрисовки — html для текста или tag для интерактива`,
+    );
+  }
+  if (интерактивный && typeof definition.load !== 'function') {
+    throw new Error(`блок "${definition.kind}": интерактивному блоку нужен load для отложенной загрузки`);
   }
   registry.set(definition.kind, definition as unknown as BlockDefinition);
   version += 1;
@@ -95,6 +126,34 @@ export function blocks(): s.Schema<Block> {
     },
   };
 }
+
+/**
+ * Отрисовать список блоков. Единственное место, которое знает, как блок
+ * попадает на страницу, — и оно тоже не знает НИ ОДНОГО вида: спрашивает реестр.
+ *
+ * Незнакомый вид не роняет лекцию и не исчезает молча: он превращается в
+ * видимую карточку с адресом беды. Читатель видит, что здесь что-то было, а
+ * автор — что именно сломалось.
+ */
+export function renderBlocks(list: readonly Block[], context: RenderContext, path = ''): string {
+  return list
+    .map((block, i) => {
+      const at = `${path}[${i}]`;
+      const definition = registry.get(block.kind);
+      if (!definition) {
+        return `<div class="guasto" role="note">Неизвестный блок <code>${escapeAttribute(block.kind)}</code> в <code>${escapeAttribute(at)}</code></div>`;
+      }
+      if (definition.html) return definition.html(block, context);
+      /* Интерактив: элемент ставится пустым, свойства едут атрибутом, и до
+         появления на экране за него не платят ни байта. */
+      const props = escapeAttribute(JSON.stringify(block));
+      return `<${definition.tag} class="isola" data-blocco="${escapeAttribute(block.kind)}" data-props="${props}"></${definition.tag}>`;
+    })
+    .join('\n');
+}
+
+const ATTR: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const escapeAttribute = (text: string): string => text.replace(/[&<>"']/g, (c) => ATTR[c]!);
 
 /** Только для тестов: реестр глобален, и каждый случай должен начинаться с чистого. */
 export function resetRegistry(): void {

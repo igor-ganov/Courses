@@ -12,9 +12,9 @@ beforeEach(resetRegistry);
 const проза = () =>
   defineBlock({
     kind: 'prose',
-    tag: 'cy-prose',
     label: 'Текст',
     schema: s.record({ kind: s.literal('prose'), text: s.text() }),
+    html: (b) => `<p>${b.text}</p>`,
   });
 
 describe('регистрация', () => {
@@ -25,9 +25,37 @@ describe('регистрация', () => {
 
   it('знает, чем блок рисуется', () => {
     проза();
-    expect(lookupBlock('prose')?.tag).toBe('cy-prose');
     expect(lookupBlock('prose')?.label).toBe('Текст');
+    expect(typeof lookupBlock('prose')?.html).toBe('function');
     expect(lookupBlock('нет такого')).toBeUndefined();
+  });
+
+  it('требует ровно один способ отрисовки: и ни одного, и оба — ошибка', () => {
+    expect(() =>
+      defineBlock({
+        kind: 'ничем',
+        label: 'Ничем',
+        schema: s.record({ kind: s.literal('ничем') }),
+      }),
+    ).toThrowError(/ровно один способ/);
+    expect(() =>
+      defineBlock({
+        kind: 'обоими',
+        label: 'Обоими',
+        schema: s.record({ kind: s.literal('обоими') }),
+        html: () => '',
+        tag: 'cy-x',
+        load: async () => {},
+      }),
+    ).toThrowError(/ровно один способ/);
+    expect(() =>
+      defineBlock({
+        kind: 'без-загрузки',
+        label: 'Без загрузки',
+        schema: s.record({ kind: s.literal('без-загрузки') }),
+        tag: 'cy-y',
+      }),
+    ).toThrowError(/load/);
   });
 
   it('не даёт занять один вид дважды: молчаливая подмена блока хуже падения', () => {
@@ -39,9 +67,9 @@ describe('регистрация', () => {
     проза();
     defineBlock({
       kind: 'figure',
-      tag: 'cy-figure',
       label: 'Рисунок',
       schema: s.record({ kind: s.literal('figure'), src: s.text(), alt: s.text() }),
+      html: () => '',
     });
     expect(blockKinds()).toEqual(['prose', 'figure']);
   });
@@ -76,9 +104,9 @@ describe('вложенность', () => {
     проза();
     const aside = defineBlock({
       kind: 'aside',
-      tag: 'cy-aside',
       label: 'Врезка',
       schema: s.record({ kind: s.literal('aside'), body: s.list(blocks(), { min: 1 }) }),
+      html: () => '',
     });
     const значение = aside({ body: [aside({ body: [{ kind: 'prose', text: 'вглубь' }] })] });
     expect(blocks().check(значение).ok).toBe(true);

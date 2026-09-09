@@ -1,0 +1,63 @@
+---
+/**
+ * ЛИСТ — общая оболочка каждой страницы платформы.
+ *
+ * Порядок слоёв снизу вверх: освещённая материя (WebGL), печатная клетка,
+ * поле, содержание. Материя и клетка едут вместе с текстом — обе размером с
+ * окно, прилипание делает сдвиг фона, иначе браузер красит полотно во весь
+ * документ и первая отрисовка встаёт.
+ *
+ * Скрипт материи грузится отложенно и не блокирует ничего: без него страница
+ * остаётся полной, просто бумага становится крашеной.
+ */
+import '~/styles/quaderno.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Заголовок страницы виден в шапке; на титульной он не нужен. */
+  bare?: boolean;
+}
+
+const { title, description } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <meta name="theme-color" content="#f3efe4" />
+    <link rel="manifest" href={`${base}manifest.webmanifest`} />
+    <link rel="icon" href={`${base}icona.svg`} type="image/svg+xml" />
+  </head>
+  <body>
+    <canvas
+      data-materia
+      data-carta="f7f3e8"
+      data-ombra="9a917f"
+      data-luce="fff7e6"
+      data-rilievo="11"
+      data-fibra="0.055"
+      data-calore="0.05"></canvas>
+    <div class="griglia" data-scorre></div>
+    <div class="margine" data-scorre></div>
+
+    <slot />
+
+    <script is:inline define:vars={{ base }}>
+      /* Материя — украшение, поэтому грузится последней и в простое: страница
+         обязана быть читаемой до неё и без неё. */
+      const поставить = () => {
+        const s = document.createElement('script');
+        s.src = `${base}materia/materia.js`;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      if ('requestIdleCallback' in window) requestIdleCallback(поставить, { timeout: 1500 });
+      else addEventListener('load', поставить);
+    </script>
+  </body>
+</html>
