@@ -143,7 +143,9 @@
     // Лист едет вместе с текстом: рисуем только экран, но выборку сдвигаем на
     // прокрутку. Знак важен: uv.y растёт вверх, документ вниз.
     '  vec2 p = vec2(uv.x*asp, uScorrimento - uv.y);\n' +
-    '  vec2 ptr = vec2(uPointer.x*asp, uScorrimento - uPointer.y);\n' +
+    // Палец приходит уже в координатах листа: складывать прокрутку и место
+    // касания нужно там, где они сняты вместе, а не здесь.
+    '  vec2 ptr = vec2(uPointer.x*asp, uPointer.y);\n' +
     '  vec3 cn = cono(p, ptr, uPress, uRaggio);\n' +
     '  vec3 n = normalize(vec3(-cn.y*uPiega, cn.z*uPiega, 1.));\n' +
     '  vec3 view = vec3(0.,0.,1.);\n' +
@@ -344,13 +346,13 @@
       img.data[b + 3] = 255;
     }
     ctx.putImageData(img, 0, 0);
+    // Плитка описана смещениями вершины от своего края: ставят её по живому
+    // пальцу, а не по тому огрублённому месту, на котором считали.
     кэш[ключ] = {
       url: холст.toDataURL('image/png'),
       пик: пик,
-      x: x0,
-      // По вертикали плитка ставится от живого пальца: форма от высоты не
-      // зависит, поэтому одна карта обслуживает весь вертикальный свайп.
-      верх: -вдоль,
+      влево: влево,
+      вдоль: вдоль,
       ширина: ширина,
       высота: высота,
     };
@@ -521,10 +523,10 @@
     var running = false;
     var scorrimento = 0;
     var pressoX = 0.5;
-    var pressoY = 0.5;
+    var ancora = 0; // где палец держит лист, в координатах документа
     var nucleo = 0.05; // радиус ядра в высотах окна — подушечка пальца
     var asse = -Math.PI / 2; // куда развёрнут сектор отрыва
-    var campo = { url: '', пик: 1, x: 0, верх: 0, ширина: 0, высота: 0 };
+    var campo = { url: '', пик: 1, влево: 0, вдоль: 0, ширина: 0, высота: 0 };
     var profondo = 0.04; // Δ — насколько продавлен палец, в высотах окна
 
     var scena = parti.scena;
@@ -553,22 +555,24 @@
       f.setAttribute('height', h.toFixed(0));
     }
 
-    function posa(img, cy) {
-      img.setAttribute('x', campo.x.toFixed(1));
-      img.setAttribute('y', (cy + campo.верх).toFixed(1));
+    function posa(img, cx, cy) {
+      img.setAttribute('x', (cx - campo.влево).toFixed(1));
+      img.setAttribute('y', (cy - campo.вдоль).toFixed(1));
       img.setAttribute('width', campo.ширина.toFixed(1));
       img.setAttribute('height', campo.высота.toFixed(1));
     }
 
-    /* Фильтр во весь экран — самое дорогое, что здесь есть, а при ведении
-       пальцем он пересчитывается каждый кадр. На тачскрине обновляем его
-       через кадр: отставание в шестнадцать миллисекунд под движущимся
-       пальцем не видно, а стоит это вдвое дешевле. */
-    var кадр = 0;
-
+    /* Фильтр во весь экран — самое дорогое, что здесь есть, и при ведении
+       пальцем он пересчитывается каждый кадр. Обновлять его через кадр было
+       заманчиво, но тогда свет идёт на шестидесяти герцах, а сдвиг пикселей на
+       тридцати: под движущимся пальцем блик отрывается от букв, и видно это
+       сразу. Лучше платить за каждый кадр. */
     function piega(finito) {
       var d = sp.x;
-      кадр += 1;
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      var cy = schermoY();
+      var pressoY = cy / Math.max(h, 1);
       // Наклон всего листа остаётся: смещение пикселей даёт сам прогиб, а
       // поворот — то, что лист при этом уходит от глаза целиком.
       // Наклон всего листа — мышиная роскошь: на тачскрине он стоит четыре
@@ -591,17 +595,15 @@
       }
       foglio.style.filter = 'url(#piega-foglio)';
       foglio.style.willChange = 'transform,filter';
-      if (coarse && кадр % 2) return;
-      var w = window.innerWidth;
-      var h = window.innerHeight;
       regione('piega-foglio', 0, window.scrollY - 40, w, h + 80);
       regione('piega-grana', 0, 0, w, h);
-      // Вбок плитка стоит там, где её посчитали (карта переиспользуется, пока
-      // палец не ушёл на сорок пикселей), по вертикали — точно под пальцем.
-      // Лист живёт в координатах документа, зерно — в координатах окна.
-      var cy = pressoY * h;
-      posa(mappaFoglio, cy + window.scrollY);
-      posa(mappaGrana, cy);
+      // Вершина плитки ставится точно под палец. Карта считалась на
+      // огрублённое место, но огрубление меняет только форму — на доли
+      // процента, — а не то, где у неё вершина. Лист живёт в координатах
+      // документа, зерно — в координатах окна.
+      var cx = pressoX * w;
+      posa(mappaFoglio, cx, ancora);
+      posa(mappaGrana, cx, cy);
       // Размах — из самого поля: пик смещения в пикселях, умноженный на два,
       // потому что карта кодирует диапазон ±½ масштаба.
       var forza = (2 * campo.пик * d).toFixed(2);
@@ -618,7 +620,9 @@
     function draw() {
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(u.uRes, canvas.width, canvas.height);
-      gl.uniform2f(u.uPointer, pressoX, 1 - pressoY);
+      // Тот же якорь, что у карты: (clientY + scrollY)/h − 1 — координата
+      // документа в высотах окна, снятая в обработчике касания.
+      gl.uniform2f(u.uPointer, pressoX, ancora / Math.max(window.innerHeight, 1) - 1);
       gl.uniform1f(u.uPress, sp.x);
       gl.uniform3fv(u.uPaper, paper);
       gl.uniform3fv(u.uShade, shade);
@@ -722,7 +726,7 @@
       var w = window.innerWidth;
       var h = window.innerHeight;
       var cx = pressoX * w;
-      var cy = pressoY * h;
+      var cy = schermoY();
       var giu = opora(cy, h);
       var ключ = Math.round(cx / 40) + ':' + (giu > 0 ? 'g' : 's');
       nucleo = ЯДРО / Math.max(h, 1);
@@ -735,9 +739,24 @@
       mappaGrana.setAttribute('href', campo.url);
     }
 
+    /* Палец держит не точку экрана, а точку листа. Поэтому запоминается
+       координата в документе, и снимается она в том же обработчике, что и
+       само касание: clientY и scrollY из одного мгновения.
+
+       Складывать их порознь нельзя, а раньше именно так и было — clientY брался
+       из touchmove, а scrollY из кадра. На прокрутке эти два источника идут
+       вразнобой (события касания приходят к главному потоку когда придут, а
+       страница едет своим ходом), их разность гуляет, и вершина конуса скачет
+       вокруг пальца. Теперь при чистой прокрутке якорь просто не меняется:
+       палец стоит на том же месте листа — там же стоит и прогиб. */
     function mira(ev) {
       pressoX = ev.clientX / Math.max(window.innerWidth, 1);
-      pressoY = ev.clientY / Math.max(window.innerHeight, 1);
+      ancora = ev.clientY + window.scrollY;
+    }
+
+    // Где палец сейчас на экране: якорь минус текущая прокрутка.
+    function schermoY() {
+      return ancora - window.scrollY;
     }
 
     /* ── ПАЛЕЦ ────────────────────────────────────────────────────────
@@ -836,7 +855,12 @@
         el.style.transform = 'translateY(' + y + 'px)';
         el.style.backgroundPositionY = -y + 'px';
       });
-      if (!running) draw();
+      if (running) return;
+      draw();
+      // Пока палец держат, пружина стоит в единице и кадров нет. Но область
+      // фильтра задана в координатах документа по текущему окну — если её не
+      // подвинуть, прогиб обрежется по старому экрану.
+      if (pressed) piega(false);
     }
     window.addEventListener('scroll', scorri, { passive: true });
 
