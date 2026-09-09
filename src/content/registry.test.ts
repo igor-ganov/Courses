@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import * as s from '~/core/schema';
-import { blockKinds, blocks, defineBlock, lookupBlock, resetRegistry } from './registry';
+import { blockKinds, blocks, defineBlock, lookupBlock, renderBlocks, resetRegistry } from './registry';
 
 /* Реестр — единственная точка расширения платформы. Новый интерактив обязан
    стоить ровно трёх вещей: схема, элемент, одна регистрация. Ни движок, ни
@@ -116,5 +116,34 @@ describe('вложенность', () => {
       'l[0]',
     );
     expect(!плохо.ok && плохо.issues[0]?.path).toBe('l[0].body[0].body[0].text');
+  });
+});
+
+describe('место под прибор', () => {
+  it('занимается заранее и попадает в разметку', () => {
+    resetRegistry();
+    defineBlock({
+      kind: 'месте',
+      label: 'Прибор с местом',
+      schema: s.record({ kind: s.literal('месте') }),
+      tag: 'cy-prova',
+      load: () => Promise.resolve(),
+      reserve: 480,
+    });
+    const html = renderBlocks([{ kind: 'месте' }], { base: '/', course: 'к' });
+    expect(html).toContain('style="min-height:480px"');
+  });
+
+  it('без указания места разметка не обрастает пустым стилем', () => {
+    resetRegistry();
+    defineBlock({
+      kind: 'безместа',
+      label: 'Прибор без места',
+      schema: s.record({ kind: s.literal('безместа') }),
+      tag: 'cy-prova',
+      load: () => Promise.resolve(),
+    });
+    const html = renderBlocks([{ kind: 'безместа' }], { base: '/', course: 'к' });
+    expect(html).not.toContain('style=');
   });
 });

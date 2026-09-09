@@ -1,0 +1,176 @@
+---
+/**
+ * ВИТОК — страница лекции.
+ *
+ * Всё, что здесь есть, приезжает разметкой: ни один блок не ждёт скрипта,
+ * чтобы стать читаемым. Приборы стоят пустыми элементами и оживают по
+ * пересечению — их код в отдельных кусках и не грузится, пока читатель до
+ * них не доехал.
+ *
+ * Маршруты строятся по учебному плану, а не по файлам: единственный источник
+ * правды об адресах — `levelHref`, и он же используется в перекрёстных
+ * ссылках внутри текста. Разъехаться им нечем.
+ */
+import Foglio from '~/layouts/Foglio.astro';
+import { PIANO } from '~/courses';
+import { renderBlocks, type Block } from '~/content/registry';
+import { levelHref } from '~/content/inline';
+import { levelKey } from '~/content/model';
+
+export function getStaticPaths() {
+  return PIANO.courses.flatMap((курс) =>
+    курс.topics.flatMap((тема) =>
+      тема.levels.map((виток) => ({
+        params: { course: курс.id, topic: тема.id, depth: String(виток.depth) },
+        props: { courseId: курс.id, topicId: тема.id, depth: виток.depth },
+      })),
+    ),
+  );
+}
+
+interface Props {
+  courseId: string;
+  topicId: string;
+  depth: number;
+}
+
+const { courseId, topicId, depth } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+const курс = PIANO.course(courseId)!;
+const тема = PIANO.topic(courseId, topicId)!;
+const ref = { topic: topicId, depth };
+const виток = PIANO.level(ref, courseId)!;
+
+/* Цели — свои плюс унаследованные. Читателю показывается и то и другое, но
+   раздельно: «чему учит этот виток» и «что к нему уже считается пройденным»
+   — разные обещания, и смешивать их нечестно. */
+const свои = виток.objectives;
+const все = PIANO.objectivesOf(ref, courseId);
+const принесённые = все.filter((ц) => !свои.includes(ц));
+
+const порядок = PIANO.readingOrder(courseId);
+const место = порядок.findIndex((а) => а.topic === topicId && а.depth === depth);
+const назад = место > 0 ? порядок[место - 1] : undefined;
+const вперёд = место >= 0 && место + 1 < порядок.length ? порядок[место + 1] : undefined;
+
+const обратные = PIANO.referencesTo(ref, courseId);
+const глубже = тема.levels.find((л) => л.depth === depth + 1);
+
+const заголовок = (а: { topic: string; depth: number }) => {
+  const т = PIANO.topic(courseId, а.topic);
+  const л = PIANO.level(а, courseId);
+  return `${т?.title ?? а.topic} · виток ${а.depth}${л ? `: ${л.title}` : ''}`;
+};
+
+/* Работ на витке — это то, что читателю предстоит сделать: вопросы и приборы
+   с целью. Число считается здесь, при сборке, и едет в разметке: скрипт игры
+   не должен разбираться в блоках. */
+const работ = виток.lecture.filter(
+  (b) => b.kind === 'question' || (b as { goal?: unknown }).goal !== undefined,
+).length;
+
+const разметка = renderBlocks(
+  виток.lecture as readonly Block[],
+  { base, course: courseId },
+  `${topicId}:${depth}.lecture`,
+);
+---
+
+<Foglio
+  title={`${виток.title} — ${тема.title}`}
+  description={тема.summary}
+  course={{ id: курс.id, title: курс.title }}
+>
+  <main class="colonna lezione">
+    <header
+      class="intestazione"
+      data-livello-corrente={`${courseId}/${levelKey(ref)}`}
+      data-lavori={String(работ)}
+    >
+      <p class="sopra mano">
+        {тема.title} · виток {depth} из {тема.levels.length}
+      </p>
+      <h1>{виток.title}</h1>
+
+      <div class="spirale" role="navigation" aria-label="Витки темы">
+        {тема.levels.map((л) => (
+          <a
+            href={levelHref({ topic: topicId, depth: л.depth }, { base, course: courseId })}
+            class:list={['giro', { corrente: л.depth === depth }]}
+            data-livello={`${courseId}/${topicId}:${л.depth}`}
+            aria-current={л.depth === depth ? 'page' : undefined}
+          >
+            <b>{л.depth}</b>
+            <span>{л.title}</span>
+          </a>
+        ))}
+      </div>
+
+      <section class="obiettivi">
+        <h2 class="etichetta">После этого витка вы сможете</h2>
+        <ul>{свои.map((ц) => <li>{ц}</li>)}</ul>
+        {принесённые.length > 0 && (
+          <details class="ereditate">
+            <summary>Считается уже пройденным ({принесённые.length})</summary>
+            <ul>{принесённые.map((ц) => <li>{ц}</li>)}</ul>
+          </details>
+        )}
+      </section>
+
+      {работ > 0 && (
+        <p class="conteggio tacito">
+          Работ на витке: <span data-conteggio>0 из {работ}</span>
+        </p>
+      )}
+      <p class="esito-livello" data-esito hidden></p>
+    </header>
+
+    <article class="testo" set:html={разметка} />
+
+    <nav class="avanti" aria-label="Дальше">
+      {глубже && (
+        <a
+          class="prossimo-giro"
+          href={levelHref({ topic: topicId, depth: глубже.depth }, { base, course: courseId })}
+        >
+          <b class="mano">Глубже по той же теме</b>
+          <span>Виток {глубже.depth}: {глубже.title}</span>
+        </a>
+      )}
+
+      {обратные.length > 0 && (
+        <section class="rimandi">
+          <h2 class="etichetta">Сюда ссылаются</h2>
+          <ul>
+            {обратные.map((а) => (
+              <li>
+                <a href={levelHref(а, { base, course: courseId })}>{заголовок(а)}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div class="scorrimento">
+        {назад ? (
+          <a class="precedente" href={levelHref(назад, { base, course: courseId })}>
+            <b class="mano">← Назад</b>
+            <span>{заголовок(назад)}</span>
+          </a>
+        ) : (
+          <a class="precedente" href={`${base}${courseId}/`}>
+            <b class="mano">← К оглавлению</b>
+            <span>{курс.title}</span>
+          </a>
+        )}
+        {вперёд && (
+          <a class="successivo" href={levelHref(вперёд, { base, course: courseId })}>
+            <b class="mano">Дальше →</b>
+            <span>{заголовок(вперёд)}</span>
+          </a>
+        )}
+      </div>
+    </nav>
+  </main>
+</Foglio>

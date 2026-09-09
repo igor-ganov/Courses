@@ -1,0 +1,129 @@
+---
+/**
+ * ПОВТОРЕНИЕ — очередь витков, чей срок настал.
+ *
+ * Страница собирается пустой: что именно просрочено, знает только устройство
+ * читателя, и это правильно — прогресс никуда не уезжает. Скрипт достаёт
+ * очередь из движка продвижения и раскладывает по заготовленному списку всех
+ * витков, который приехал разметкой.
+ *
+ * Названия витков нужны здесь, а хранилище их не помнит: в нём лежат только
+ * ключи и числа. Поэтому список всех адресов едет с сервера скрытым, и
+ * скрипт лишь показывает те строки, чей срок пришёл.
+ */
+import Foglio from '~/layouts/Foglio.astro';
+import { PIANO } from '~/courses';
+import { levelHref } from '~/content/inline';
+
+const base = import.meta.env.BASE_URL;
+
+const витки = PIANO.courses.flatMap((курс) =>
+  PIANO.readingOrder(курс.id).map((а) => ({
+    ключ: `${курс.id}/${а.topic}:${а.depth}`,
+    href: levelHref(а, { base, course: курс.id }),
+    тема: PIANO.topic(курс.id, а.topic)!.title,
+    название: PIANO.level(а, курс.id)!.title,
+    depth: а.depth,
+  })),
+);
+---
+
+<Foglio title="Повторение" description="Витки, чей срок повторения настал.">
+  <main class="colonna ripasso">
+    <h1>Повторение</h1>
+    <p class="occhiello">
+      Промежуток между повторениями растёт после каждой удачной попытки и
+      сбрасывается в сутки после неудачной. Просроченное дольше стоит выше.
+    </p>
+
+    <p class="vuoto" data-vuoto>
+      Пока ничего не просрочено. Сдайте виток — и он сам вернётся сюда через
+      сутки.
+    </p>
+
+    <ol class="coda" data-coda>
+      {витки.map((в) => (
+        <li class="riga" data-livello={в.ключ} hidden>
+          <a href={в.href}>
+            <b>{в.название}</b>
+            <span class="tacito">{в.тема} · виток {в.depth}</span>
+          </a>
+          <span class="scaduto" data-scaduto></span>
+        </li>
+      ))}
+    </ol>
+
+    <section class="conservare">
+      <h2>Перенести на другое устройство</h2>
+      <p class="tacito">
+        Прогресс лежит только здесь, в этом браузере. Чтобы взять его с собой,
+        выпишите его и вставьте на другом устройстве.
+      </p>
+      <p class="scelte">
+        <button class="bottone" type="button" data-esporta>Выписать</button>
+        <button class="bottone" type="button" data-importa>Вставить</button>
+      </p>
+      <textarea class="scambio" data-scambio rows="6" spellcheck="false" hidden></textarea>
+      <p class="esito-scambio" data-esito-scambio hidden></p>
+    </section>
+  </main>
+
+  <script>
+    import { progresso } from '~/scripts/gioco';
+
+    const p = progresso();
+    const очередь = p.due();
+    const пусто = document.querySelector<HTMLElement>('[data-vuoto]');
+
+    for (const { key, overdueDays } of очередь) {
+      const строка = document.querySelector<HTMLElement>(`.riga[data-livello="${CSS.escape(key)}"]`);
+      if (!строка) continue;
+      строка.hidden = false;
+      const метка = строка.querySelector<HTMLElement>('[data-scaduto]');
+      if (метка) {
+        метка.textContent =
+          overdueDays >= 1 ? `просрочено на ${Math.round(overdueDays)} дн.` : 'сегодня';
+      }
+      /* Просроченное дольше — выше. Движок уже отдал очередь в этом порядке,
+         остаётся перенести строки, а не пересортировать заново. */
+      строка.parentElement?.appendChild(строка);
+    }
+    if (пусто) пусто.hidden = очередь.length > 0;
+
+    /* ── перенос между устройствами ─────────────────────────────────── */
+
+    const поле = document.querySelector<HTMLTextAreaElement>('[data-scambio]');
+    const итог = document.querySelector<HTMLElement>('[data-esito-scambio]');
+    const сказать = (текст: string, беда = false) => {
+      if (!итог) return;
+      итог.hidden = false;
+      итог.textContent = текст;
+      итог.classList.toggle('male', беда);
+    };
+
+    document.querySelector('[data-esporta]')?.addEventListener('click', () => {
+      if (!поле) return;
+      поле.hidden = false;
+      поле.value = p.export();
+      поле.select();
+      сказать('Скопируйте это и вставьте на другом устройстве.');
+    });
+
+    document.querySelector('[data-importa]')?.addEventListener('click', () => {
+      if (!поле) return;
+      if (поле.hidden || поле.value.trim() === '') {
+        поле.hidden = false;
+        поле.value = '';
+        поле.focus();
+        сказать('Вставьте выписанное сюда и нажмите «Вставить» ещё раз.');
+        return;
+      }
+      try {
+        p.import(поле.value);
+        сказать('Готово. Обновите страницу.');
+      } catch (беда) {
+        сказать(`Не похоже на выписку: ${(беда as Error).message}`, true);
+      }
+    });
+  </script>
+</Foglio>

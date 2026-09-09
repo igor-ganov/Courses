@@ -1,0 +1,142 @@
+---
+/**
+ * ОГЛАВЛЕНИЕ КУРСА — две развёртки одного и того же.
+ *
+ * По модулям — как курс задуман: тема за темой, все её витки подряд. По
+ * спирали — как его стоит проходить: сперва первый виток всех тем, потом
+ * второй. Вторая развёртка и есть смысл спирального курса, и потому она
+ * стоит первой вкладкой.
+ *
+ * Обе строятся из плана, а не переписаны руками: `readingOrder` и
+ * `spiralOrder` — единственные, кто знает порядок.
+ */
+import Foglio from '~/layouts/Foglio.astro';
+import { PIANO } from '~/courses';
+import { levelHref } from '~/content/inline';
+
+export function getStaticPaths() {
+  return PIANO.courses.map((курс) => ({
+    params: { course: курс.id },
+    props: { courseId: курс.id },
+  }));
+}
+
+interface Props {
+  courseId: string;
+}
+
+const { courseId } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const курс = PIANO.course(courseId)!;
+
+const спираль = PIANO.spiralOrder(courseId);
+const глубины = [...new Set(спираль.map((а) => а.depth))].sort((a, b) => a - b);
+
+const витков = курс.topics.reduce((n, т) => n + т.levels.length, 0);
+const работ = курс.topics.reduce(
+  (n, т) =>
+    n +
+    т.levels.reduce(
+      (m, л) =>
+        m + л.lecture.filter((b) => b.kind === 'question' || (b as { goal?: unknown }).goal !== undefined).length,
+      0,
+    ),
+  0,
+);
+
+const тема = (id: string) => PIANO.topic(courseId, id)!;
+const ссылка = (topic: string, depth: number) => levelHref({ topic, depth }, { base, course: courseId });
+const ключ = (topic: string, depth: number) => `${courseId}/${topic}:${depth}`;
+---
+
+<Foglio title={курс.title} description={курс.description} course={{ id: курс.id, title: курс.title }}>
+  <main class="colonna indice">
+    <h1>{курс.title}</h1>
+    {курс.subtitle && <p class="sottotitolo mano">{курс.subtitle}</p>}
+    <p class="descrizione">{курс.description}</p>
+
+    <p class="cifre tacito">
+      {курс.modules.length} модуля · {курс.topics.length} тем · {витков} витков · {работ} работ
+    </p>
+
+    <div class="pastiglie" role="tablist" aria-label="Как разложить курс">
+      <button class="pastiglia" role="tab" aria-pressed="true" aria-controls="a-spirale" data-vista="spirale">
+        по спирали
+      </button>
+      <button class="pastiglia" role="tab" aria-pressed="false" aria-controls="a-moduli" data-vista="moduli">
+        по модулям
+      </button>
+    </div>
+
+    <section id="a-spirale" class="vista" data-vista="spirale">
+      <p class="nota">
+        Сначала первый виток всех тем — целиком, но неглубоко. Потом второй виток
+        тех же тем: то же самое, но с мерой и доказательством. Порядок внутри
+        витка считается по зависимостям, а не по алфавиту.
+      </p>
+
+      {глубины.map((d) => (
+        <section class="giro-livello">
+          <h2>Виток {d}</h2>
+          <ol class="temi">
+            {спираль
+              .filter((а) => а.depth === d)
+              .map((а) => (
+                <li class="tema">
+                  <a href={ссылка(а.topic, а.depth)} data-livello={ключ(а.topic, а.depth)}>
+                    <b>{PIANO.level(а, courseId)?.title ?? тема(а.topic).title}</b>
+                    <span class="tacito">{тема(а.topic).title}</span>
+                  </a>
+                </li>
+              ))}
+          </ol>
+        </section>
+      ))}
+    </section>
+
+    <section id="a-moduli" class="vista" data-vista="moduli" hidden>
+      {курс.modules.map((модуль) => (
+        <section class="modulo">
+          <h2>
+            {модуль.glyph && <span class="glifo" aria-hidden="true">{модуль.glyph}</span>}
+            {модуль.title}
+          </h2>
+          <p class="descrizione">{модуль.description}</p>
+          <ul class="temi">
+            {модуль.topicIds.map((id) => (
+              <li class="tema">
+                <b>{тема(id).title}</b>
+                <p class="tacito">{тема(id).summary}</p>
+                <div class="giri">
+                  {тема(id).levels.map((л) => (
+                    <a class="giro" href={ссылка(id, л.depth)} data-livello={ключ(id, л.depth)}>
+                      <b>{л.depth}</b>
+                      <span>{л.title}</span>
+                    </a>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </section>
+  </main>
+
+  <script>
+    /* Переключатель развёрток. Обе развёртки уже в разметке: без скрипта
+       читатель видит спираль и может дойти до любого витка — переключатель
+       лишь прячет одну из двух. */
+    const кнопки = [...document.querySelectorAll<HTMLButtonElement>('[data-vista]')].filter(
+      (э) => э.tagName === 'BUTTON',
+    );
+    const виды = [...document.querySelectorAll<HTMLElement>('section.vista')];
+    for (const кнопка of кнопки) {
+      кнопка.addEventListener('click', () => {
+        const выбран = кнопка.dataset.vista;
+        for (const к of кнопки) к.setAttribute('aria-pressed', String(к.dataset.vista === выбран));
+        for (const в of виды) в.hidden = в.dataset.vista !== выбран;
+      });
+    }
+  </script>
+</Foglio>

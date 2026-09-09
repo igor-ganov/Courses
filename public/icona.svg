@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Контур обратной связи на клетчатой бумаге">
+  <rect width="512" height="512" rx="72" fill="#f3efe4"/>
+  <g stroke="#a8c0d6" stroke-width="2" opacity=".55">
+    <path d="M128 40v432M256 40v432M384 40v432M40 128h432M40 256h432M40 384h432"/>
+  </g>
+  <g fill="none" stroke="#1b3a6b" stroke-width="17" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M112 200h56M232 200h48M344 200h48"/>
+    <path d="M168 168h64v64h-64zM280 168h64v64h-64z"/>
+    <path d="M392 200v104q0 16-16 16H152q-16 0-16-16v-52"/>
+    <path d="M118 264l18 22 18-22"/>
+  </g>
+  <circle cx="136" cy="200" r="13" fill="#a8402f"/>
+</svg>

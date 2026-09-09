@@ -44,6 +44,20 @@ export interface BlockDefinition<T extends { kind: string } = { kind: string }> 
   /** Интерактивный блок: имя элемента и его отложенная загрузка. */
   readonly tag?: string;
   readonly load?: () => Promise<unknown>;
+  /**
+   * Сколько места прибор займёт, когда оживёт, в пикселях. Место занимается
+   * заранее.
+   *
+   * Это не украшение. Прибор оживает по пересечению, то есть под самым
+   * пальцем, и если до оживления он занимал сотню пикселей, а после — четыре
+   * сотни, то текст под ним уезжает ровно в тот момент, когда читатель до
+   * него добрался. Один такой прыжок стоит попадания по ссылке.
+   *
+   * Число приблизительное, и точным быть не может: высота зависит от длины
+   * подписи и ширины окна. Но приблизительно верное число убирает прыжок
+   * почти целиком, а одинаковое для всех — не убирает вовсе.
+   */
+  readonly reserve?: number;
 }
 
 /** Блок как его видит движок: метка вида плюс что угодно, что позволила схема. */
@@ -147,7 +161,8 @@ export function renderBlocks(list: readonly Block[], context: RenderContext, pat
       /* Интерактив: элемент ставится пустым, свойства едут атрибутом, и до
          появления на экране за него не платят ни байта. */
       const props = escapeAttribute(JSON.stringify(block));
-      return `<${definition.tag} class="isola" data-blocco="${escapeAttribute(block.kind)}" data-props="${props}"></${definition.tag}>`;
+      const место = definition.reserve ? ` style="min-height:${Math.round(definition.reserve)}px"` : '';
+      return `<${definition.tag} class="isola" data-blocco="${escapeAttribute(block.kind)}" data-props="${props}"${место}></${definition.tag}>`;
     })
     .join('\n');
 }

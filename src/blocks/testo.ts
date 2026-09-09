@@ -129,7 +129,9 @@ export const table = defineBlock({
   schema: s
     .record({
       kind: s.literal('table'),
-      head: s.list(строка(200), { min: 1 }),
+      /* Угловая ячейка часто пуста: в таблице с подписями строк ей нечего
+         сказать. Это единственное место, где пустая строка осмысленна. */
+      head: s.list(s.text({ max: 200, allowEmpty: true }), { min: 1 }),
       rows: s.list(s.list(строка(400)), { min: 1 }),
       caption: s.optional(строка(300)),
     })

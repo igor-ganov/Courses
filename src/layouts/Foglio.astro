@@ -7,31 +7,41 @@
  * окно, прилипание делает сдвиг фона, иначе браузер красит полотно во весь
  * документ и первая отрисовка встаёт.
  *
- * Скрипт материи грузится отложенно и не блокирует ничего: без него страница
- * остаётся полной, просто бумага становится крашеной.
+ * Три скрипта, и порядок между ними не случаен:
+ *
+ *   1. Острова и игра — модуль, собранный сборщиком. Он и включает приборы,
+ *      и помечает состояние. Грузится с `type=module`, то есть отложенно, но
+ *      до простоя: без него страница читается, но не считается.
+ *   2. Материя — украшение, поэтому в простое и последней.
+ *   3. Служитель — в `load`, чтобы регистрация не мешала первой отрисовке.
+ *
+ * Ни один из трёх не обязателен: без всех трёх остаётся полная лекция на
+ * крашеной бумаге. Это и есть проверка на то, что слои разделены честно.
  */
 import '~/styles/quaderno.css';
 
 interface Props {
   title: string;
   description?: string;
-  /** Заголовок страницы виден в шапке; на титульной он не нужен. */
-  bare?: boolean;
+  /** Курс, к которому относится страница: он ведёт хлебные крошки. */
+  course?: { id: string; title: string } | undefined;
 }
 
-const { title, description } = Astro.props;
+const { title, description, course } = Astro.props;
 const base = import.meta.env.BASE_URL;
+const полный = title.endsWith('Кибернетика') ? title : `${title} — Кибернетика`;
 ---
 
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
+    <title>{полный}</title>
     {description && <meta name="description" content={description} />}
     <meta name="theme-color" content="#f3efe4" />
     <link rel="manifest" href={`${base}manifest.webmanifest`} />
     <link rel="icon" href={`${base}icona.svg`} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={`${base}icona.svg`} />
   </head>
   <body>
     <canvas
@@ -45,7 +55,29 @@ const base = import.meta.env.BASE_URL;
     <div class="griglia" data-scorre></div>
     <div class="margine" data-scorre></div>
 
+    <header class="testata">
+      <nav class="briciole" aria-label="Где я">
+        <a href={base}>Тетрадь</a>
+        {course && <><span aria-hidden="true">·</span><a href={`${base}${course.id}/`}>{course.title}</a></>}
+      </nav>
+      <div class="stato" data-stato-gioco data-ripasso={`${base}ripasso/`} aria-live="polite"></div>
+    </header>
+
     <slot />
+
+    <footer class="piede">
+      <p class="tacito">
+        Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href={`${base}blocchi/`}>Из чего собраны страницы</a>.
+      </p>
+    </footer>
+
+    <script>
+      import { accendiIsole } from '~/scripts/isole';
+      import { avviaGioco } from '~/scripts/gioco';
+      accendiIsole();
+      avviaGioco();
+    </script>
 
     <script is:inline define:vars={{ base }}>
       /* Материя — украшение, поэтому грузится последней и в простое: страница
@@ -58,6 +90,16 @@ const base = import.meta.env.BASE_URL;
       };
       if ('requestIdleCallback' in window) requestIdleCallback(поставить, { timeout: 1500 });
       else addEventListener('load', поставить);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
     </script>
   </body>
 </html>

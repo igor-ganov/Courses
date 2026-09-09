@@ -6,22 +6,22 @@
   "description": "Интерактивная платформа для курсов: офлайн-первая, спиральная, с материалом вместо пересказа",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/offline.mjs",
     "preview": "astro preview",
     "check": "astro check && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "build:pages": "PAGES_BASE=/Courses/ npm run build"
   },
   "dependencies": {
-    "@astrojs/lit": "4.3.0",
-    "@webcomponents/template-shadowroot": "0.2.1",
     "astro": "5.18.2",
     "lit": "3.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@playwright/test": "1.63.0",
+    "sharp": "0.34.5",
     "typescript": "5.9.3",
     "vitest": "3.2.4"
   }

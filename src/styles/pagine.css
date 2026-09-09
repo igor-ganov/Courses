@@ -1,0 +1,831 @@
+/* PAGINE — страницы тетради поверх общего словаря.
+ *
+ * В quaderno.css лежит то, из чего сделана всякая страница: набор, поля,
+ * приборы, ручки, кнопки. Здесь — четыре разворота, которые из этого
+ * собираются: обложка, оглавление, виток, галерея.
+ *
+ * Правила прежние и здесь тоже держатся:
+ *
+ *   — Замкнутых рамок нет. Всё, что обводит, обводит незамкнутым штрихом или
+ *     не обводит вовсе. Список отделяется отступом и линией слева, а не
+ *     карточкой: карточка — это печать.
+ *   — Отступы кратны шагу клетки. Если что-то отступает на 19 px, это ошибка,
+ *     а не находка.
+ *   — Состояние витка — рукой: галочка, штриховка, кружок. Ни одной заливки
+ *     цветом «пройдено», потому что в тетради так не отмечают.
+ */
+
+/* ── шапка и подвал ────────────────────────────────────────────────── */
+
+.testata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 20px;
+  max-width: var(--колонка);
+  margin: 0 auto;
+  padding: calc(var(--шаг) * 0.5) 24px 0;
+}
+
+.briciole {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(19px * var(--кегль)), var(--пол));
+  color: var(--грифель);
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.briciole a {
+  color: var(--грифель);
+  text-decoration-color: color-mix(in srgb, var(--грифель) 45%, transparent);
+}
+
+.briciole a:last-child {
+  color: var(--паста);
+}
+
+/* Полоса состояния ставится скриптом; пока её нет, шапка не должна зиять. */
+.stato:empty {
+  display: none;
+}
+
+.stato {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(19px * var(--кегль)), var(--пол));
+  color: var(--грифель);
+}
+
+.stato .grado {
+  color: var(--паста);
+  font-weight: 700;
+}
+
+/* Опыт — не индикатор загрузки, а карандашная полоска на полях. */
+.stato .barra {
+  display: block;
+  width: 78px;
+  height: 7px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='7' preserveAspectRatio='none'><path d='M1,5.4 C24,4.2 56,5.6 79,4.4' fill='none' stroke='%235c6068' stroke-width='1.1' stroke-linecap='round' opacity='.55'/></svg>")
+    no-repeat center / 100% 100%;
+}
+
+.stato .barra i {
+  display: block;
+  height: 7px;
+  width: calc(var(--riempita, 0) * 100%);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='7' preserveAspectRatio='none'><path d='M1,4.6 C22,2.4 54,4.4 79,2.6' fill='none' stroke='%231b3a6b' stroke-width='2' stroke-linecap='round'/></svg>")
+    no-repeat left center / 78px 100%;
+}
+
+.stato .punti {
+  font-family: 'Literata', serif;
+  font-size: max(calc(15px * var(--кегль)), var(--пол));
+  font-variant-numeric: tabular-nums;
+}
+
+.stato .serie::before {
+  content: '·';
+  margin-right: 8px;
+  color: var(--тихий);
+}
+
+.stato .ripasso {
+  color: var(--красный);
+}
+
+.piede {
+  max-width: var(--колонка);
+  margin: 0 auto;
+  padding: 0 24px calc(var(--шаг) * 2);
+}
+
+.piede p {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(18px * var(--кегль)), var(--пол));
+  border-top: 1px solid color-mix(in srgb, var(--грифель) 22%, transparent);
+  padding-top: calc(var(--шаг) * 0.5);
+  max-width: none;
+}
+
+/* ── общее для разворотов ──────────────────────────────────────────── */
+
+.sopra {
+  font-size: max(calc(21px * var(--кегль)), var(--пол));
+  color: var(--грифель);
+  margin: 0 0 2px;
+  line-height: 1.1;
+}
+
+.sottotitolo {
+  font-size: max(calc(23px * var(--кегль)), var(--пол));
+  color: var(--грифель);
+  margin: 0 0 var(--шаг);
+  line-height: 1.15;
+}
+
+.occhiello {
+  font-size: max(calc(19px * var(--кегль)), var(--пол));
+  line-height: calc(var(--шаг) * 1.15);
+  margin-bottom: calc(var(--шаг) * 1.5);
+}
+
+.cifre {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(19px * var(--кегль)), var(--пол));
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ярлычок раздела: не заголовок, а подпись на полях. */
+.etichetta {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(21px * var(--кегль)), var(--пол));
+  font-weight: 600;
+  color: var(--грифель);
+  margin: 0 0 4px;
+  line-height: 1.15;
+}
+
+.scelte {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+  margin: var(--шаг) 0;
+}
+
+/* ── обложка ───────────────────────────────────────────────────────── */
+
+.copertina .corso {
+  margin: calc(var(--шаг) * 2) 0;
+}
+
+.copertina .promessa {
+  margin-top: calc(var(--шаг) * 3);
+}
+
+.patti {
+  margin: 0;
+  display: grid;
+  gap: var(--шаг);
+}
+
+.patti dt {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(25px * var(--кегль)), var(--пол));
+  color: var(--паста);
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+
+.patti dd {
+  margin: 0;
+  padding-left: 14px;
+  max-width: 62ch;
+  border-left: 1px solid color-mix(in srgb, var(--клетка) 70%, transparent);
+}
+
+/* ── оглавление ────────────────────────────────────────────────────── */
+
+.indice .descrizione {
+  max-width: 62ch;
+}
+
+.indice .vista {
+  margin-top: var(--шаг);
+}
+
+.giro-livello,
+.modulo {
+  margin-bottom: calc(var(--шаг) * 2);
+}
+
+.modulo .glifo {
+  margin-right: 10px;
+  opacity: 0.75;
+}
+
+.temi {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: calc(var(--шаг) * 0.5);
+}
+
+ol.temi {
+  counter-reset: тема;
+}
+
+ol.temi > .tema {
+  counter-increment: тема;
+}
+
+.tema > a,
+.giro {
+  display: grid;
+  gap: 0 10px;
+  text-decoration: none;
+  padding: 3px 0 3px 30px;
+  position: relative;
+  align-items: baseline;
+}
+
+.tema > a b,
+.tema > b {
+  font-weight: 600;
+  color: var(--паста);
+}
+
+.tema > a:hover b {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tema > b {
+  display: block;
+  padding-left: 30px;
+}
+
+.tema > p {
+  margin: 0 0 6px;
+  padding-left: 30px;
+  font-size: max(calc(15px * var(--кегль)), var(--пол));
+  line-height: calc(var(--шаг) * 0.85);
+}
+
+/* Номер витка — кружком от руки, слева на поле. */
+.giro > b,
+ol.temi > .tema > a::before {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(17px * var(--кегль)), var(--пол));
+  color: var(--грифель);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22'><path d='M11,2.2 C15.9,2 19.8,6 19.8,11 C19.8,16 16,19.9 11,19.8 C6,19.7 2.2,15.8 2.2,11 C2.2,6.3 5.7,2.6 9.9,2.3' fill='none' stroke='%235c6068' stroke-width='1.2' stroke-linecap='round' opacity='.6'/></svg>")
+    no-repeat center;
+}
+
+ol.temi > .tema > a::before {
+  content: counter(тема);
+}
+
+.giri {
+  display: grid;
+  gap: 2px;
+  padding-left: 30px;
+}
+
+.giri .giro {
+  padding-left: 30px;
+}
+
+.giro {
+  grid-template-columns: auto 1fr;
+}
+
+.giro > span,
+.tema > a > span {
+  color: var(--текст);
+}
+
+.tema > a > span.tacito {
+  font-size: max(calc(15px * var(--кегль)), var(--пол));
+}
+
+/* ── отметки состояния: галочка, штриховка, кружок ─────────────────────
+   Метка витка всегда висит на самой ссылке. Так отметка попадает внутрь
+   того же относительного бокса, что и кружок с номером, — и не приходится
+   гадать, у какого предка её искать. */
+
+a[data-livello][data-stato='fatto']::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 18px;
+  height: 18px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18'><path d='M2,9.5 C4.6,11.4 6.2,13.6 7.2,15.6 C9,10.4 12,5.2 16.4,1.6' fill='none' stroke='%233f6b4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>")
+    no-repeat center;
+}
+
+/* Начатый, но не сданный: доля освоенного заштрихована по дуге кружка. */
+a[data-livello][data-stato='iniziato']::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: conic-gradient(
+    color-mix(in srgb, var(--паста) 55%, transparent) calc(var(--padronanza, 0) * 360deg),
+    transparent 0
+  );
+  opacity: 0.45;
+}
+
+/* ── виток ─────────────────────────────────────────────────────────── */
+
+.lezione .intestazione {
+  margin-bottom: calc(var(--шаг) * 1.5);
+}
+
+.spirale {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin: calc(var(--шаг) * 0.5) 0 var(--шаг);
+}
+
+.spirale .giro {
+  grid-template-columns: auto auto;
+  padding: 2px 0 2px 28px;
+  font-size: max(calc(15px * var(--кегль)), var(--пол));
+}
+
+.spirale .giro span {
+  color: var(--грифель);
+}
+
+.spirale .giro.corrente span {
+  color: var(--паста);
+  font-weight: 600;
+}
+
+.spirale .giro.corrente > b {
+  color: var(--паста);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22'><path d='M11,2.2 C15.9,2 19.8,6 19.8,11 C19.8,16 16,19.9 11,19.8 C6,19.7 2.2,15.8 2.2,11 C2.2,6.3 5.7,2.6 9.9,2.3' fill='none' stroke='%231b3a6b' stroke-width='1.8' stroke-linecap='round'/></svg>");
+}
+
+.obiettivi {
+  margin: var(--шаг) 0;
+  padding-left: 14px;
+  border-left: 2px solid color-mix(in srgb, var(--паста) 25%, transparent);
+}
+
+.obiettivi ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.obiettivi li {
+  margin-bottom: 2px;
+}
+
+.ereditate {
+  margin-top: 6px;
+}
+
+.ereditate summary {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(18px * var(--кегль)), var(--пол));
+  color: var(--тихий);
+  cursor: pointer;
+}
+
+.ereditate ul {
+  margin-top: 4px;
+  color: var(--тихий);
+}
+
+.conteggio {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(19px * var(--кегль)), var(--пол));
+  margin: 0;
+}
+
+.esito-livello {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(21px * var(--кегль)), var(--пол));
+  color: var(--зелёный);
+  margin: 6px 0 0;
+}
+
+/* ── набор лекции ──────────────────────────────────────────────────── */
+
+.testo h2 {
+  scroll-margin-top: calc(var(--шаг) * 2);
+}
+
+.definizione {
+  margin: 0 0 var(--шаг);
+  padding-left: 14px;
+  border-left: 2px solid color-mix(in srgb, var(--паста) 25%, transparent);
+}
+
+.definizione dt {
+  margin-bottom: 2px;
+}
+
+.definizione dd {
+  margin: 0;
+  max-width: 62ch;
+}
+
+.citazione {
+  margin: 0 0 var(--шаг);
+  padding-left: 22px;
+  position: relative;
+}
+
+.citazione::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  bottom: 20px;
+  width: 3px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='70'><path d='M2.4,2 C1.2,20 3,44 1.8,68' fill='none' stroke='%231b3a6b' stroke-width='1.6' stroke-linecap='round' opacity='.5'/></svg>")
+    repeat-y;
+}
+
+.citazione blockquote {
+  margin: 0;
+  font-style: italic;
+  max-width: 60ch;
+}
+
+.citazione figcaption,
+.formula-blocco figcaption,
+.codice figcaption,
+.disegno figcaption,
+.tabella figcaption {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(18px * var(--кегль)), var(--пол));
+  color: var(--тихий);
+  line-height: 1.2;
+  margin-top: 4px;
+}
+
+.formula-blocco {
+  margin: 0 0 var(--шаг);
+  text-align: center;
+}
+
+.formula-blocco .formula,
+.testo .formula {
+  font-family: 'PT Mono', ui-monospace, monospace;
+  color: var(--паста);
+}
+
+.formula-blocco .formula {
+  font-size: max(calc(19px * var(--кегль)), var(--пол));
+  padding: 6px 0;
+}
+
+.codice {
+  margin: 0 0 var(--шаг);
+}
+
+.codice pre {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  background: color-mix(in srgb, var(--бумага) 55%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--грифель) 35%, transparent);
+}
+
+.tabella {
+  margin: 0 0 var(--шаг);
+}
+
+/* Таблица лежит в figure, и возит вбок именно figure: у самой таблицы
+   overflow не работает — она не блок. */
+.tabella table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: max(calc(15px * var(--кегль)), var(--пол));
+}
+
+.tabella th,
+.tabella td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 12px 5px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--клетка) 60%, transparent);
+}
+
+.tabella th {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(19px * var(--кегль)), var(--пол));
+  font-weight: 600;
+  color: var(--паста);
+  border-bottom-color: color-mix(in srgb, var(--паста) 45%, transparent);
+}
+
+.disegno {
+  margin: 0 0 var(--шаг);
+}
+
+.disegno svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Врезка: та же обводка одним штрихом, что у прибора, — она уже нарисована
+   в .strumento. Тон меняет только цвет пометки на полях, а не заливку:
+   заливками в тетради не пользуются. */
+.incastro {
+  position: relative;
+}
+
+.incastro > .titolo-strumento::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 22px;
+  bottom: 18px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--tono, var(--грифель));
+  opacity: 0.55;
+}
+
+.incastro[data-tono='storia'] {
+  --tono: var(--грифель);
+}
+
+.incastro[data-tono='attenzione'] {
+  --tono: var(--красный);
+}
+
+.incastro[data-tono='attenzione'] > .titolo-strumento {
+  color: var(--красный);
+}
+
+.incastro[data-tono='prova'] {
+  --tono: var(--зелёный);
+}
+
+.incastro[data-tono='prova'] > .titolo-strumento {
+  color: var(--зелёный);
+}
+
+/* Блок внутри врезки не отступает второй раз: он уже внутри отступа. */
+.incastro > :last-child {
+  margin-bottom: 0;
+}
+
+/* ── список ────────────────────────────────────────────────────────── */
+
+.elenco {
+  margin: 0 0 var(--шаг);
+  padding-left: 22px;
+  max-width: 62ch;
+}
+
+.elenco li {
+  margin-bottom: 4px;
+}
+
+/* Маркер — короткий штрих, а не точка: точку ставит печать, штрих — рука. */
+.elenco:not(ol) {
+  list-style: none;
+  padding-left: 18px;
+}
+
+.elenco:not(ol) > li {
+  position: relative;
+}
+
+.elenco:not(ol) > li::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: calc(var(--шаг) * 0.45);
+  width: 9px;
+  height: 3px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='3'><path d='M1,2 C4,1.2 7,2.2 9,1.4' fill='none' stroke='%235c6068' stroke-width='1.3' stroke-linecap='round'/></svg>")
+    no-repeat center;
+}
+
+.rinvio-blocco {
+  margin: 0 0 var(--шаг);
+  padding-left: 22px;
+  position: relative;
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(20px * var(--кегль)), var(--пол));
+}
+
+.rinvio-blocco::before {
+  content: '↳';
+  position: absolute;
+  left: 2px;
+  top: -1px;
+  color: var(--тихий);
+}
+
+.guasto {
+  margin: 0 0 var(--шаг);
+  padding: 10px 14px;
+  color: var(--красный);
+  border-left: 3px solid var(--красный);
+  font-family: 'PT Mono', ui-monospace, monospace;
+  font-size: 0.9em;
+}
+
+/* Прибор до оживления: место под него занято, но пусто — не мигает. */
+.isola {
+  display: block;
+  min-height: calc(var(--шаг) * 4);
+  margin: 0 0 var(--шаг);
+}
+
+/* ── дальше ────────────────────────────────────────────────────────── */
+
+.avanti {
+  margin-top: calc(var(--шаг) * 2);
+  padding-top: var(--шаг);
+  border-top: 1px solid color-mix(in srgb, var(--грифель) 22%, transparent);
+  display: grid;
+  gap: var(--шаг);
+}
+
+.prossimo-giro,
+.precedente,
+.successivo {
+  display: grid;
+  gap: 1px;
+  text-decoration: none;
+}
+
+.prossimo-giro b,
+.precedente b,
+.successivo b {
+  font-size: max(calc(21px * var(--кегль)), var(--пол));
+  color: var(--паста);
+  line-height: 1.1;
+}
+
+.prossimo-giro span,
+.precedente span,
+.successivo span {
+  color: var(--грифель);
+  font-size: max(calc(15px * var(--кегль)), var(--пол));
+  line-height: calc(var(--шаг) * 0.85);
+}
+
+.prossimo-giro:hover b,
+.precedente:hover b,
+.successivo:hover b {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rimandi ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.scorrimento {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--шаг) 24px;
+}
+
+.scorrimento > * {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.successivo {
+  text-align: right;
+}
+
+/* ── галерея блоков ────────────────────────────────────────────────── */
+
+.galleria .voce {
+  margin-bottom: calc(var(--шаг) * 2);
+  scroll-margin-top: calc(var(--шаг) * 2);
+}
+
+.galleria h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.galleria .genere {
+  font-size: max(calc(14px * var(--кегль)), var(--пол));
+  color: var(--грифель);
+}
+
+.galleria .modo {
+  font-family: 'Literata', serif;
+  font-size: max(calc(13px * var(--кегль)), var(--пол));
+  color: var(--тихий);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.galleria .modo.vivo {
+  color: var(--зелёный);
+}
+
+.galleria .campione {
+  margin-top: 10px;
+  padding-left: 16px;
+  border-left: 1px dashed color-mix(in srgb, var(--грифель) 30%, transparent);
+}
+
+/* ── повторение ────────────────────────────────────────────────────── */
+
+/* Строки очереди приезжают скрытыми, и показывает их скрипт. Правило ниже
+   обязательно: display у .riga перебивает встроенный [hidden], и без него
+   на странице повторения висел бы весь курс сразу. */
+.coda .riga[hidden] {
+  display: none;
+}
+
+.coda {
+  list-style: none;
+  margin: 0 0 calc(var(--шаг) * 2);
+  padding: 0;
+  display: grid;
+  gap: calc(var(--шаг) * 0.5);
+}
+
+.coda .riga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+
+.coda .riga a {
+  display: grid;
+  text-decoration: none;
+}
+
+.coda .riga a b {
+  color: var(--паста);
+}
+
+.coda .scaduto {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(18px * var(--кегль)), var(--пол));
+  color: var(--красный);
+}
+
+.vuoto {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(20px * var(--кегль)), var(--пол));
+  color: var(--грифель);
+}
+
+.scambio {
+  width: 100%;
+  font-family: 'PT Mono', ui-monospace, monospace;
+  font-size: max(calc(13px * var(--кегль)), var(--пол));
+  padding: 10px 12px;
+  border: 0;
+  border-left: 2px solid color-mix(in srgb, var(--грифель) 35%, transparent);
+  background: color-mix(in srgb, var(--бумага) 60%, transparent);
+  color: var(--текст);
+  resize: vertical;
+}
+
+.esito-scambio {
+  font-family: 'Caveat', cursive;
+  font-size: max(calc(19px * var(--кегль)), var(--пол));
+  color: var(--зелёный);
+}
+
+.esito-scambio.male {
+  color: var(--красный);
+}
+
+/* ── телефон ───────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .testata {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .piede {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .successivo {
+    text-align: left;
+  }
+
+  .scorrimento {
+    display: grid;
+  }
+}
