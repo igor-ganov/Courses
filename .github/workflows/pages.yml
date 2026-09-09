@@ -3,7 +3,6 @@ name: Pages
 on:
   push:
     branches: [claude/cybernetics-interactive-platform-j5tbo7]
-    paths: ['design/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 
 permissions:
@@ -14,18 +13,76 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  # Выкладывать непроверенное незачем: тетрадь обещает работать без сети и в
+  # ладони, и оба обещания проверяются здесь, до выкладки, а не после.
+  proverki:
+    name: Проверки
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Собрать сайт
+      - run: npm ci
+
+      - name: Типы
+        run: npx tsc --noEmit
+
+      - name: Модульные проверки
+        run: npm test
+
+      - name: Собрать
+        run: npm run build
+        env:
+          PAGES_BASE: /Courses/
+
+      - name: Поставить браузер
+        run: npx playwright install --with-deps chromium
+
+      - name: Сквозные проверки
+        run: npx playwright test
+        env:
+          PAGES_BASE: /Courses/
+
+      - name: Отчёт о сквозных проверках
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright
+          path: playwright-report
+          retention-days: 7
+
+      - name: Сохранить собранное
+        uses: actions/upload-artifact@v4
+        with:
+          name: sito
+          path: dist
+          retention-days: 1
+
+  vylozhit:
+    name: Выложить
+    needs: proverki
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: sito
+          path: _site
+
+      - name: Показать направления дизайна рядом с тетрадью
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Собрать витрину
         run: |
-          mkdir -p _site
-          cp -r design/fonts design/mockups design/materia.js design/grana.png _site/
-          cp design/mostra.html _site/index.html
-          cp design/geometria.html _site/geometria.html
-          cp design/tocchi.html _site/tocchi.html
+          mkdir -p _site/design
+          cp -r repo/design/fonts repo/design/mockups repo/design/materia.js \
+                repo/design/grana.png _site/design/
+          cp repo/design/mostra.html _site/design/index.html
+          cp repo/design/geometria.html repo/design/tocchi.html _site/design/
           touch _site/.nojekyll
 
       # Pages здесь классические, из ветки: токен Actions не имеет права
@@ -37,7 +94,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          git commit -q -m "Витрина направлений: ${GITHUB_SHA::7}"
+          git commit -q -m "Тетрадь: ${GITHUB_SHA::7}"
           git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}" gh-pages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

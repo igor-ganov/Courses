@@ -31,14 +31,14 @@ async function служительГотов(context: BrowserContext, стр: imp
 
 test.describe('тетрадь без сети', () => {
   test('виток, на котором читатель не был, открывается без сети', async ({ context, page }) => {
-    await page.goto('/');
+    await page.goto('./');
     await служительГотов(context, page);
 
     await context.setOffline(true);
 
     /* Никуда, кроме этого адреса, читатель не заходил. Если страница
        откроется, значит опись действительно разложена целиком. */
-    const ответ = await page.goto('/cibernetica/secondorder/1/');
+    const ответ = await page.goto('cibernetica/secondorder/1/');
     expect(ответ?.status(), 'страница отдана служителем').toBeLessThan(400);
 
     await expect(page.locator('h1')).toHaveText('Кибернетика наблюдающих систем');
@@ -54,11 +54,11 @@ test.describe('тетрадь без сети', () => {
   });
 
   test('шрифты и значки тоже лежат на устройстве', async ({ context, page }) => {
-    await page.goto('/');
+    await page.goto('./');
     await служительГотов(context, page);
     await context.setOffline(true);
 
-    await page.goto('/cibernetica/');
+    await page.goto('cibernetica/');
     /* Рукописный шрифт — часть тетради, а не украшение: без него оглавление
        выглядит чужим. Проверяем, что он реально загружен, а не подменён. */
     const загружен = await page.evaluate(async () => {
@@ -67,14 +67,14 @@ test.describe('тетрадь без сети', () => {
     });
     expect(загружен).toBe(true);
 
-    const значок = await page.request.get('/icona-512.png');
+    const значок = await page.request.get('icona-512.png');
     expect(значок.ok()).toBe(true);
 
     await context.setOffline(false);
   });
 
   test('манифест описывает установимое приложение', async ({ request }) => {
-    const ответ = await request.get('/manifest.webmanifest');
+    const ответ = await request.get('manifest.webmanifest');
     expect(ответ.ok()).toBe(true);
     const м = await ответ.json();
 

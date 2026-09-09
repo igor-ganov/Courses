@@ -11,6 +11,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const ПОРТ = 4321;
+/* Префикс сайта. На Pages тетрадь живёт в подкаталоге, и проверять её на
+   корне значило бы не проверить как раз то, что ломается при переезде.
+   Поэтому адреса в проверках относительные — они считаются от базы. */
+const БАЗА = (process.env.PAGES_BASE ?? '/').replace(/\/*$/, '/');
 
 export default defineConfig({
   testDir: 'e2e',
@@ -19,7 +23,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
-    baseURL: `http://127.0.0.1:${ПОРТ}`,
+    baseURL: `http://127.0.0.1:${ПОРТ}${БАЗА}`,
     trace: 'retain-on-failure',
   },
   projects: [
@@ -29,7 +33,7 @@ export default defineConfig({
   webServer: {
     /* `astro preview` отдаёт ровно то, что уедет на Pages, и с тем же base. */
     command: `npx astro preview --port ${ПОРТ} --host 127.0.0.1`,
-    url: `http://127.0.0.1:${ПОРТ}/`,
+    url: `http://127.0.0.1:${ПОРТ}${БАЗА}`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },

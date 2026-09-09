@@ -9,7 +9,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('оглавление курса', () => {
   test('обе развёртки ведут в одни и те же витки', async ({ page }) => {
-    await page.goto('/cibernetica/');
+    await page.goto('cibernetica/');
 
     const адреса = async () =>
       (await page.locator('section.vista:not([hidden]) a[data-livello]').evaluateAll((узлы) =>
@@ -26,7 +26,7 @@ test.describe('оглавление курса', () => {
   });
 
   test('спираль идёт по глубине, а не по темам', async ({ page }) => {
-    await page.goto('/cibernetica/');
+    await page.goto('cibernetica/');
     const глубины = await page
       .locator('section[data-vista="spirale"] a[data-livello]')
       .evaluateAll((узлы) => узлы.map((у) => Number(у.getAttribute('data-livello')!.split(':')[1])));
@@ -39,7 +39,7 @@ test.describe('оглавление курса', () => {
   test('без скрипта оглавление всё равно доводит до витка', async ({ browser }) => {
     const контекст = await browser.newContext({ javaScriptEnabled: false });
     const стр = await контекст.newPage();
-    await стр.goto('/cibernetica/');
+    await стр.goto('cibernetica/');
     await стр.locator('section[data-vista="spirale"] a[data-livello]').first().click();
     await expect(стр.locator('h1')).toHaveText(/\S/);
     await контекст.close();
@@ -48,7 +48,7 @@ test.describe('оглавление курса', () => {
 
 test.describe('галерея блоков', () => {
   test('показывает весь реестр, и каждый блок живой', async ({ page }) => {
-    await page.goto('/blocchi/');
+    await page.goto('blocchi/');
 
     /* Каждому виду — свой раздел с примером; ни одной карточки беды. */
     const разделов = await page.locator('.galleria .voce').count();
@@ -64,13 +64,13 @@ test.describe('галерея блоков', () => {
 
 test.describe('повторение', () => {
   test('пусто, пока ничего не сдано', async ({ page }) => {
-    await page.goto('/ripasso/');
+    await page.goto('ripasso/');
     await expect(page.locator('[data-vuoto]')).toBeVisible();
     await expect(page.locator('.coda .riga:visible')).toHaveCount(0);
   });
 
   test('сданный виток возвращается в очередь, когда придёт срок', async ({ page }) => {
-    await page.goto('/ripasso/');
+    await page.goto('ripasso/');
     /* Подкладываем состояние прямо в хранилище: ждать сутки ради проверки
        очереди — не проверка, а ожидание. Формат — тот же, что пишет движок. */
     await page.evaluate(() => {
@@ -104,7 +104,7 @@ test.describe('повторение', () => {
   });
 
   test('прогресс выписывается и вставляется обратно', async ({ page }) => {
-    await page.goto('/ripasso/');
+    await page.goto('ripasso/');
     await page.evaluate(() => localStorage.setItem('courses.progress', JSON.stringify({ xp: 123, levels: {}, streak: { current: 0, best: 0, lastDay: null }, badges: [] })));
     await page.reload();
 

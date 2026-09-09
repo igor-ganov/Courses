@@ -10,7 +10,7 @@
  */
 import { expect, test } from '@playwright/test';
 
-const ВИТОК = '/cibernetica/feedback/2/';
+const ВИТОК = 'cibernetica/feedback/2/';
 
 test.describe('страница витка', () => {
   test('содержание приезжает разметкой, без скриптов', async ({ browser }) => {
@@ -81,7 +81,7 @@ test.describe('страница витка', () => {
     await page.reload();
     expect(await опыт()).toBeGreaterThan(0);
     /* И на оглавлении виток теперь помечен как начатый или сданный. */
-    await page.goto('/cibernetica/');
+    await page.goto('cibernetica/');
     await expect(
       page.locator('[data-livello="cibernetica/feedback:2"]').first(),
     ).toHaveAttribute('data-stato', /fatto|iniziato/);
@@ -92,6 +92,6 @@ test.describe('страница витка', () => {
     await page.locator('.successivo').click();
     await expect(page).toHaveURL(/\/cibernetica\/feedback\/3\/$/);
     await page.locator('.precedente').click();
-    await expect(page).toHaveURL(new RegExp(`${ВИТОК}$`));
+    await expect(page).toHaveURL(new RegExp(`/${ВИТОК}$`));
   });
 });

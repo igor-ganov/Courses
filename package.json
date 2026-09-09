@@ -6,7 +6,7 @@
   "description": "Интерактивная платформа для курсов: офлайн-первая, спиральная, с материалом вместо пересказа",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/offline.mjs",
+    "build": "astro build && node scripts/twa.mjs && node scripts/offline.mjs",
     "preview": "astro preview",
     "check": "astro check && tsc --noEmit",
     "test": "vitest run",
