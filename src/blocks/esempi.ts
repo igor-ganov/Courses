@@ -140,7 +140,7 @@ export const ESEMPI: Readonly<Record<string, Block>> = {
 
   automaton: automaton({ title: 'Правило 110', rule: 110, width: 121, steps: 90 }),
 
-  life: life({ title: '«Жизнь»', figure: 'планёр', width: 48, height: 32 }),
+  life: life({ title: '«Жизнь»', width: 48, height: 32 }),
 
   logistic: logistic({ title: 'Удвоения периода', r: 3.2 }),
 

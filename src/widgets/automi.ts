@@ -14,6 +14,7 @@
 import { css, html, stile, Widget } from './base';
 import {
   FIGURES,
+  soup,
   createGrid,
   elementaryRun,
   lifeStep,
@@ -127,9 +128,13 @@ export class Automa extends Widget<AutomaProps> {
   }
 }
 
+/** Имя начального поля, которого нет среди фигур: случайная россыпь. */
+const РОССЫПЬ = 'россыпь';
+
 /* ── «Жизнь» ────────────────────────────────────────────────────────── */
 
 interface VitaProps {
+  /** Имя фигуры из FIGURES; «россыпь» — случайное поле по зерну. */
   readonly figure?: string;
   readonly width?: number;
   readonly height?: number;
@@ -153,12 +158,7 @@ export class Vita extends Widget<VitaProps> {
     this.running = true;
     const w = this.props.width ?? 64;
     const h = this.props.height ?? 40;
-    this.grid = setCells(
-      createGrid(w, h),
-      (FIGURES[this.props.figure ?? 'планёр'] ?? FIGURES.планёр!).map(
-        ([x, y]) => [x + Math.floor(w / 2) - 2, y + Math.floor(h / 2) - 2] as const,
-      ),
-    );
+    this.grid = this.posa(this.props.figure ?? РОССЫПЬ, w, h);
 
     this.stop = this.loop(() => {
       if (!this.running) return;
@@ -169,6 +169,15 @@ export class Vita extends Widget<VitaProps> {
       this.grid = lifeStep(this.grid);
       this.generation += 1;
     });
+  }
+
+  /** Начальное поле по имени: либо известная фигура посередине, либо россыпь. */
+  private posa(имя: string, w: number, h: number): Grid {
+    if (имя === РОССЫПЬ || !FIGURES[имя]) return soup(w, h);
+    return setCells(
+      createGrid(w, h),
+      FIGURES[имя]!.map(([x, y]) => [x + Math.floor(w / 2) - 2, y + Math.floor(h / 2) - 2] as const),
+    );
   }
 
   protected override ferma(): void {
@@ -235,16 +244,11 @@ export class Vita extends Widget<VitaProps> {
         <button class="bottone" @click=${() => (this.running = !this.running)}>
           ${this.running ? 'Пауза' : 'Дальше'}
         </button>
-        ${Object.keys(FIGURES).map(
+        ${[РОССЫПЬ, ...Object.keys(FIGURES)].map(
           (имя) => html`<button
             class="bottone"
             @click=${() => {
-              const w = this.grid.width;
-              const h = this.grid.height;
-              this.grid = setCells(
-                createGrid(w, h),
-                FIGURES[имя]!.map(([x, y]) => [x + Math.floor(w / 2) - 2, y + Math.floor(h / 2) - 2] as const),
-              );
+              this.grid = this.posa(имя, this.grid.width, this.grid.height);
               this.generation = 0;
             }}>
             ${имя}

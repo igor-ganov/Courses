@@ -18,6 +18,7 @@ import {
   population,
   setCells,
   singleSeed,
+  soup,
 } from './automi';
 import {
   attractorAt,
@@ -273,5 +274,37 @@ describe('аттрактор Лоренца', () => {
   it('неподвижная точка в начале координат остаётся неподвижной', () => {
     const p = lorenzStep({ x: 0, y: 0, z: 0 }, 0.01);
     expect(p).toEqual({ x: 0, y: 0, z: 0 });
+  });
+});
+
+describe('россыпь для «Жизни»', () => {
+  it('одно зерно даёт одно и то же поле', () => {
+    const a = soup(20, 12, 0.3, 7);
+    const b = soup(20, 12, 0.3, 7);
+    expect([...a.cells]).toEqual([...b.cells]);
+    expect(soup(20, 12, 0.3, 8).cells).not.toEqual(a.cells);
+  });
+
+  it('плотность примерно та, что заказана', () => {
+    const g = soup(120, 80, 0.28);
+    const доля = population(g) / (120 * 80);
+    expect(доля).toBeGreaterThan(0.24);
+    expect(доля).toBeLessThan(0.32);
+  });
+
+  it('россыпь приходит к покою, а не к пустоте: правило порождает структуры', () => {
+    /* Из случайного месива само собой выпадают устойчивые фигуры. Проверка
+       ровно этого: население падает в разы, но не в ноль, и к двухсотому
+       поколению почти не меняется. */
+    let g = soup(80, 60, 0.3, 3);
+    const начало = population(g);
+    for (let i = 0; i < 200; i += 1) g = lifeStep(g);
+    const после = population(g);
+    let ещё = g;
+    for (let i = 0; i < 20; i += 1) ещё = lifeStep(ещё);
+
+    expect(после).toBeGreaterThan(20);
+    expect(после).toBeLessThan(начало / 2);
+    expect(Math.abs(population(ещё) - после)).toBeLessThan(после * 0.3);
   });
 });
