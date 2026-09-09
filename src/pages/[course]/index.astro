@@ -36,11 +36,7 @@ const витков = курс.topics.reduce((n, т) => n + т.levels.length, 0);
 const работ = курс.topics.reduce(
   (n, т) =>
     n +
-    т.levels.reduce(
-      (m, л) =>
-        m + л.lecture.filter((b) => b.kind === 'question' || (b as { goal?: unknown }).goal !== undefined).length,
-      0,
-    ),
+    т.levels.reduce((m, л) => m + л.lecture.filter((b) => b.kind === 'question').length, 0),
   0,
 );
 

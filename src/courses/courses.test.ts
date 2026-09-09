@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { COURSES, PIANO } from './index';
-import { blocks } from '~/content/registry';
+import { blocks, lookupBlock } from '~/content/registry';
 
 /* Содержание проверяется так же, как код. Курс, который собрался, но в котором
    виток без задания или ссылка в никуда, — это брак, который увидит читатель,
@@ -83,6 +83,32 @@ describe('учебный план', () => {
           }),
         ),
       );
+    }
+  });
+
+  it('у задания с целью на витке есть прибор, который эту цель произносит', () => {
+    /* Задание вида «удержите контур» выглядит совершенно обычным вопросом, но
+       ответить на него можно только через донесение прибора. Если прибора с
+       такой целью на витке нет — или он есть, но не настроен на цель, — виток
+       становится непроходимым, и заметить это по данным нельзя: и вопрос, и
+       прибор по отдельности законны. Отсюда проверка. */
+    for (const курс of COURSES) {
+      for (const тема of курс.topics) {
+        for (const виток of тема.levels) {
+          const цели = виток.lecture
+            .filter((б) => б.kind === 'question')
+            .map((б) => (б as { question?: { kind?: string; goal?: string } }).question)
+            .filter((в): в is { kind: string; goal: string } => в?.kind === 'goal');
+
+          for (const вопрос of цели) {
+            const где = `${тема.id}:${виток.depth} → ${вопрос.goal}`;
+            const прибор = виток.lecture.find((б) =>
+              (lookupBlock(б.kind)?.goals?.(б) ?? []).includes(вопрос.goal),
+            );
+            expect(прибор, где).toBeDefined();
+          }
+        }
+      }
     }
   });
 

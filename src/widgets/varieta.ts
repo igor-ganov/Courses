@@ -81,9 +81,12 @@ export class Varieta extends Widget<GiocoProps> {
       ? 'Удержано.'
       : `Не отработано: на «${ТАБЛИЦА.disturbances[round.disturbance]}» нужного хода нет.`;
     this.tick += 1;
+    /* Донесение после каждого хода, а не только на победе: вопрос с целью
+       стоит рядом и должен показывать, сколько уже удержано. Ходов немного,
+       и лишних донесений здесь не бывает. */
     const g = this.game.goal();
-    if (g.reached && !this.reported) {
-      this.reported = true;
+    if (!this.reported) {
+      this.reported = g.reached;
       this.riporta(g);
     }
   }
@@ -216,9 +219,11 @@ export class Scatola extends Widget<ScatolaProps> {
   private send(input: number): void {
     this.box.send(input);
     this.tick += 1;
+    /* То же и здесь: каждый опыт сужает круг подозреваемых, и это и есть
+       продвижение к цели. Молчать до самого опознания незачем. */
     const g = this.box.goal(МАШИНЫ);
-    if (g.reached && !this.reported) {
-      this.reported = true;
+    if (!this.reported) {
+      this.reported = g.reached;
       this.riporta(g);
     }
   }

@@ -48,6 +48,8 @@ export class Contorno extends Widget<Props> {
   private loopModel!: Loop;
   private stop?: () => void;
   private reported = false;
+  /** Лучшая доля, о которой уже донесли: чтобы не доносить каждый кадр. */
+  private riferito = 0;
 
   protected override avvia(): void {
     const p = this.props;
@@ -85,8 +87,15 @@ export class Contorno extends Widget<Props> {
       this.tick += 1;
       if (this.props.goal && !this.reported) {
         const g = this.loopModel.goal();
-        if (g.reached) {
-          this.reported = true;
+        /* Доносится не только успех, но и продвижение — заметными шагами.
+           Иначе задание с целью становится тупиком: пока цель не взята,
+           вопрос рядом не знает вообще ничего и не может ни показать,
+           насколько читатель близок, ни зачесть попытку. Шаг в двадцатую
+           долю выбран так, чтобы донесений было десятка два за попытку,
+           а не по одному на кадр. */
+        if (g.reached || g.score >= this.riferito + 0.05) {
+          this.riferito = g.score;
+          this.reported = g.reached;
           this.riporta(g);
         }
       }
@@ -104,6 +113,7 @@ export class Contorno extends Widget<Props> {
 
   private reset(): void {
     this.reported = false;
+    this.riferito = 0;
     this.loopModel.reset();
     this.tick += 1;
   }

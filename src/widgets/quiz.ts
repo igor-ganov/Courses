@@ -10,7 +10,7 @@
  * здесь.
  */
 
-import { css, html, stile, Widget } from './base';
+import { css, html, stile, Widget, type GoalReport } from './base';
 import { gradeAnswer, standardQuestions, questionKinds, type QuestionBase } from '~/engine/assessment';
 
 /* Стандартные виды регистрируются один раз на страницу. Реестр глобален, и
@@ -106,6 +106,112 @@ const stileDomanda = css`
     font-variant-numeric: tabular-nums;
   }
 
+  /* ── порядок ─────────────────────────────────────────────────────── */
+
+  .ordine {
+    display: grid;
+    gap: 2px;
+    margin: 0 0 8px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .voce {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 4px 0;
+  }
+
+  .voce .posto {
+    font-family: 'Caveat', cursive;
+    font-size: max(calc(21px * var(--кегль, 1)), var(--пол, 0px));
+    color: var(--тихий, #6f7682);
+    min-width: 18px;
+  }
+
+  .voce .testo {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .voce.giusta .testo {
+    color: var(--зелёный, #3f6b4a);
+  }
+
+  .voce.sbagliata .testo {
+    color: var(--красный, #a8402f);
+  }
+
+  /* Стрелки, а не перетаскивание: пальцем в узкой колонке тащить нечего, а
+     клавиатурой перетаскивание вообще недоступно. */
+  .freccia {
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font: inherit;
+    color: var(--паста, #1b3a6b);
+    padding: 6px 8px;
+    min-width: 34px;
+    min-height: 34px;
+    line-height: 1;
+  }
+
+  .freccia[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  /* ── сопоставление ───────────────────────────────────────────────── */
+
+  .coppie {
+    display: grid;
+    gap: 6px;
+    margin: 0 0 8px;
+  }
+
+  .coppia {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .coppia .sinistra {
+    flex: 1 1 40%;
+    min-width: 0;
+  }
+
+  .coppia select {
+    flex: 1 1 45%;
+    font: inherit;
+    padding: 5px 6px;
+    min-height: 34px;
+    border: 0;
+    border-bottom: 1.4px solid var(--грифель, #5c6068);
+    background: none;
+    color: var(--текст, #20242c);
+  }
+
+  .coppia.giusta select {
+    color: var(--зелёный, #3f6b4a);
+  }
+
+  .coppia.sbagliata select {
+    color: var(--красный, #a8402f);
+  }
+
+  /* ── цель в приборе ──────────────────────────────────────────────── */
+
+  .compito {
+    margin: 0 0 8px;
+    color: var(--грифель, #5c6068);
+  }
+
+  .avanzamento {
+    font-variant-numeric: tabular-nums;
+  }
+
   .spiegazione {
     margin: 8px 0 0;
     color: var(--грифель, #5c6068);
@@ -113,6 +219,21 @@ const stileDomanda = css`
 `;
 
 const ЛИТЕРЫ = 'абвгдежзи';
+
+/**
+ * Начальная раскладка для вопроса на порядок.
+ *
+ * Правильный порядок — тот, в котором пункты записаны, поэтому показывать их
+ * как записано нельзя: ответ был бы уже дан. Перестановка при этом должна
+ * быть заведомо неверной и заведомо одинаковой при каждом заходе — иначе
+ * читатель, вернувшийся к витку, решает другую задачу.
+ *
+ * Разворот подходит по обоим условиям: он не совпадает с исходным ни при
+ * каком числе пунктов больше одного, и он один и тот же всегда.
+ */
+function меша(n: number): number[] {
+  return Array.from({ length: n }, (_, i) => n - 1 - i);
+}
 
 interface QuizProps {
   readonly question?: QuestionBase & Record<string, unknown>;
@@ -125,18 +246,55 @@ export class Quiz extends Widget<QuizProps> {
     scelta: { state: true },
     multi: { state: true },
     testo: { state: true },
+    ordine: { state: true },
+    coppie: { state: true },
+    rapporto: { state: true },
     inviato: { state: true },
   };
   declare scelta: number;
   declare multi: number[];
   declare testo: string;
+  /** Порядок: где сейчас стоит каждый пункт. Значение — исходный номер. */
+  declare ordine: number[];
+  /** Сопоставление: против какого правого поставлен каждый левый. */
+  declare coppie: number[];
+  /** Последнее донесение прибора для задания с целью. */
+  declare rapporto: GoalReport | undefined;
   declare inviato: boolean;
+
+  /* Задание с целью выполняется не здесь, а в приборе, который стоит рядом в
+     лекции. Донесение всплывает по документу, и вопрос ловит своё по имени
+     цели: связывать вопрос с элементом прибора значило бы требовать от
+     автора порядка блоков, а он вправе поставить прибор и до, и после. */
+  private слушатель: ((событие: Event) => void) | undefined;
 
   protected override avvia(): void {
     this.scelta = -1;
     this.multi = [];
     this.testo = '';
+    this.rapporto = undefined;
     this.inviato = false;
+
+    const q = this.question;
+    this.ordine = q?.kind === 'order' ? меша((q.items as string[]).length) : [];
+    this.coppie = q?.kind === 'match' ? (q.pairs as string[][]).map(() => -1) : [];
+
+    if (q?.kind === 'goal') {
+      this.слушатель = (событие) => {
+        const донесение = (событие as CustomEvent<GoalReport>).detail;
+        if (!донесение || донесение.goal !== q.goal || this.inviato) return;
+        this.rapporto = донесение;
+        /* Дошёл до цели — засчитываем сразу: просить после этого нажать
+           «Ответить» значит делать вид, что задание ещё не сделано. */
+        if (донесение.reached) this.invia();
+      };
+      document.addEventListener('cy-goal', this.слушатель);
+    }
+  }
+
+  protected override ferma(): void {
+    if (this.слушатель) document.removeEventListener('cy-goal', this.слушатель);
+    this.слушатель = undefined;
   }
 
   private get question(): (QuestionBase & Record<string, unknown>) | undefined {
@@ -148,7 +306,38 @@ export class Quiz extends Widget<QuizProps> {
     if (!q) return undefined;
     if (q.kind === 'multi') return this.multi;
     if (q.kind === 'numeric') return this.testo;
+    if (q.kind === 'order') return this.ordine;
+    if (q.kind === 'match') return this.coppie;
+    if (q.kind === 'goal') return this.rapporto;
     return this.scelta;
+  }
+
+  /** Готов ли ответ к отправке. Пустое отправлять незачем. */
+  private pronto(): boolean {
+    const q = this.question;
+    if (!q) return false;
+    switch (q.kind) {
+      case 'numeric':
+        return this.testo.trim() !== '';
+      case 'multi':
+        return this.multi.length > 0;
+      case 'order':
+        return true;
+      case 'match':
+        return this.coppie.every((c) => c >= 0);
+      case 'goal':
+        return this.rapporto !== undefined;
+      default:
+        return this.scelta >= 0;
+    }
+  }
+
+  private sposta(da: number, verso: number): void {
+    const куда = da + verso;
+    if (куда < 0 || куда >= this.ordine.length) return;
+    const next = [...this.ordine];
+    [next[da], next[куда]] = [next[куда]!, next[da]!];
+    this.ordine = next;
   }
 
   private invia(): void {
@@ -208,6 +397,75 @@ export class Quiz extends Widget<QuizProps> {
           </ul>`
         : null}
 
+      ${q.kind === 'order'
+        ? html`<ol class="ordine">
+            ${this.ordine.map((исходный, место) => {
+              /* После ответа подсвечивается не «на своём ли месте», а целый
+                 стык с предыдущим: оценка считает именно стыки, и показывать
+                 иное значило бы объяснять читателю чужую арифметику. */
+              const стык =
+                this.inviato && место > 0 && исходный === this.ordine[место - 1]! + 1;
+              const разрыв = this.inviato && место > 0 && !стык;
+              return html`<li class="voce ${стык ? 'giusta' : ''} ${разрыв ? 'sbagliata' : ''}">
+                <span class="posto">${место + 1}.</span>
+                <span class="testo">${(q.items as string[])[исходный]}</span>
+                <button
+                  class="freccia"
+                  aria-label="Выше: ${(q.items as string[])[исходный]}"
+                  ?disabled=${this.inviato || место === 0}
+                  @click=${() => this.sposta(место, -1)}>
+                  ↑
+                </button>
+                <button
+                  class="freccia"
+                  aria-label="Ниже: ${(q.items as string[])[исходный]}"
+                  ?disabled=${this.inviato || место === this.ordine.length - 1}
+                  @click=${() => this.sposta(место, 1)}>
+                  ↓
+                </button>
+              </li>`;
+            })}
+          </ol>`
+        : null}
+
+      ${q.kind === 'match'
+        ? html`<div class="coppie">
+            ${(q.pairs as string[][]).map((пара, i) => {
+              const верно = this.inviato && this.coppie[i] === i;
+              return html`<div class="coppia ${this.inviato ? (верно ? 'giusta' : 'sbagliata') : ''}">
+                <span class="sinistra">${пара[0]}</span>
+                <select
+                  aria-label="Пара для: ${пара[0]}"
+                  ?disabled=${this.inviato}
+                  @change=${(e: Event) => {
+                    const next = [...this.coppie];
+                    next[i] = Number((e.target as HTMLSelectElement).value);
+                    this.coppie = next;
+                  }}>
+                  <option value="-1" ?selected=${this.coppie[i] === -1}>— выберите —</option>
+                  ${(q.pairs as string[][]).map(
+                    (правая, j) =>
+                      html`<option value=${j} ?selected=${this.coppie[i] === j}>${правая[1]}</option>`,
+                  )}
+                </select>
+              </div>`;
+            })}
+          </div>`
+        : null}
+
+      ${q.kind === 'goal'
+        ? html`<p class="compito">
+            ${this.rapporto
+              ? this.rapporto.reached
+                ? 'Цель достигнута.'
+                : html`Пока пройдено
+                    <span class="avanzamento"
+                      >${((this.rapporto.score ?? 0) * 100).toFixed(0)} %</span
+                    >. Можно продолжать в приборе или зачесть как есть.`
+              : 'Задание выполняется в приборе рядом. Как только цель будет взята, оно засчитается само.'}
+          </p>`
+        : null}
+
       ${q.kind === 'numeric'
         ? html`<p>
             <input
@@ -222,14 +480,10 @@ export class Quiz extends Widget<QuizProps> {
         : null}
 
       <div class="azioni">
-        <button
-          class="bottone"
-          ?disabled=${this.inviato ||
-          (q.kind === 'numeric' ? this.testo.trim() === '' : q.kind === 'multi' ? this.multi.length === 0 : this.scelta < 0)}
-          @click=${() => this.invia()}>
-          Ответить
+        <button class="bottone" ?disabled=${this.inviato || !this.pronto()} @click=${() => this.invia()}>
+          ${q.kind === 'goal' ? 'Зачесть как есть' : 'Ответить'}
         </button>
-        ${this.inviato
+        ${this.inviato && q.kind !== 'goal'
           ? html`<button
               class="bottone"
               @click=${() => {
@@ -237,6 +491,8 @@ export class Quiz extends Widget<QuizProps> {
                 this.scelta = -1;
                 this.multi = [];
                 this.testo = '';
+                if (q.kind === 'order') this.ordine = меша((q.items as string[]).length);
+                if (q.kind === 'match') this.coppie = (q.pairs as string[][]).map(() => -1);
               }}>
               Ещё раз
             </button>`

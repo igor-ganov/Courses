@@ -48,6 +48,8 @@ export const loop = defineBlock({
   }),
   tag: 'cy-contorno',
   reserve: 640,
+  /* Контур молчит, пока автор не задал ему допуск и время удержания. */
+  goals: (b) => (b.goal ? ['settled'] : []),
   load: () => import('~/widgets/contorno'),
 });
 
@@ -63,6 +65,7 @@ export const ashby = defineBlock({
   }),
   tag: 'cy-varieta',
   reserve: 420,
+  goals: () => ['held'],
   load: () => import('~/widgets/varieta'),
 });
 
@@ -77,6 +80,7 @@ export const blackbox = defineBlock({
   }),
   tag: 'cy-scatola',
   reserve: 420,
+  goals: () => ['identified'],
   load: () => import('~/widgets/varieta'),
 });
 

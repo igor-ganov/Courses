@@ -84,20 +84,21 @@ export function segnaIndice(root: ParentNode, p: Progress): void {
 
 /* ── виток ─────────────────────────────────────────────────────────── */
 
-/** Что приезжает в `cy-answer` (вопрос) и в `cy-goal` (прибор с целью). */
+/**
+ * Что приезжает в `cy-answer`.
+ *
+ * Донесения приборов (`cy-goal`) сюда не приходят, и это решение. Задание с
+ * целью — такой же вопрос, как остальные: он ловит донесение своего прибора
+ * сам, оценивает его тем же движком и отправляет обычный `cy-answer`. Если бы
+ * счёт слушал ещё и `cy-goal`, одно и то же действие читателя считалось бы
+ * дважды — и по-разному, потому что у донесения нет ни трудности, ни разбора.
+ */
 interface Dettaglio {
   readonly id?: string;
-  readonly goal?: string;
   readonly score?: number;
   readonly difficulty?: number;
   readonly correct?: boolean;
-  readonly reached?: boolean;
 }
-
-/* Прибор с целью не знает своей трудности: он не вопрос, у него нет автора,
-   который проставил бы вес. Три — середина шкалы, и это честнее, чем
-   заставлять автора писать вес там, где он ничего не значит. */
-const ВЕС_ЦЕЛИ = 3;
 
 /**
  * Завести счёт на странице витка. Ключ и число работ приезжают в разметке:
@@ -117,7 +118,7 @@ export function avviaLivello(root: ParentNode, p: Progress): (() => void) | unde
   const sessione = createSessione(всего);
   const счётчик = узел.querySelector<HTMLElement>('[data-conteggio]');
   const итог = узел.querySelector<HTMLElement>('[data-esito]');
-  /* Слушаем на документе, а не на узле шапки: приборы стоят по всей лекции,
+  /* Слушаем на документе, а не на узле шапки: задания стоят по всей лекции,
      а событие всплывает и выходит из теневого корня (composed). */
   const лист: EventTarget = root instanceof Document ? root : (root as Element);
   let записано = false;
@@ -144,20 +145,15 @@ export function avviaLivello(root: ParentNode, p: Progress): (() => void) | unde
 
   const принять = (событие: Event) => {
     const д = ((событие as CustomEvent<Dettaglio>).detail ?? {}) as Dettaglio;
-    const id = д.id ?? (д.goal !== undefined ? `цель:${д.goal}` : undefined);
-    if (id === undefined) return;
-    const score = typeof д.score === 'number' ? д.score : д.correct || д.reached ? 1 : 0;
-    sessione.segna({ id, score, difficulty: д.difficulty ?? ВЕС_ЦЕЛИ });
+    if (д.id === undefined) return;
+    const score = typeof д.score === 'number' ? д.score : д.correct ? 1 : 0;
+    sessione.segna({ id: д.id, score, difficulty: д.difficulty ?? 3 });
     обновить();
   };
 
   лист.addEventListener('cy-answer', принять);
-  лист.addEventListener('cy-goal', принять);
   обновить();
-  return () => {
-    лист.removeEventListener('cy-answer', принять);
-    лист.removeEventListener('cy-goal', принять);
-  };
+  return () => лист.removeEventListener('cy-answer', принять);
 }
 
 /** Точка входа страницы: всё, что найдёт, — то и заведёт. */
