@@ -55,11 +55,16 @@ const ключ = (topic: string, depth: number) => `${courseId}/${topic}:${depth
       {курс.modules.length} модуля · {курс.topics.length} тем · {витков} витков · {работ} работ
     </p>
 
-    <div class="pastiglie" role="tablist" aria-label="Как разложить курс">
-      <button class="pastiglia" role="tab" aria-pressed="true" aria-controls="a-spirale" data-vista="spirale">
+    {/* Кнопки-переключатели, а не вкладки: роль tab обязывает к aria-selected,
+        управлению стрелками и связанным tabpanel, а здесь просто прячется одна
+        из двух развёрток, обе из которых уже в разметке. Врать о роли хуже,
+        чем не заявлять её: читалка объявит вкладки и станет ждать поведения,
+        которого нет. */}
+    <div class="pastiglie" role="group" aria-label="Как разложить курс">
+      <button class="pastiglia" type="button" aria-pressed="true" aria-controls="a-spirale" data-vista="spirale">
         по спирали
       </button>
-      <button class="pastiglia" role="tab" aria-pressed="false" aria-controls="a-moduli" data-vista="moduli">
+      <button class="pastiglia" type="button" aria-pressed="false" aria-controls="a-moduli" data-vista="moduli">
         по модулям
       </button>
     </div>

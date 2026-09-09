@@ -20,7 +20,7 @@ test.describe('оглавление курса', () => {
     const спираль = await адреса();
     expect(спираль.length).toBe(17);
 
-    await page.getByRole('tab', { name: 'по модулям' }).click();
+    await page.getByRole('button', { name: 'по модулям' }).click();
     const модули = await адреса();
     expect(модули).toEqual(спираль);
   });
