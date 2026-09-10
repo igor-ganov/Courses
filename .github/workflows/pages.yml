@@ -46,14 +46,30 @@ jobs:
         env:
           PAGES_BASE: /Courses/
 
+      # Оба замера ниже идут по одному и тому же поднятому сайту, поэтому он
+      # поднимается отдельным шагом и переживает шаг: nohup с отвязкой, иначе
+      # оболочка шага уносит его с собой.
+      - name: Поднять собранное
+        run: |
+          nohup npx astro preview --port 4321 --host 127.0.0.1 > preview.log 2>&1 &
+          disown
+          npx wait-on -t 60000 http://127.0.0.1:4321/Courses/
+        env:
+          PAGES_BASE: /Courses/
+
       # Оценки Lighthouse — такая же проверка, как остальные: падает, если
       # хоть одна ниже сотни. Без неё они молча съезжают от любой мелочи —
       # лишний шрифт на критическом пути, скрипт, поехавшая шапка.
       - name: Оценки Lighthouse
-        run: |
-          npx astro preview --port 4321 --host 127.0.0.1 &
-          npx wait-on -t 60000 http://127.0.0.1:4321/Courses/
-          node scripts/faro.mjs
+        run: node scripts/faro.mjs
+        env:
+          PAGES_BASE: /Courses/
+
+      # Lighthouse меряет загрузку, а не листание. Прокрутку пальцем нужно
+      # мерить отдельно: именно её однажды и утопила освещённая бумага —
+      # 46 мс на кадр вместо 17, и ни одна проверка этого не показывала.
+      - name: Листание пальцем
+        run: node scripts/scorrimento.mjs
         env:
           PAGES_BASE: /Courses/
 
