@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "build:pages": "PAGES_BASE=/Courses/ npm run build"
+    "build:pages": "PAGES_BASE=/Courses/ npm run build",
+    "faro": "node scripts/faro.mjs"
   },
   "dependencies": {
     "astro": "5.18.2",
@@ -21,8 +22,11 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@playwright/test": "1.63.0",
+    "chrome-launcher": "1.2.1",
+    "lighthouse": "12.8.2",
     "sharp": "0.34.5",
     "typescript": "5.9.3",
-    "vitest": "3.2.4"
+    "vitest": "3.2.4",
+    "wait-on": "9.1.0"
   }
 }

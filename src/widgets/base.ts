@@ -67,11 +67,26 @@ export const stile = css`
     line-height: 1.2;
   }
 
+  /* Приборные числа лежат в сетке, а не в переносимой строке.
+
+     Гибкая строка с переносом меняет число рядов, когда меняется ширина
+     содержимого, — а содержимое здесь меняется каждый кадр: «19.55°»
+     становится «9.5°», «1.45°» — «12.30°». На узком экране ряд то влезал,
+     то нет, прибор дышал по высоте, и весь текст под ним прыгал по
+     нескольку раз в секунду. Сквозная проверка намеряла на витке про
+     обратную связь восемнадцать сдвигов подряд и CLS 1,17.
+
+     В сетке число колонок зависит только от ширины прибора, а высота
+     ряда задана. Что бы ни показывали приборы, коробка не меняется. */
   .quadranti {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 26px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+    gap: 6px 20px;
     margin: 0 0 14px;
+  }
+
+  .quadrante {
+    min-height: calc(var(--шаг, 26px) * 1.7);
   }
 
   .quadrante b {
@@ -81,6 +96,17 @@ export const stile = css`
     font-size: max(calc(17px * var(--кегль, 1)), var(--пол, 0px));
     color: var(--тихий, #6f7682);
     line-height: 1.1;
+  }
+
+  .quadrante b,
+  .quadrante span {
+    /* Подпись не переносится, а обрезается: перенос — это опять смена
+       высоты, а обрезанную подпись читатель хотя бы видит целиком в
+       заголовке прибора. */
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .quadrante span {
@@ -199,12 +225,16 @@ export const stile = css`
     touch-action: pan-y;
   }
 
+  /* Строка итога меняется по ходу расчёта и бывает то в одну строку, то в
+     три. Место отведено под три: пусть внизу прибора остаётся воздух, лишь
+     бы текст под прибором не ездил. */
   .esito {
     font-family: 'Caveat', cursive;
     font-size: max(calc(19px * var(--кегль, 1)), var(--пол, 0px));
+    line-height: 1.25;
     color: var(--грифель, #5c6068);
     margin: 10px 0 0;
-    min-height: 1.3em;
+    min-height: 3.75em;
   }
 
   .esito.bene {

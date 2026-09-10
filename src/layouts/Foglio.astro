@@ -19,6 +19,26 @@
  * крашеной бумаге. Это и есть проверка на то, что слои разделены честно.
  */
 import '~/styles/quaderno.css';
+/* Три файла, с которых начинается всякая страница: наборное для текста —
+   прямое и полужирное, — и рукописное для заголовка. В каждом кириллица,
+   цифры и знаки препинания; латинские буквы, греческие и математические
+   знаки лежат отдельно и приезжают, только если встретились.
+
+   Предзагрузка нужна из-за font-display: optional. Он даёт браузеру сто
+   миллисекунд и, если шрифт не приехал, оставляет запасной до конца
+   загрузки — ни подмен, ни сдвигов. Без предзагрузки браузер узнаёт о
+   шрифте, только разобрав стиль, и в сто миллисекунд не укладывается
+   никогда; с ней загрузка идёт вместе со стилем и успевает.
+
+   Адреса с отпечатками известны только сборщику, поэтому берутся импортом,
+   а не пишутся строкой. */
+import caveat from '~/assets/fonts/caveat-sempre.woff2?url';
+import literata from '~/assets/fonts/literata-sempre.woff2?url';
+import literataGrasso from '~/assets/fonts/literata-b-sempre.woff2?url';
+import lit_i from '~/assets/fonts/literata-i-sempre.woff2?url';
+import mono from '~/assets/fonts/pt-mono-sempre.woff2?url';
+
+const СНАЧАЛА = [literata, literataGrasso, caveat, lit_i, mono];
 
 interface Props {
   title: string;
@@ -38,10 +58,15 @@ const полный = title.endsWith('Кибернетика') ? title : `${title
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{полный}</title>
     {description && <meta name="description" content={description} />}
+    {СНАЧАЛА.map((путь) => (
+      <link rel="preload" href={путь} as="font" type="font/woff2" crossorigin />
+    ))}
     <meta name="theme-color" content="#f3efe4" />
     <link rel="manifest" href={`${base}manifest.webmanifest`} />
     <link rel="icon" href={`${base}icona.svg`} type="image/svg+xml" />
-    <link rel="apple-touch-icon" href={`${base}icona.svg`} />
+    {/* apple-touch-icon указывал на тот же SVG, и это была двойная загрузка
+        ни за чем: iOS растровый значок и берёт только из манифеста при
+        добавлении на экран, а SVG для этой роли не понимает вовсе. */}
   </head>
   <body>
     <canvas
@@ -80,16 +105,37 @@ const полный = title.endsWith('Кибернетика') ? title : `${title
     </script>
 
     <script is:inline define:vars={{ base }}>
-      /* Материя — украшение, поэтому грузится последней и в простое: страница
-         обязана быть читаемой до неё и без неё. */
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
       const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
         const s = document.createElement('script');
-        s.src = `${base}materia/materia.js`;
+        s.src = адрес;
         s.defer = true;
         document.head.appendChild(s);
       };
-      if ('requestIdleCallback' in window) requestIdleCallback(поставить, { timeout: 1500 });
-      else addEventListener('load', поставить);
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
 
       /* Служитель делает курс доступным без сети. Регистрация после загрузки:
          до первой отрисовки ей нечего делать, а мешать она умеет. */

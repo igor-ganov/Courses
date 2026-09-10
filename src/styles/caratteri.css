@@ -1,12 +1,37 @@
-@font-face{font-family:'Caveat';font-style:normal;font-weight:600;font-display:swap;src:url('../assets/fonts/caveat-600-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
-@font-face{font-family:'Caveat';font-style:normal;font-weight:600;font-display:swap;src:url('../assets/fonts/caveat-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('../assets/fonts/caveat-700-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
-@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('../assets/fonts/caveat-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'Literata';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/literata-400-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
-@font-face{font-family:'Literata';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/literata-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'Literata';font-style:italic;font-weight:400;font-display:swap;src:url('../assets/fonts/literata-400i-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
-@font-face{font-family:'Literata';font-style:italic;font-weight:400;font-display:swap;src:url('../assets/fonts/literata-400i-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'Literata';font-style:normal;font-weight:600;font-display:swap;src:url('../assets/fonts/literata-600-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
-@font-face{font-family:'Literata';font-style:normal;font-weight:600;font-display:swap;src:url('../assets/fonts/literata-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
-@font-face{font-family:'PT Mono';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/pt-mono-400-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
-@font-face{font-family:'PT Mono';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/pt-mono-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+/* Собран автоматически: node scripts/caratteri.mjs. Править здесь нечего.
+
+   Знаки урезаны до тех, что в тетради встречаются; какие именно —
+   в assets/fonts/glifi.json, и за этим следит тест. Файлы `-sempre`
+   несут кириллицу с цифрами и нужны всегда, `-raro` — латинские буквы,
+   греческие и математические знаки, и приезжают, только если такой знак
+   на странице встретился.
+
+   font-display у двух половин разный, и это решение.
+
+   `-sempre` — optional: они предзагружаются, укладываются в отведённые
+   сто миллисекунд и рисуют текст сразу собой. Если сеть совсем плоха и
+   не уложились — страница целиком набирается запасным шрифтом и уже не
+   меняется. При swap вместо этого каждый файл, приехав, подменял бы
+   шрифт под уже прочитанным текстом: десяток начертаний — десяток
+   подмен подряд, ровно то, на что жалуются.
+
+   `-raro` — swap, и по обратной причине. Это единичные знаки: «P» в
+   подписи ручки, λ в формуле. При optional они остались бы запасным
+   шрифтом до конца загрузки — то есть латинская буква посреди
+   рукописного слова была бы набрана не рукописным. Лучше поздно, но
+   своим: подменяется несколько знаков, и строка от этого не едет —
+   за этим следит e2e/stabilita.spec.ts.
+
+   Со второй страницы всё уже лежит на устройстве (кладёт служитель), и
+   обе половины рисуют собой с первого кадра. */
+@font-face{font-family:'Simboli';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/simboli-0.woff2') format('woff2');unicode-range:U+1D62, U+1E8B, U+208A, U+2099}
+@font-face{font-family:'Simboli';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/simboli-1.woff2') format('woff2');unicode-range:U+21B3, U+21BB, U+21CC, U+223F, U+25A6}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:optional;src:url('../assets/fonts/caveat-sempre.woff2') format('woff2');unicode-range:U+20-7E, U+A0, U+AB, U+B0-B2, U+B7, U+BB, U+BD, U+E9, U+401, U+410-44F, U+451, U+2013-2014, U+2026, U+2070, U+2080-2082, U+2212, U+2248, U+2264-2265}
+@font-face{font-family:'Literata';font-style:normal;font-weight:400;font-display:optional;src:url('../assets/fonts/literata-sempre.woff2') format('woff2');unicode-range:U+20-40, U+5B-60, U+7B-7E, U+A0, U+AB, U+B0-B2, U+B7, U+BB, U+BD, U+401, U+410-44F, U+451}
+@font-face{font-family:'Literata';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/literata-raro.woff2') format('woff2');unicode-range:U+41-5A, U+61-7A, U+E9, U+39A, U+3A3, U+3AE, U+3B2, U+3B5, U+3B7, U+3BB, U+3BD, U+3C1-3C2, U+3C4-3C5, U+3C9, U+2013-2014, U+2026, U+2070, U+2080-2082, U+2190-2193, U+2212, U+221E, U+222B, U+2248, U+2264-2265}
+@font-face{font-family:'Literata';font-style:normal;font-weight:600;font-display:optional;src:url('../assets/fonts/literata-b-sempre.woff2') format('woff2');unicode-range:U+20-40, U+5B-60, U+7B-7E, U+A0, U+AB, U+B0-B2, U+B7, U+BB, U+BD, U+401, U+410-44F, U+451}
+@font-face{font-family:'Literata';font-style:normal;font-weight:600;font-display:swap;src:url('../assets/fonts/literata-b-raro.woff2') format('woff2');unicode-range:U+41-5A, U+61-7A, U+E9, U+39A, U+3A3, U+3AE, U+3B2, U+3B5, U+3B7, U+3BB, U+3BD, U+3C1-3C2, U+3C4-3C5, U+3C9, U+2013-2014, U+2026, U+2070, U+2080-2082, U+2190-2193, U+2212, U+221E, U+222B, U+2248, U+2264-2265}
+@font-face{font-family:'Literata';font-style:italic;font-weight:400;font-display:optional;src:url('../assets/fonts/literata-i-sempre.woff2') format('woff2');unicode-range:U+20-40, U+5B-60, U+7B-7E, U+A0, U+AB, U+B0-B2, U+B7, U+BB, U+BD, U+401, U+410-44F, U+451}
+@font-face{font-family:'Literata';font-style:italic;font-weight:400;font-display:swap;src:url('../assets/fonts/literata-i-raro.woff2') format('woff2');unicode-range:U+41-5A, U+61-7A, U+E9, U+39A, U+3A3, U+3AE, U+3B2, U+3B5, U+3B7, U+3BB, U+3BD, U+3C1-3C2, U+3C4-3C5, U+3C9, U+2013-2014, U+2026, U+2070, U+2080-2082, U+2190-2193, U+2212, U+221E, U+222B, U+2248, U+2264-2265}
+@font-face{font-family:'PT Mono';font-style:normal;font-weight:400;font-display:optional;src:url('../assets/fonts/pt-mono-sempre.woff2') format('woff2');unicode-range:U+20-40, U+5B-60, U+7B-7E, U+A0, U+AB, U+B0-B2, U+B7, U+BB, U+BD, U+401, U+410-44F, U+451}
+@font-face{font-family:'PT Mono';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/pt-mono-raro.woff2') format('woff2');unicode-range:U+41-5A, U+61-7A, U+E9, U+2013-2014, U+2026, U+2081-2082, U+2190-2193, U+2212, U+221E, U+222B, U+2248, U+2264-2265, U+2500}

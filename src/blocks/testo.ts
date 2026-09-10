@@ -134,15 +134,35 @@ export const table = defineBlock({
       head: s.list(s.text({ max: 200, allowEmpty: true }), { min: 1 }),
       rows: s.list(s.list(строка(400)), { min: 1 }),
       caption: s.optional(строка(300)),
+      /**
+       * Первый столбец — подписи строк, а не данные. По умолчанию да: в
+       * таблице сравнения слева всегда стоит то, что сравнивают.
+       *
+       * Это не украшение разметки. Ячейка данных, до которой не дотянуться
+       * ни от одного заголовка, для читалки экрана безымянна: «уходит вразнос
+       * или в новый режим» — а чего именно, непонятно. Заголовок строки и
+       * даёт второе имя.
+       */
+      rowHeaders: s.optional(s.flag()),
     })
     .where(
       (t) => t.rows.every((r) => r.length === t.head.length),
       'в каждой строке столько же ячеек, сколько в шапке',
     ),
   html: (b, c) => {
+    const подписи = b.rowHeaders !== false;
     const th = b.head.map((h) => `<th scope="col">${inlineHtml(h, внутри(c))}</th>`).join('');
     const tr = b.rows
-      .map((row) => `<tr>${row.map((cell) => `<td>${inlineHtml(cell, внутри(c))}</td>`).join('')}</tr>`)
+      .map(
+        (row) =>
+          `<tr>${row
+            .map((cell, i) =>
+              подписи && i === 0
+                ? `<th scope="row">${inlineHtml(cell, внутри(c))}</th>`
+                : `<td>${inlineHtml(cell, внутри(c))}</td>`,
+            )
+            .join('')}</tr>`,
+      )
       .join('');
     return (
       `<figure class="tabella"><table><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table>` +
@@ -189,7 +209,12 @@ export const figure = defineBlock({
       'в схеме не должно быть скриптов и обработчиков событий',
     ),
   html: (b, c) =>
-    `<figure class="disegno" role="img" aria-label="${escapeHtml(b.alt)}">${b.svg}` +
+    /* Подпись вешается на сам SVG, а не на figure: роль img для figure
+       запрещена, и читалка на такой разметке спотыкается. Внутри — авторский
+       SVG, у которого своей роли нет, поэтому она приписывается снаружи
+       обёрткой в group с меткой. */
+    `<figure class="disegno">` +
+    `<div role="img" aria-label="${escapeHtml(b.alt)}">${b.svg}</div>` +
     (b.caption ? `<figcaption>${inlineHtml(b.caption, внутри(c))}</figcaption>` : '') +
     `</figure>`,
 });

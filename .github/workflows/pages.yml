@@ -46,6 +46,17 @@ jobs:
         env:
           PAGES_BASE: /Courses/
 
+      # Оценки Lighthouse — такая же проверка, как остальные: падает, если
+      # хоть одна ниже сотни. Без неё они молча съезжают от любой мелочи —
+      # лишний шрифт на критическом пути, скрипт, поехавшая шапка.
+      - name: Оценки Lighthouse
+        run: |
+          npx astro preview --port 4321 --host 127.0.0.1 &
+          npx wait-on -t 60000 http://127.0.0.1:4321/Courses/
+          node scripts/faro.mjs
+        env:
+          PAGES_BASE: /Courses/
+
       - name: Отчёт о сквозных проверках
         if: failure()
         uses: actions/upload-artifact@v4
