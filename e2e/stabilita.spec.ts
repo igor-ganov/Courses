@@ -82,7 +82,15 @@ async function сдвиги(page: Page, путь: string): Promise<Сдвиг[]>
   return page.evaluate(() => window.__сдвиги ?? []);
 }
 
-for (const путь of ['./', 'cibernetica/', 'cibernetica/feedback/2/', 'blocchi/']) {
+for (const путь of [
+  './',
+  'kubernetes/',
+  'kubernetes/riconciliazione/1/',
+  'kubernetes/scheduler/1/',
+  'kubernetes/dichiarativo/1/',
+  'cibernetica/feedback/2/',
+  'blocchi/',
+]) {
   test(`ничего не съезжает: ${путь}`, async ({ page }) => {
     const найденные = await сдвиги(page, путь);
     const сумма = найденные.reduce((с, э) => с + э.значение, 0);

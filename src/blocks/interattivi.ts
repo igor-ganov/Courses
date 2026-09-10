@@ -17,10 +17,16 @@ import { questionsSchema, standardQuestions, questionKinds, type QuestionBase } 
 
 if (questionKinds().length === 0) standardQuestions();
 
-/* Место, которое прибор занимает до оживления, измерено на собранном сайте
-   в двух профилях — настольном и телефонном — и взято посередине. Точнее не
-   бывает: высота зависит от подписи и ширины окна. Смысл в том, чтобы текст
-   под прибором не уезжал в тот самый момент, когда читатель до него доехал.
+/* Место, которое прибор занимает до оживления, измерено на собранном сайте —
+   по телефонному профилю и по самому высокому случаю каждого вида.
+   
+   Прежде оно бралось посередине между настольным и телефонным, и это была
+   ошибка: в ладони приборы вырастали на сотню-другую пикселей сверх резерва,
+   и текст под ними уезжал ровно тогда, когда читатель до него доехал. Замер
+   по всем страницам обоих курсов показал недобор до трёхсот пикселей.
+   Середина не годится в принципе: резерв нужен по худшему случаю, а лишний
+   воздух на настольном экране не стоит ничего.
+
    Числа стоят у каждого прибора рядом с его именем: разъехаться им негде. */
 
 const общие = {
@@ -47,7 +53,7 @@ export const loop = defineBlock({
     ),
   }),
   tag: 'cy-contorno',
-  reserve: 640,
+  reserve: 950,
   /* Контур молчит, пока автор не задал ему допуск и время удержания. */
   goals: (b) => (b.goal ? ['settled'] : []),
   load: () => import('~/widgets/contorno'),
@@ -64,7 +70,7 @@ export const ashby = defineBlock({
     target: s.optional(s.number({ integer: true, min: 1 })),
   }),
   tag: 'cy-varieta',
-  reserve: 420,
+  reserve: 580,
   goals: () => ['held'],
   load: () => import('~/widgets/varieta'),
 });
@@ -79,7 +85,7 @@ export const blackbox = defineBlock({
     hidden: s.optional(s.text({ max: 60 })),
   }),
   tag: 'cy-scatola',
-  reserve: 420,
+  reserve: 530,
   goals: () => ['identified'],
   load: () => import('~/widgets/varieta'),
 });
@@ -96,7 +102,7 @@ export const entropy = defineBlock({
     ),
   }),
   tag: 'cy-entropia',
-  reserve: 410,
+  reserve: 530,
   load: () => import('~/widgets/informazione'),
 });
 
@@ -111,7 +117,7 @@ export const channel = defineBlock({
     p: s.optional(s.number({ min: 0, max: 0.5 })),
   }),
   tag: 'cy-canale',
-  reserve: 540,
+  reserve: 670,
   load: () => import('~/widgets/informazione'),
 });
 
@@ -127,7 +133,7 @@ export const automaton = defineBlock({
     steps: s.optional(s.number({ integer: true, min: 10, max: 400 })),
   }),
   tag: 'cy-automa',
-  reserve: 580,
+  reserve: 600,
   load: () => import('~/widgets/automi'),
 });
 
@@ -143,7 +149,7 @@ export const life = defineBlock({
     height: s.optional(s.number({ integer: true, min: 16, max: 200 })),
   }),
   tag: 'cy-vita',
-  reserve: 600,
+  reserve: 650,
   load: () => import('~/widgets/automi'),
 });
 
@@ -157,7 +163,7 @@ export const logistic = defineBlock({
     r: s.optional(s.number({ min: 2.4, max: 4 })),
   }),
   tag: 'cy-logistica',
-  reserve: 600,
+  reserve: 720,
   load: () => import('~/widgets/dinamica'),
 });
 
@@ -171,7 +177,7 @@ export const lorenz = defineBlock({
     rho: s.optional(s.number({ min: 1, max: 60 })),
   }),
   tag: 'cy-lorenz',
-  reserve: 600,
+  reserve: 780,
   load: () => import('~/widgets/dinamica'),
 });
 
@@ -188,6 +194,21 @@ export const question = defineBlock({
     question: questionsSchema() as s.Schema<QuestionBase & Record<string, unknown>>,
   }),
   tag: 'cy-quiz',
-  reserve: 270,
+  /* Одного числа мало: задание с четырьмя длинными вариантами вдвое выше
+     задания с целью в приборе, и одинаковый резерв неверен для обоих. Здесь
+     считается по тексту — сколько строк займут вопрос и каждый вариант на
+     узком экране. Ширина взята телефонная (около 38 знаков в строке): резерв
+     нужен по худшему случаю, а лишний воздух на настольном экране не стоит
+     ничего. */
+  reserve: (b) => {
+    const q = b.question as { prompt?: unknown; options?: unknown };
+    const строк = (t: unknown) => Math.max(1, Math.ceil(String(t ?? '').length / 38));
+    const варианты = Array.isArray(q.options) ? q.options : [];
+    const текст = варианты.reduce((н: number, o) => н + 24 + строк(o) * 28, 0);
+    /* Нижняя граница держит те виды вопроса, у которых вариантов нет вовсе:
+       задание с целью в приборе и задание на порядок несут собственную
+       разметку, и текста в них почти не видно. */
+    return Math.max(500, 165 + строк(q.prompt) * 28 + текст);
+  },
   load: () => import('~/widgets/quiz'),
 });

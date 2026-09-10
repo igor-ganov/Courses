@@ -21,7 +21,15 @@ const ПУТИ = process.argv.slice(2);
 const адреса =
   ПУТИ.length > 0
     ? ПУТИ
-    : ['/', '/cibernetica/', '/cibernetica/feedback/2/', '/blocchi/', '/ripasso/'];
+    : [
+        '/',
+        '/kubernetes/',
+        '/kubernetes/riconciliazione/1/',
+        '/kubernetes/scheduler/1/',
+        '/cibernetica/feedback/2/',
+        '/blocchi/',
+        '/ripasso/',
+      ];
 
 /* Браузер берётся тот же, которым идут сквозные проверки: другой браузер —
    другие числа, и сравнивать их между собой было бы не с чем. */

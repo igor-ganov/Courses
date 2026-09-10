@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { COURSES, PIANO } from './index';
-import { blocks, lookupBlock } from '~/content/registry';
+import { blockDefinitions, blocks, lookupBlock } from '~/content/registry';
 
 /* Содержание проверяется так же, как код. Курс, который собрался, но в котором
    виток без задания или ссылка в никуда, — это брак, который увидит читатель,
@@ -11,15 +11,21 @@ import { blocks, lookupBlock } from '~/content/registry';
 
 describe('учебный план', () => {
   it('собран и связен', () => {
-    expect(COURSES).toHaveLength(1);
-    expect(PIANO.course('cibernetica')).toBeDefined();
+    expect(COURSES.length).toBeGreaterThan(0);
+    for (const курс of COURSES) expect(PIANO.course(курс.id), курс.id).toBeDefined();
+    expect(PIANO.course('kubernetes')).toBeDefined();
   });
 
   it('спираль идёт по глубине и начинается со всех первых витков', () => {
-    const порядок = PIANO.spiralOrder('cibernetica').map(String);
-    const первые = порядок.slice(0, 9);
-    expect(первые.every((k) => k.endsWith(':1'))).toBe(true);
-    expect(new Set(первые).size).toBe(9);
+    /* Проверяется для каждого курса, а не для названного: спираль — свойство
+       платформы, и курс, в котором она развалилась, должен уронить сборку
+       независимо от того, вспомнили о нём здесь или нет. */
+    for (const курс of COURSES) {
+      const порядок = PIANO.spiralOrder(курс.id).map(String);
+      const первые = порядок.slice(0, курс.topics.length);
+      expect(первые.every((k) => k.endsWith(':1')), курс.id).toBe(true);
+      expect(new Set(первые).size, курс.id).toBe(курс.topics.length);
+    }
   });
 
   it('в каждом витке есть хотя бы одно задание — иначе это чтение, а не курс', () => {
@@ -34,7 +40,16 @@ describe('учебный план', () => {
   });
 
   it('в каждом витке есть интерактив или схема — курс обещает модели, а не пересказ', () => {
-    const живые = new Set(['loop', 'ashby', 'blackbox', 'entropy', 'channel', 'automaton', 'life', 'logistic', 'lorenz', 'figure']);
+    /* Список берётся из реестра, а не пишется здесь. Прежде он был литералом,
+       и новый прибор в курсе молча не считался живым: проверка проходила,
+       а обещание «модели, а не пересказ» держалось на памяти автора.
+       Задание из этого списка исключено нарочно — вопрос не модель. */
+    const живые = new Set<string>([
+      ...blockDefinitions()
+        .filter((d) => d.tag && d.kind !== 'question')
+        .map((d) => d.kind),
+      'figure',
+    ]);
     for (const курс of COURSES) {
       for (const тема of курс.topics) {
         for (const виток of тема.levels) {

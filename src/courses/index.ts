@@ -8,9 +8,12 @@
 
 import { curriculum, validateCurriculum } from '~/content/graph';
 import '~/blocks';
+import { kubernetes } from './kubernetes';
 import { cibernetica } from './cibernetica';
 
-export const COURSES = [cibernetica];
+/* Порядок здесь — порядок в оглавлении. Kubernetes первым: он и есть предмет,
+   ради которого платформа затевалась. */
+export const COURSES = [kubernetes, cibernetica];
 
 const беды = validateCurriculum(COURSES);
 if (беды.length > 0) {

@@ -37,6 +37,7 @@ import {
   lorenz,
   question,
 } from './interattivi';
+import { manifest, reconcile, schedule } from './orchestra';
 
 export const ESEMPI: Readonly<Record<string, Block>> = {
   prose: prose({
@@ -145,6 +146,24 @@ export const ESEMPI: Readonly<Record<string, Block>> = {
   logistic: logistic({ title: 'Удвоения периода', r: 3.2 }),
 
   lorenz: lorenz({ title: 'Аттрактор Лоренца', rho: 28 }),
+
+  manifest: manifest({
+    title: 'Заявка на три экземпляра',
+    lines: [
+      { text: 'apiVersion: apps/v1', part: 'meta', note: 'Какого рода объект и какой его версии. Версия — обещание о полях, а не о поведении.' },
+      { text: 'kind: Deployment', part: 'meta' },
+      { text: 'metadata:', part: 'meta' },
+      { text: '  name: web', part: 'meta', note: 'Имя внутри пространства имён. По нему объект и опознаётся: изменить имя значит завести другой объект.' },
+      { text: 'spec:', part: 'spec' },
+      { text: '  replicas: 3', part: 'spec', note: 'Заявленное число. Не «создать три», а «пусть будет три»: разница видна, когда один упадёт.' },
+      { text: 'status:', part: 'status' },
+      { text: '  readyReplicas: 2', part: 'status', note: 'Отчёт кластера, а не ваша заявка. Пишет его контроллер; править это поле руками бессмысленно — его перепишут.' },
+    ],
+  }),
+
+  reconcile: reconcile({ title: 'Цикл сверки', desired: 3, resync: 0.5, startup: 2.5 }),
+
+  schedule: schedule({ title: 'Куда поедет под' }),
 
   /* Вид задания в реестре один, а разметок у него пять — по виду вопроса.
      В примере стоит выбор как самый частый; порядок, сопоставление и цель в

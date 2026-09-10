@@ -20,7 +20,7 @@ const БАЗА =
   (process.env['FARO_BASE'] ?? 'http://127.0.0.1:4321') +
   (process.env['PAGES_BASE'] ?? '/').replace(/\/*$/, '');
 const ПУТИ = process.argv.slice(2);
-const адреса = ПУТИ.length > 0 ? ПУТИ : ['/cibernetica/feedback/2/', '/cibernetica/'];
+const адреса = ПУТИ.length > 0 ? ПУТИ : ['/kubernetes/riconciliazione/1/', '/cibernetica/feedback/2/'];
 
 /* До починки было 46 мс против 17 (отношение 2,7) и 0,73 доли длинных кадров
    против 0,05; после — 17 против 17 и 0,16 против 0,05. Пороги с запасом:

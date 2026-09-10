@@ -56,8 +56,13 @@ export interface BlockDefinition<T extends { kind: string } = { kind: string }> 
    * Число приблизительное, и точным быть не может: высота зависит от длины
    * подписи и ширины окна. Но приблизительно верное число убирает прыжок
    * почти целиком, а одинаковое для всех — не убирает вовсе.
+   *
+   * Бывает и так, что одного числа на вид блока мало: разбор манифеста
+   * из восьми строк и из пятнадцати отличаются вдвое, и любое одно число
+   * для них одинаково неверно. Поэтому здесь допустима и функция от блока —
+   * спрашивается ровно то же самое, но с учётом содержимого.
    */
-  readonly reserve?: number;
+  readonly reserve?: number | ((block: T) => number);
   /**
    * Какие цели этот прибор произнесёт, будучи настроен вот так.
    *
@@ -175,7 +180,9 @@ export function renderBlocks(list: readonly Block[], context: RenderContext, pat
       /* Интерактив: элемент ставится пустым, свойства едут атрибутом, и до
          появления на экране за него не платят ни байта. */
       const props = escapeAttribute(JSON.stringify(block));
-      const место = definition.reserve ? ` style="min-height:${Math.round(definition.reserve)}px"` : '';
+      const сколько =
+        typeof definition.reserve === 'function' ? definition.reserve(block) : definition.reserve;
+      const место = сколько ? ` style="min-height:${Math.round(сколько)}px"` : '';
       return `<${definition.tag} class="isola" data-blocco="${escapeAttribute(block.kind)}" data-props="${props}"${место}></${definition.tag}>`;
     })
     .join('\n');

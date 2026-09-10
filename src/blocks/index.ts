@@ -8,3 +8,4 @@
 
 export * from './testo';
 export * from './interattivi';
+export * from './orchestra';
