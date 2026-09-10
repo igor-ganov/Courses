@@ -14,7 +14,8 @@
     "e2e": "playwright test",
     "build:pages": "PAGES_BASE=/Courses/ npm run build",
     "faro": "node scripts/faro.mjs",
-    "scorrimento": "node scripts/scorrimento.mjs"
+    "scorrimento": "node scripts/scorrimento.mjs",
+    "vernice": "node scripts/vernice.mjs"
   },
   "dependencies": {
     "astro": "5.18.2",
