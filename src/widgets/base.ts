@@ -203,9 +203,34 @@ export const stile = css`
       no-repeat center / 100% 100%;
   }
 
+  .bottone:active {
+    transform: translateY(1.2px);
+  }
+
   .bottone[disabled] {
     opacity: 0.45;
     cursor: default;
+  }
+
+  .bottone[disabled]:active {
+    transform: none;
+  }
+
+  /* Селекторы страницы сквозь теневой корень не проходят, поэтому запрет
+     выделения на нажимаемом приходится повторить и здесь. Подсветка касания
+     наследуется и снята на html — но пусть стоит и тут: прибор должен вести
+     себя одинаково, куда бы его ни поставили. */
+  button,
+  input[type='range'] {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Взамен снятой подсветки — своё касание. Нажатие обязано отзываться:
+     кнопка, которая на палец не отвечает вовсе, читается как сломанная. */
+  button:active {
+    transform: translateY(1px);
   }
 
   .azioni {
