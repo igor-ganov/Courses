@@ -10,7 +10,7 @@
  * закреплено, что наплыв переживаем, а убивают службу пробы.
  */
 
-import { css, html, stile, Widget } from './base';
+import { css, html, stile, svg, Widget } from './base';
 import { createSonde, NAPLYV, type Sonde, type SondeState } from './models/sonde';
 
 interface Props {
@@ -19,8 +19,21 @@ interface Props {
   readonly hint?: string;
 }
 
-/** Шагов модели на кадр: наплыв в двадцать секунд проходит за пять реальных. */
-const ШАГОВ = 4;
+/**
+ * Прогон считается целиком и мгновенно — часов у прибора нет.
+ *
+ * Сначала он шёл по кадрам, и это было ошибкой замысла: читатель двигал
+ * ручку и ждал, пока наплыв доедет до конца. Ожидание ничему не учит, а
+ * сравнивать две настройки становится нельзя — между ними полминуты.
+ * Теперь ручка меняет весь исход сразу, как в схемном тренажёре: подвинул
+ * сопротивление — ток пересчитался.
+ */
+interface Kadr {
+  readonly t: number;
+  readonly ready: number;
+  readonly latency: number;
+  readonly errors: number;
+}
 
 export class SondeWidget extends Widget<Props> {
   static override styles = [
@@ -84,22 +97,14 @@ export class SondeWidget extends Widget<Props> {
         color: var(--тихий, #636a75);
       }
 
-      /* Полоса нагрузки: наплыв видно как событие, а не как цифру. */
-      .carico {
-        position: relative;
-        height: 6px;
+      /* Кривая всего прогона. Она и есть ответ прибора: подвинул ручку —
+         сразу видно, что стало со всей историей, а не с текущей секундой. */
+      svg.tela {
+        display: block;
+        width: 100%;
+        height: auto;
         margin: 0 0 4px;
-        background: color-mix(in srgb, var(--грифель, #5c6068) 16%, transparent);
-      }
-
-      .carico i {
-        position: absolute;
-        inset: 0 auto 0 0;
-        background: var(--паста, #1b3a6b);
-      }
-
-      .carico.surge i {
-        background: var(--красный, #a8402f);
+        touch-action: pan-y;
       }
 
       .etichetta {
@@ -152,7 +157,7 @@ export class SondeWidget extends Widget<Props> {
   declare tick: number;
 
   private sonde!: Sonde;
-  private stop?: () => void;
+  private кадры: Kadr[] = [];
   private reported = false;
   private riferito = 0;
 
@@ -162,16 +167,6 @@ export class SondeWidget extends Widget<Props> {
     this.readiness = NAPLYV.readiness;
     this.tick = 0;
     this.заново();
-    this.stop = this.loop(() => {
-      if (this.sonde.state().done) return;
-      for (let i = 0; i < ШАГОВ; i += 1) this.sonde.step();
-      this.tick += 1;
-      this.донести();
-    });
-  }
-
-  protected override ferma(): void {
-    this.stop?.();
   }
 
   private заново(): void {
@@ -184,9 +179,22 @@ export class SondeWidget extends Widget<Props> {
       },
       this.props.goal ?? { maxErrors: 0.02 },
     );
+    /* Весь наплыв прогоняется здесь же, за один заход: полтораста шагов
+       модели — это доли миллисекунды, и ждать их незачем. */
+    this.кадры = [];
+    while (!this.sonde.state().done) {
+      const s = this.sonde.step();
+      this.кадры.push({
+        t: s.time,
+        ready: s.replicas.filter((r) => r.phase === 'running').length,
+        latency: Math.max(...s.replicas.map((r) => r.latency), 0),
+        errors: s.errorRate,
+      });
+    }
     this.reported = false;
     this.riferito = 0;
     this.tick += 1;
+    this.донести();
   }
 
   private донести(): void {
@@ -226,6 +234,87 @@ export class SondeWidget extends Widget<Props> {
     </div>`;
   }
 
+  /**
+   * Кривая всего прогона: сколько экземпляров принимают нагрузку.
+   *
+   * Сначала здесь рисовалось время ответа, и это было неверно выбранной
+   * величиной: при полном обвале никто не отвечает, время ответа падает в
+   * ноль — и график читался как аккуратный прямоугольник, будто всё хорошо.
+   * Число в строю такой двусмысленности не имеет: провал есть провал.
+   */
+  private tela() {
+    const W = 620;
+    const H = 170;
+    const к = this.кадры;
+    if (к.length < 2) return null;
+    const всего = NAPLYV.replicas;
+    const x = (i: number) => (i / (к.length - 1)) * W;
+    const y = (v: number) => H - 10 - (v / всего) * (H - 26);
+
+    /* Ступенями, а не сглаженно: экземпляр либо принимает нагрузку, либо
+       нет, и промежуточных значений тут не существует. */
+    let путь = `M0,${y(к[0]!.ready).toFixed(1)}`;
+    for (let i = 1; i < к.length; i += 1) {
+      if (к[i]!.ready !== к[i - 1]!.ready) {
+        путь += `L${x(i).toFixed(1)},${y(к[i - 1]!.ready).toFixed(1)}`;
+      }
+      путь += `L${x(i).toFixed(1)},${y(к[i]!.ready).toFixed(1)}`;
+    }
+
+    const с = к.findIndex((f) => f.t >= NAPLYV.surgeAt);
+    const до = к.findIndex((f) => f.t >= NAPLYV.surgeAt + NAPLYV.surgeFor);
+    const полоса =
+      с >= 0
+        ? svg`<rect
+            x=${x(с).toFixed(1)}
+            y="0"
+            width=${(x(до < 0 ? к.length - 1 : до) - x(с)).toFixed(1)}
+            height=${H}
+            fill="var(--красный, #a8402f)"
+            opacity="0.17" />`
+        : null;
+
+    /* Перезапуски: там, где число в строю упало. */
+    const кресты: number[] = [];
+    for (let i = 1; i < к.length; i += 1) {
+      if (к[i]!.ready < к[i - 1]!.ready) кресты.push(i);
+    }
+
+    return html`<svg
+      class="tela"
+      viewBox="0 0 ${W} ${H}"
+      preserveAspectRatio="none"
+      role="img"
+      aria-label=${`Экземпляров в строю за прогон: минимум ${Math.min(...к.map((f) => f.ready))} из ${всего}, перезапусков ${кресты.length}`}>
+      ${полоса}
+      ${/* Линейка только по краям: клетка тетради уже проходит под графиком,
+            и внутренние линии с ней спорят, а не помогают. */ ''}
+      ${[0, всего].map(
+        (n) => svg`<line
+          x1="0"
+          y1=${y(n).toFixed(1)}
+          x2=${W}
+          y2=${y(n).toFixed(1)}
+          stroke="var(--грифель, #5c6068)"
+          stroke-width="0.9"
+          opacity="0.4" />`,
+      )}
+      <path
+        d=${путь}
+        fill="none"
+        stroke="var(--паста, #1b3a6b)"
+        stroke-width="2"
+        stroke-linejoin="round" />
+      ${кресты.map(
+        (i) => svg`<path
+          d=${`M${(x(i) - 5).toFixed(1)},${H - 8} l10,8 M${(x(i) + 5).toFixed(1)},${H - 8} l-10,8`}
+          stroke="var(--красный, #a8402f)"
+          stroke-width="1.6"
+          fill="none" />`,
+      )}
+    </svg>`;
+  }
+
   private replica(s: SondeState, i: number) {
     const r = s.replicas[i]!;
     const поднимается = r.phase === 'starting';
@@ -248,26 +337,22 @@ export class SondeWidget extends Widget<Props> {
     const s = this.sonde.state();
     const цель = this.props.goal ?? { maxErrors: 0.02 };
     const g = this.sonde.goal();
-    const доля = Math.min(1, s.load / NAPLYV.surge);
 
     return html`<section class="telaio">
       <h4>${this.props.title ?? 'Наплыв и пробы'}</h4>
       <p class="suggerimento">
         ${this.props.hint ??
-        'Служба обязана пережить наплыв: очередь трёх экземпляров его держит. Убить её могут только ваши настройки. Двиньте срок пробы живости и посмотрите, что будет.'}
+        'Служба обязана пережить наплыв: очередь трёх экземпляров его держит. Убить её могут только ваши настройки. Двиньте срок пробы живости — весь прогон пересчитается сразу.'}
       </p>
 
-      <div
-        class="carico ${s.surging ? 'surge' : ''}"
-        role="img"
-        aria-label=${`Нагрузка ${s.load} запросов в секунду`}>
-        <i style=${`width:${(доля * 100).toFixed(0)}%`}></i>
-      </div>
+      ${this.tela()}
       <p class="etichetta">
-        ${s.surging ? `Наплыв: ${s.load} запросов в секунду` : `Спокойно: ${s.load} запросов в секунду`}
+        Сколько экземпляров в строю за прогон. Розовым — наплыв, крестиками внизу —
+        перезапуски: каждый из них устроила проба живости.
       </p>
 
       <div class="repliche">${s.replicas.map((_, i) => this.replica(s, i))}</div>
+      <p class="etichetta">Состояние в конце прогона.</p>
 
       <div class="quadranti">
         <div class="quadrante ${s.errorRate > цель.maxErrors ? 'male' : 'bene'}">
@@ -297,17 +382,22 @@ export class SondeWidget extends Widget<Props> {
           }}>
           Проба готовности: ${this.readiness ? 'включена' : 'выключена'}
         </button>
-        <button class="bottone" @click=${() => this.заново()}>Сначала</button>
+        <button
+          class="bottone"
+          @click=${() => {
+            this.timeout = NAPLYV.timeout;
+            this.threshold = NAPLYV.threshold;
+            this.readiness = NAPLYV.readiness;
+            this.заново();
+          }}>
+          Как было
+        </button>
       </div>
 
-      <p class="esito ${g.reached ? 'bene' : ''} ${s.done && !g.reached ? 'male' : ''}">
-        ${s.done
-          ? g.reached
-            ? 'Наплыв пережит без потерь. Проба живости при этом ни разу не сработала — и это правильно: она отвечает на вопрос «нужен ли перезапуск», а не «хорошо ли идут дела».'
-            : `Потеряно ${(s.errorRate * 100).toFixed(0)} % запросов при ${s.restarts} перезапусках — и ни одна программа не была сломана. Убила службу проба: медленно не значит зависла.`
-          : s.restarts > 0
-            ? 'Пошли перезапуски. Смотрите, что происходит с временем ответа у выживших.'
-            : `Держите потери ниже ${(цель.maxErrors * 100).toFixed(0)} % до конца прогона.`}
+      <p class="esito ${g.reached ? 'bene' : ''} ${!g.reached ? 'male' : ''}">
+        ${g.reached
+          ? 'Наплыв пережит без потерь. Проба живости при этом ни разу не сработала — и это правильно: она отвечает на вопрос «нужен ли перезапуск», а не «хорошо ли идут дела».'
+          : `Потеряно ${(s.errorRate * 100).toFixed(0)} % запросов при ${s.restarts} перезапусках — и ни одна программа не была сломана. Убила службу проба: медленно не значит зависла.`}
       </p>
     </section>`;
   }

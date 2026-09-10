@@ -16,7 +16,7 @@
  * просто не слушает.
  */
 
-import { LitElement, css, html, type PropertyValues, type TemplateResult } from 'lit';
+import { LitElement, css, html, svg, type PropertyValues, type TemplateResult } from 'lit';
 
 export interface GoalReport {
   readonly goal: string;
@@ -343,7 +343,14 @@ export abstract class Widget<P = Record<string, unknown>> extends LitElement {
   }
 }
 
-export { html, css };
+/* `svg` вывозится наравне с `html`, и это не удобство.
+ *
+ * Вложенный `html`-шаблон внутри <svg> создаёт элементы в пространстве имён
+ * HTML: в дереве они есть, имена у них заглавными буквами, и не видно их
+ * никогда. Ошибка молчаливая — ни исключения, ни предупреждения, — и она
+ * уже жила в приборе про контур: полоса допуска не рисовалась с самого дня,
+ * когда её завели. Для куска SVG нужен `svg`, и других способов нет. */
+export { html, css, svg };
 
 /** Мелочи, общие для приборов с гипотезами и следами. */
 export const stileTraccia = css`

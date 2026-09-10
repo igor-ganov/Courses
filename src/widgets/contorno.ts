@@ -7,7 +7,7 @@
  * через экран, а через экран её никто не проверяет.
  */
 
-import { html, Widget } from './base';
+import { html, svg, Widget } from './base';
 import { createLoop, type Loop, type LoopSettings } from './models/contorno';
 
 interface Props {
@@ -145,7 +145,7 @@ export class Contorno extends Widget<Props> {
       .join('');
     const задание = y(set.setpoint).toFixed(1);
     const допуск = this.props.goal
-      ? html`<rect
+      ? svg`<rect
           x="0"
           y=${y(set.setpoint + this.props.goal.tolerance).toFixed(1)}
           width=${W}

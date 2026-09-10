@@ -37,7 +37,7 @@ import {
   lorenz,
   question,
 } from './interattivi';
-import { manifest, nightshift, probes, reconcile, schedule, selector, traffic } from './orchestra';
+import { manifest, probes, reconcile, schedule, selector, traffic, workshop } from './orchestra';
 
 export const ESEMPI: Readonly<Record<string, Block>> = {
   prose: prose({
@@ -165,13 +165,13 @@ export const ESEMPI: Readonly<Record<string, Block>> = {
 
   schedule: schedule({ title: 'Куда поедет под' }),
 
-  nightshift: nightshift({ title: 'Ночная смена', desired: 3, chaos: 12 }),
-
   selector: selector({ title: 'Отбор по метке' }),
 
   probes: probes({ title: 'Наплыв и пробы' }),
 
   traffic: traffic({ title: 'Очередь ключей', modo: 'coda' }),
+
+  workshop: workshop({ title: 'Мастерская манифеста' }),
 
   /* Вид задания в реестре один, а разметок у него пять — по виду вопроса.
      В примере стоит выбор как самый частый; порядок, сопоставление и цель в

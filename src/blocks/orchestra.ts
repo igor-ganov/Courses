@@ -15,6 +15,25 @@ const общие = {
   hint: s.optional(s.text({ max: 600 })),
 };
 
+export const workshop = defineBlock({
+  kind: 'workshop',
+  label: 'Мастерская манифеста',
+  note: 'Читатель правит настоящий YAML — кластер отвечает сразу. Уровни с задачами, как в CSS Grid Garden.',
+  schema: s.record({
+    kind: s.literal('workshop'),
+    ...общие,
+    /** Какие уровни показать. Пусто — все. */
+    levels: s.optional(s.list(s.text({ max: 32 }), { min: 1 })),
+    goal: s.optional(s.flag()),
+  }),
+  tag: 'cy-officina',
+  /* Высота зависит от числа уровней в полоске и от длины манифеста; взято по
+     самому высокому случаю на телефоне. */
+  reserve: 1420,
+  goals: (b) => (b.goal ? ['built'] : []),
+  load: () => import('~/widgets/officina'),
+});
+
 export const manifest = defineBlock({
   kind: 'manifest',
   label: 'Разбор манифеста',
@@ -81,7 +100,8 @@ export const probes = defineBlock({
     goal: s.optional(s.record({ maxErrors: s.number({ min: 0, max: 1 }) })),
   }),
   tag: 'cy-sonde',
-  reserve: 860,
+  /* С кривой прогона прибор выше: она заменила живую полосу нагрузки. */
+  reserve: 1010,
   goals: () => ['endured'],
   load: () => import('~/widgets/sonde'),
 });
@@ -100,27 +120,6 @@ export const selector = defineBlock({
   reserve: 920,
   goals: (b) => (b.goal ? ['selected'] : []),
   load: () => import('~/widgets/selettore'),
-});
-
-export const nightshift = defineBlock({
-  kind: 'nightshift',
-  label: 'Ночная смена',
-  note: 'Игра: подежурить руками против заявленного состояния. Счёт — доля времени в строю и число пробуждений.',
-  schema: s.record({
-    kind: s.literal('nightshift'),
-    ...общие,
-    desired: s.optional(s.number({ integer: true, min: 1, max: 5 })),
-    /** В среднем раз в столько секунд падает под. */
-    chaos: s.optional(s.number({ min: 1, max: 60 })),
-    goal: s.optional(
-      s.record({ uptime: s.number({ min: 0, max: 1 }), over: s.number({ min: 10 }) }),
-    ),
-  }),
-  tag: 'cy-turno',
-  reserve: 900,
-  /* Смена засчитывается всегда: игра без счёта — это показ. */
-  goals: () => ['survived'],
-  load: () => import('~/widgets/turno'),
 });
 
 export const reconcile = defineBlock({
