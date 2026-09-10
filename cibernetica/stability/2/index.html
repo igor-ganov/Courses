@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Порог и то, что за ним — Устойчивость — Кибернетика</title><meta name="description" content="Где регулирование ломается. Порог, за которым отрицательная связь начинает раскачивать, и что бывает за порогом."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/cibernetica/">Кибернетика: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="cibernetica/stability:2" data-lavori="2"> <p class="sopra mano"> Устойчивость · виток 2 из 2 </p> <h1>Порог и то, что за ним</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/cibernetica/stability/1/" class="giro" data-livello="cibernetica/stability:1"> <b>1</b> <span>Равновесие и что с ним бывает</span> </a><a href="/Courses/cibernetica/stability/2/" class="giro corrente" data-livello="cibernetica/stability:2" aria-current="page"> <b>2</b> <span>Порог и то, что за ним</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>считать запас по усилению для контура с запаздыванием</li><li>объяснять, что происходит при переходе через порог</li><li>связывать потерю устойчивости с удвоением периода и хаосом</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (18)</summary> <ul><li>узнавать контур управления в устройствах, в живом и в обществе</li><li>называть четыре части контура и говорить, что происходит при обрыве каждой</li><li>объяснять, почему кибернетика говорит о поведении, а не об устройстве</li><li>рисовать контур из четырёх частей и показывать направление обхода</li><li>отличать разомкнутое управление от замкнутого</li><li>называть, что именно возвращается по обратной связи</li><li>различать отрицательную и положительную обратную связь по поведению</li><li>приводить примеры, где положительная связь полезна</li><li>объяснять, почему знак связи не совпадает с «хорошо» и «плохо»</li><li>объяснять, откуда берётся статическая ошибка у пропорционального регулятора</li><li>называть, что делает каждое из трёх слагаемых и чем платит</li><li>подбирать усиление и интеграл так, чтобы контур приходил к заданию</li><li>отличать устойчивое равновесие от неустойчивого</li><li>называть три исхода для возмущённой системы</li><li>узнавать раскачку по виду графика</li><li>объяснять, почему запаздывание превращает регулирование в раскачку</li><li>оценивать, во что обходится усиление при данном запаздывании</li><li>узнавать запаздывание в системах, где оно не выглядит как задержка</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 2</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Порог устойчивости — это не «примерно там», а вполне считаемая величина. Условие простое: пройдя круг, сигнал не должен вернуться усиленным и перевёрнутым.</p>
+<figure class="formula-blocco"><div class="formula" translate="no">|L(jω)| = 1  и  arg L(jω) = −180°</div><figcaption>L — то, что круг делает с сигналом частоты ω. Если на той частоте, где сдвиг фазы достиг половины периода, усиление ещё не упало ниже единицы, — контур раскачается.</figcaption></figure>
+<p>Отсюда две практические величины. <b class="termine">Запас по усилению</b>: во сколько раз можно ещё поднять усиление до порога. <b class="termine">Запас по фазе</b>: сколько градусов сдвига контур ещё выдержит — а значит, сколько запаздывания можно добавить. Инженеры держат первый около двух-трёх раз, второй около сорока-шестидесяти градусов, и это не суеверие: объект со временем меняется.</p>
+<p>На практике эти два запаса не роскошь, а необходимость. Объект меняется: теплообменник зарастает, трение растёт, нагрузка не та, что при наладке. Регулятор, настроенный впритык к порогу, будет устойчив ровно в день сдачи, а через полгода начнёт звенеть — и виноватым окажется тот, кто его настраивал.</p>
+<p>Есть и вторая причина держать запас. Условие выше записано для одной частоты, но круг проходят все частоты сразу, и у реального объекта характеристика известна не точно: её сняли на стенде, при одной температуре, на малых отклонениях. Найквист в 1932 году предложил смотреть не на одну точку, а на весь путь, который вычерчивает L(jω) на комплексной плоскости, и считать, обходит ли этот путь точку −1. Тогда запас перестаёт быть числом и становится расстоянием до этой точки — а расстояние честно учитывает, что ошибка может прийти и по усилению, и по фазе разом.</p>
+<section class="strumento incastro" data-tono="storia"><p class="titolo-strumento">Максвелл, 1868</p><p>Регуляторы Уатта начали раскачиваться, когда машины стали мощнее и быстрее. Джеймс Клерк Максвелл разобрал уравнения и показал: устойчивость определяется корнями характеристического уравнения, а не здравым смыслом. Так родилась теория управления — из поломки, а не из идеи.</p></section>
+<h2 id="a-chto-za-porogom">А что за порогом</h2>
+<p>Обычно на этом изложение и заканчивается: за порогом — плохо. Но за порогом есть своя структура, и она гораздо интереснее. Когда система теряет устойчивость, она не сваливается в хаос сразу: сначала появляется колебание, потом колебание с удвоенным периодом, потом ещё раз удвоенным, и лишь потом хаос.</p>
+<cy-logistica class="isola" data-blocco="logistic" data-props="{&quot;kind&quot;:&quot;logistic&quot;,&quot;title&quot;:&quot;Что происходит за порогом&quot;,&quot;hint&quot;:&quot;Ведите r вправо: покой, два состояния, четыре, восемь — и хаос. И внутри хаоса вдруг снова окно с периодом три.&quot;,&quot;r&quot;:2.9}" style="min-height:720px"></cy-logistica>
+<p>Эта последовательность одинакова для громадного числа систем — от контура регулирования до популяции рыбы и до капающего крана. Отношение расстояний между удвоениями стремится к числу Фейгенбаума, 4,669…, и оно универсально: не зависит ни от системы, ни от того, чем её описывают.</p>
+<aside class="nota">Универсальность здесь того же сорта, что у сектора 139° у смятой бумаги: число не выводится из вещества, оно следует из структуры. Такие числа — лучшее, что кибернетика может предъявить в свою пользу.</aside>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;numeric&quot;,&quot;id&quot;:&quot;stb-2-feigenbaum&quot;,&quot;prompt&quot;:&quot;Чему примерно равно отношение расстояний между последовательными удвоениями периода?&quot;,&quot;difficulty&quot;:4,&quot;explain&quot;:&quot;Константа Фейгенбаума, 4,669201… Она одинакова для любых систем с удвоением периода — в этом и состоит открытие.&quot;,&quot;answer&quot;:4.669,&quot;tolerance&quot;:0.15,&quot;relative&quot;:true}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;order&quot;,&quot;id&quot;:&quot;stb-2-route&quot;,&quot;prompt&quot;:&quot;Расставьте по порядку то, что происходит с системой при росте параметра&quot;,&quot;difficulty&quot;:4,&quot;explain&quot;:&quot;Путь к хаосу через удвоения периода. Каждое следующее удвоение случается на промежутке в 4,669 раза короче предыдущего, поэтому их бесконечно много на конечном отрезке.&quot;,&quot;items&quot;:[&quot;Покой в одной точке&quot;,&quot;Колебание с периодом 2&quot;,&quot;Период 4&quot;,&quot;Хаос&quot;]}}" style="min-height:500px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/cibernetica/emergence/2/" class="rinvio">Подробно про то, что за порогом</a></p></article> <nav class="avanti" aria-label="Дальше">  <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/cibernetica/feedback/3/">Обратная связь · виток 3: Запаздывание как главный враг</a> </li><li> <a href="/Courses/cibernetica/emergence/2/">Сложность из простого · виток 2: Горизонт предсказания</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/cibernetica/stability/1/"> <b class="mano">← Назад</b> <span>Устойчивость · виток 1: Равновесие и что с ним бывает</span> </a> <a class="successivo" href="/Courses/cibernetica/variety/1/"> <b class="mano">Дальше →</b> <span>Необходимое разнообразие · виток 1: Только разнообразие поглощает разнообразие</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

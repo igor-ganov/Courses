@@ -1,0 +1,1395 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Пять почерков</title>
+<style>
+/* Начертания объявлены прямо здесь: отдельный файл стилей блокирует
+   отрисовку на лишний оборот сети, а весит объявление пять килобайт.
+   Сами файлы шрифтов тянутся отдельно и кэшируются — и только те, что
+   нужны видимому направлению. */
+@font-face{font-family:'Caveat';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/caveat-600-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/caveat-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/caveat-700-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/caveat-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Literata';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/literata-400-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Literata';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/literata-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Literata';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/literata-400i-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Literata';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/literata-400i-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Literata';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/literata-600-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Literata';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/literata-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'PT Mono';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/pt-mono-400-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'PT Mono';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/pt-mono-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/oswald-400-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/oswald-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/oswald-600-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Oswald';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/oswald-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/playfair-display-700-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/playfair-display-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Playfair Display';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/playfair-display-400i-cyrillic.woff2') format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Playfair Display';font-style:italic;font-weight:400;font-display:swap;src:url('fonts/playfair-display-400i-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ВИТРИНА
+   Оболочка намеренно молчит: пять материалов внутри — это и есть
+   содержание, а панель выбора не должна с ними спорить. Поэтому
+   графит, узкий гротеск и никакого своего цвета: активный выбор
+   отмечен бумагой, а не акцентом.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root{
+  --графит:#191715;
+  --графит-стекло:rgba(23,21,19,.86);
+  --волос:rgba(246,240,228,.20);
+  --светлый:#f4efe4;
+  --приглушённый:#a7a091;
+  --низ:calc(84px + env(safe-area-inset-bottom));
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:#f7f3e8;
+  font-family:'Literata',Georgia,serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
+
+.direzione[hidden]{display:none}
+
+/* ── панель выбора ─────────────────────────────────────────── */
+.pannello{
+  position:fixed;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);
+  z-index:50;display:flex;flex-direction:column;align-items:center;gap:7px;
+  width:max-content;max-width:calc(100vw - 16px);
+}
+.scelte{
+  display:flex;gap:4px;padding:5px;
+  background:var(--графит-стекло);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--волос);border-radius:999px;
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.6);
+  overflow-x:auto;scrollbar-width:none;max-width:100%;
+}
+.scelte::-webkit-scrollbar{display:none}
+.scelta{
+  display:grid;gap:1px;justify-items:center;
+  border:0;background:none;cursor:pointer;
+  padding:7px 15px 8px;border-radius:999px;color:var(--приглушённый);
+  font-family:'Oswald',"Helvetica Neue",sans-serif;white-space:nowrap;
+  transition:background .16s,color .16s;
+}
+.scelta b{font-weight:500;font-size:13.5px;letter-spacing:.10em;text-transform:uppercase}
+.scelta i{font-style:normal;font-size:10.5px;letter-spacing:.04em;opacity:.72}
+.scelta:hover{color:var(--светлый);background:rgba(246,240,228,.07)}
+.scelta[aria-pressed="true"]{background:var(--светлый);color:#1b1917}
+.scelta[aria-pressed="true"] i{opacity:.62}
+.scelta:focus-visible{outline:2px solid var(--светлый);outline-offset:2px}
+
+.consiglio{
+  margin:0;font-size:11.5px;letter-spacing:.05em;color:var(--светлый);
+  background:var(--графит-стекло);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--волос);border-radius:999px;padding:4px 13px;
+  text-align:center;
+}
+.consiglio::after{content:"Наведите и нажмите — свет идёт за курсором, палец вдавливает лист"}
+@media (hover:none){
+  .consiglio::after{content:"Коснитесь листа — под пальцем продавится ямка"}
+  /* Палец не мельче 44 px, иначе в поезде не попасть. */
+  .scelta{padding:11px 15px}
+  .scelta i{display:none}
+  .consiglio{display:none}
+}
+@media (max-width:560px){
+  .scelta i{display:none}
+  .scelta b{font-size:12.5px;letter-spacing:.08em}
+}
+@media (prefers-reduced-motion:reduce){
+  .scelta{transition:none}
+}
+
+/* ── quaderno ─────────────────────────── */
+.direzione[data-dir="quaderno"]{--кегль:1;--пол:0px;
+  --клетка:#a8c0d6;
+  --поле:#d98b8b;
+  --паста:#1b3a6b;
+  --паста-тень:#16305a;
+  --грифель:#5c6068;
+  --текст:#20242c;
+  --тихий:#6f7682;
+  --красный:#a8402f;
+  --зелёный:#3f6b4a;
+  --шаг:26px;
+}
+.direzione[data-dir="quaderno"] *{box-sizing:border-box}
+.direzione[data-dir="quaderno"]{min-height:100%;position:relative}
+.direzione[data-dir="quaderno"]{
+  margin:0;color:var(--текст);
+  font-family:'Literata',Georgia,serif;font-size:max(calc(16.5px*var(--кегль)),var(--пол));line-height:var(--шаг);
+  -webkit-font-smoothing:antialiased;
+}
+.direzione[data-dir="quaderno"] .griglia{
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;
+  background:
+    repeating-linear-gradient(to right, color-mix(in srgb, var(--клетка) 78%, transparent) 0 1px, transparent 1px var(--шаг)),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--клетка) 78%, transparent) 0 1px, transparent 1px var(--шаг));
+  mask-image:radial-gradient(130% 100% at 50% 25%, #000 72%, transparent 100%);
+}
+.direzione[data-dir="quaderno"] .margine{
+  position:absolute;top:0;height:100vh;left:calc(50% - 430px);width:2px;z-index:-1;pointer-events:none;
+  background:linear-gradient(var(--поле),var(--поле)) left 0 top 0/1.1px 100% no-repeat,
+             linear-gradient(var(--поле),var(--поле)) left 3px top 12px/1px calc(100% - 40px) no-repeat;
+  opacity:.5;
+}
+.direzione[data-dir="quaderno"] main{max-width:720px;margin:0 auto;padding:calc(var(--шаг)*2) 24px calc(var(--шаг)*4)}
+.direzione[data-dir="quaderno"] .testata{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:calc(var(--шаг)*2)}
+.direzione[data-dir="quaderno"] .marchio{font-family:'Caveat',cursive;font-size:max(calc(27px*var(--кегль)),var(--пол));font-weight:700;color:var(--паста);letter-spacing:.01em}
+.direzione[data-dir="quaderno"] .marchio sup{font-family:'Literata',serif;font-size:max(calc(11px*var(--кегль)),var(--пол));font-weight:400;color:var(--тихий);letter-spacing:.08em;text-transform:uppercase}
+.direzione[data-dir="quaderno"] .grado{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:'Caveat',cursive;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--грифель)}
+.direzione[data-dir="quaderno"] .barra{position:relative;width:110px;height:9px}
+.direzione[data-dir="quaderno"] .barra::before{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='110' height='9'><path d='M2,7.5 C24,6.6 66,6.9 105,7.2 M2,7.4 C3,5 2.6,3 3,1.4 M105,7.1 C106,5 105.6,3.2 106,1.8 M3,1.5 C30,.6 70,1 99,1.4' fill='none' stroke='%231b3a6b' stroke-width='1.1' stroke-linecap='round' opacity='.75'/></svg>") no-repeat;
+}
+.direzione[data-dir="quaderno"] .barra i{position:absolute;left:2px;top:2px;height:5px;width:62%;background:var(--паста);opacity:.22;border-radius:1px}
+.direzione[data-dir="quaderno"] .riga-corso{font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));color:var(--тихий);margin:0 0 2px}
+.direzione[data-dir="quaderno"] h1{
+  font-family:'Caveat',cursive;font-weight:700;
+  font-size:clamp(44px,8vw,68px);line-height:.94;letter-spacing:-.01em;
+  margin:0 0 6px;color:var(--паста);text-wrap:balance;
+}
+.direzione[data-dir="quaderno"] .sottotitolo{
+  font-family:'Caveat',cursive;font-size:max(calc(26px*var(--кегль)),var(--пол));color:var(--грифель);
+  margin:0 0 calc(var(--шаг)*1.5);
+}
+.direzione[data-dir="quaderno"] p{margin:0 0 var(--шаг);max-width:62ch}
+.direzione[data-dir="quaderno"] .occhiello{font-size:max(calc(18px*var(--кегль)),var(--пол));line-height:calc(var(--шаг)*1.15)}
+.direzione[data-dir="quaderno"] .nota{
+  position:relative;font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--грифель);
+  line-height:1.25;margin:0 0 var(--шаг);padding-left:14px;
+}
+.direzione[data-dir="quaderno"] .nota::before{content:"";position:absolute;left:0;top:5px;bottom:4px;width:2px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='60'><path d='M1.6,2 C.8,16 2.2,34 1.4,57' fill='none' stroke='%235c6068' stroke-width='1.3' stroke-linecap='round'/></svg>") repeat-y;
+  opacity:.6}
+.direzione[data-dir="quaderno"] .termine{font-weight:600;color:var(--паста);position:relative;white-space:nowrap}
+.direzione[data-dir="quaderno"] .termine::after{
+  content:"";position:absolute;left:-2px;right:-4px;bottom:-4px;height:6px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='6' preserveAspectRatio='none'><path d='M2,2.4 C40,1.2 96,3 147,1.8' fill='none' stroke='%231b3a6b' stroke-width='1.4' stroke-linecap='round'/><path d='M6,5.1 C48,4 92,5.4 140,4.4' fill='none' stroke='%231b3a6b' stroke-width='1' stroke-linecap='round' opacity='.6'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="quaderno"] figure{margin:0 0 var(--шаг)}
+.direzione[data-dir="quaderno"] .schema{width:100%;height:auto;display:block}
+.direzione[data-dir="quaderno"] figcaption{font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--тихий);margin-top:6px}
+.direzione[data-dir="quaderno"] .strumento{
+  position:relative;padding:20px 22px 18px;margin:0 0 var(--шаг);
+  background:color-mix(in srgb, #fffdf6 62%, transparent);
+}
+.direzione[data-dir="quaderno"] .strumento::before{
+  content:"";position:absolute;inset:-6px -8px;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200' preserveAspectRatio='none'><path d='M14,10 C90,5 210,7 288,11 C295,12 296,20 296,34 C297,90 296,150 295,178 C294,188 286,190 274,190 C190,193 90,191 22,190 C11,189 7,182 7,170 C5,120 6,50 7,26 C7,16 11,12 22,11' fill='none' stroke='%231b3a6b' stroke-width='1.5' stroke-linecap='round' opacity='.55'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="quaderno"] .titolo-strumento{font-family:'Caveat',cursive;font-size:max(calc(23px*var(--кегль)),var(--пол));color:var(--паста);margin:0 0 2px}
+.direzione[data-dir="quaderno"] .suggerimento{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--тихий);margin:0 0 14px;line-height:1.2}
+.direzione[data-dir="quaderno"] .grafico{display:block;width:100%;height:auto;margin-bottom:12px}
+.direzione[data-dir="quaderno"] .quadranti{display:flex;flex-wrap:wrap;gap:6px 26px;margin-bottom:14px}
+.direzione[data-dir="quaderno"] .quadrante b{display:block;font-family:'Caveat',cursive;font-size:max(calc(17px*var(--кегль)),var(--пол));font-weight:500;color:var(--тихий);line-height:1.1}
+.direzione[data-dir="quaderno"] .quadrante span{font-family:'Literata',serif;font-size:max(calc(17px*var(--кегль)),var(--пол));font-variant-numeric:tabular-nums;color:var(--текст)}
+.direzione[data-dir="quaderno"] .quadrante.male span{color:var(--красный)}
+.direzione[data-dir="quaderno"] .quadrante.bene span{color:var(--зелёный)}
+.direzione[data-dir="quaderno"] .manopole{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.direzione[data-dir="quaderno"] .manopola{display:grid;gap:3px}
+.direzione[data-dir="quaderno"] .manopola label{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--грифель);display:flex;justify-content:space-between;gap:8px}
+.direzione[data-dir="quaderno"] .manopola label i{font-style:normal;font-family:'Literata',serif;font-size:max(calc(15px*var(--кегль)),var(--пол));color:var(--паста);font-variant-numeric:tabular-nums}
+.direzione[data-dir="quaderno"] input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:none;cursor:grab}
+.direzione[data-dir="quaderno"] input[type=range]::-webkit-slider-runnable-track{
+  height:3px;border-radius:2px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='3' preserveAspectRatio='none'><path d='M1,2 C60,1 140,2.2 199,1.2' fill='none' stroke='%235c6068' stroke-width='1.2' stroke-linecap='round'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="quaderno"] input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;margin-top:-7px;border:0;background:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M8,1.6 C11.6,1.4 14.4,4.4 14.4,8 C14.4,11.7 11.5,14.5 8,14.4 C4.5,14.3 1.7,11.5 1.7,8 C1.7,4.6 4.3,1.9 7.4,1.7' fill='%23fffdf6' stroke='%231b3a6b' stroke-width='1.5' stroke-linecap='round'/></svg>") no-repeat center;
+}
+.direzione[data-dir="quaderno"] .pastiglie{display:flex;flex-wrap:wrap;gap:8px 12px;margin:0 0 var(--шаг)}
+.direzione[data-dir="quaderno"] .pastiglia{
+  position:relative;border:0;background:none;cursor:pointer;padding:5px 12px;
+  font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--грифель);
+}
+.direzione[data-dir="quaderno"] .pastiglia[aria-pressed=true]{color:var(--паста)}
+.direzione[data-dir="quaderno"] .pastiglia[aria-pressed=true]::before{
+  content:"";position:absolute;inset:-3px -6px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' preserveAspectRatio='none'><path d='M22,3 C60,1 96,3 110,7 C118,10 118,24 108,28 C92,33 40,33 16,30 C6,28 3,16 9,9 C12,5.5 16,4 21,3.2' fill='none' stroke='%231b3a6b' stroke-width='1.4' stroke-linecap='round' opacity='.7'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="quaderno"] .domanda{margin:0 0 10px;font-size:max(calc(17px*var(--кегль)),var(--пол))}
+.direzione[data-dir="quaderno"] .numero{font-family:'Caveat',cursive;font-size:max(calc(23px*var(--кегль)),var(--пол));color:var(--паста);margin-right:6px}
+.direzione[data-dir="quaderno"] .opzioni{display:grid;gap:2px;margin:0 0 var(--шаг);padding:0;list-style:none}
+.direzione[data-dir="quaderno"] .opzione{
+  position:relative;display:flex;gap:12px;align-items:baseline;width:100%;text-align:left;
+  border:0;background:none;cursor:pointer;padding:7px 8px 7px 6px;
+  font:inherit;font-size:max(calc(16.5px*var(--кегль)),var(--пол));color:var(--текст);
+}
+.direzione[data-dir="quaderno"] .opzione .lettera{font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));color:var(--тихий);min-width:18px}
+.direzione[data-dir="quaderno"] .opzione:hover .lettera{color:var(--паста)}
+.direzione[data-dir="quaderno"] .opzione[aria-checked=true]::before{
+  content:"";position:absolute;left:-4px;top:2px;width:26px;height:26px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26'><path d='M4,13 C7,17 9,20 11,22 C14,15 18,8 23,3' fill='none' stroke='%233f6b4a' stroke-width='2' stroke-linecap='round'/></svg>") no-repeat center;
+}
+.direzione[data-dir="quaderno"] .opzione[aria-checked=true] .lettera{opacity:0}
+.direzione[data-dir="quaderno"] .opzione[aria-checked=true]{color:var(--зелёный)}
+.direzione[data-dir="quaderno"] .azioni{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.direzione[data-dir="quaderno"] .bottone{
+  position:relative;border:0;background:none;cursor:pointer;
+  font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));color:var(--паста);
+  padding:9px 22px;
+  
+  transform:translateY(calc(var(--premuto,0) * .7px));
+}
+.direzione[data-dir="quaderno"] .bottone::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='46' preserveAspectRatio='none'><path d='M18,4 C62,1.5 118,3 145,6 C153,7 155,14 154,23 C153,33 152,39 145,41 C112,44 48,43 17,41 C8,40.5 5,34 5.5,24 C6,14 8,7 16,5' fill='none' stroke='%231b3a6b' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat center/100% 100%;
+  filter:drop-shadow(calc(var(--luce-dx,0) * -6px) calc(var(--luce-dy,0) * 6px + 2px) 2px rgba(32,36,44,.18));
+}
+.direzione[data-dir="quaderno"] .bottone--pieno{color:#fffdf6}
+.direzione[data-dir="quaderno"] .bottone--pieno::after{
+  content:"";position:absolute;inset:2px 4px;z-index:-1;border-radius:14px 10px 16px 9px/9px 15px 8px 14px;
+  background:var(--паста);
+}
+.direzione[data-dir="quaderno"] .bottone:active{transform:translateY(1.2px)}
+.direzione[data-dir="quaderno"] .legenda{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--тихий)}
+@media (max-width:640px){.direzione[data-dir="quaderno"]{--кегль:1.12;--пол:15px}
+.direzione[data-dir="quaderno"] main{padding-left:16px;padding-right:16px}
+.direzione[data-dir="quaderno"] figure,.direzione[data-dir="quaderno"] *:has(> svg.schema),.direzione[data-dir="quaderno"] *:has(> svg.grafico),.direzione[data-dir="quaderno"] pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+.direzione[data-dir="quaderno"] svg.schema,.direzione[data-dir="quaderno"] svg.grafico{min-width:min(820px,200vw)}
+.direzione[data-dir="quaderno"] button{min-height:44px}}
+
+/* Панель стоит внизу — освобождаем под неё место в каждом направлении. */
+.direzione[data-dir] main{padding-bottom:var(--низ)}
+</style>
+
+<canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas>
+
+<div class="direzione" data-dir="quaderno">
+
+<div class="griglia" data-scorre></div>
+<div class="margine" data-scorre></div>
+
+<main>
+  <header class="testata">
+    <div class="marchio">Кибернетика<sup> курс</sup></div>
+    <div class="grado">
+      <span class="barra"><i></i></span>
+      Регулятор
+    </div>
+  </header>
+
+  <p class="riga-corso">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и предел усиления</h1>
+  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
+
+  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="nota">душ с длинной трубой — тот же контур,<br>и ведёт он себя точно так же</p>
+
+  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
+  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
+  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение и начинает
+  его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 620 150" role="img" aria-label="Схема контура с запаздыванием">
+      <g fill="none" stroke="#1b3a6b" stroke-width="1.6" stroke-linecap="round">
+        <path d="M28,46 C64,43 96,44 122,46 C130,47 132,52 131,60 C130,70 129,74 122,76 C96,79 60,78 30,76 C22,75 20,69 21,60 C22,51 23,48 29,46.6"/>
+        <path d="M186,46 C222,43 254,44 280,46 C288,47 290,52 289,60 C288,70 287,74 280,76 C254,79 218,78 188,76 C180,75 178,69 179,60 C180,51 181,48 187,46.6"/>
+        <path d="M344,46 C380,43 412,44 438,46 C446,47 448,52 447,60 C446,70 445,74 438,76 C412,79 376,78 346,76 C338,75 336,69 337,60 C338,51 339,48 345,46.6"/>
+        <path d="M502,46 C538,43 570,44 596,46 C604,47 606,52 605,60 C604,70 603,74 596,76 C570,79 534,78 504,76 C496,75 494,69 495,60 C496,51 497,48 503,46.6"/>
+        <path d="M133,61 C148,60 162,61 176,61 M168,57 L177,61 L168,65"/>
+        <path d="M291,61 C306,60 320,61 334,61 M326,57 L335,61 L326,65"/>
+        <path d="M449,61 C464,60 478,61 492,61 M484,57 L493,61 L484,65"/>
+        <path d="M556,79 C555,96 554,108 552,118 C550,126 542,128 528,128 C400,131 200,130 96,128 C82,127.6 76,120 75,110 C74,98 74,88 75,79 M79,88 L75,79 L71,88"/>
+      </g>
+      <g font-family="Caveat, cursive" font-size="19" fill="#1b3a6b" text-anchor="middle">
+        <text x="76" y="66">цель</text><text x="234" y="66">регулятор</text>
+        <text x="392" y="66">объект</text><text x="550" y="66">датчик</text>
+      </g>
+      <g font-family="Caveat, cursive" font-size="18" fill="#a8402f">
+        <text x="300" y="146">здесь теряется время</text>
+        <path d="M296,138 C286,132 278,130 272,129" fill="none" stroke="#a8402f" stroke-width="1.3" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <figcaption>Обход круга занимает время — и в этом всё дело</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Ручка усиления и ручка запаздывания</p>
+    <p class="suggerimento">поставьте запаздывание на ноль и поднимите усиление до упора — спокойно;<br>верните усиление и медленно двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 560 170" role="img" aria-label="Переходный процесс">
+      <path d="M40,40 H548" stroke="#3f6b4a" stroke-width="1.2" stroke-dasharray="7 6" fill="none" opacity=".8"/>
+      <text x="548" y="32" font-family="Caveat, cursive" font-size="17" fill="#3f6b4a" text-anchor="end">уставка</text>
+      <path d="M40,150 C58,148 66,120 80,74 C92,34 104,14 118,26 C132,38 138,84 152,96 C168,110 180,72 196,58 C214,42 226,60 244,68 C264,77 278,54 300,52 C330,49 360,58 392,54 C430,49 470,52 548,51"
+            fill="none" stroke="#1b3a6b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M40,150 C60,150 78,148 100,140 C126,131 150,120 190,112 C240,102 300,96 548,92"
+            fill="none" stroke="#5c6068" stroke-width="1.4" stroke-dasharray="4 5" opacity=".7"/>
+      <path d="M40,12 C39,60 40,120 40,158 M34,152 C50,151 120,152 548,151" fill="none" stroke="#5c6068" stroke-width="1.2" stroke-linecap="round"/>
+      <text x="546" y="110" font-family="Caveat, cursive" font-size="17" fill="#5c6068" text-anchor="end">усилие регулятора</text>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>статическая ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулирование</b><span>34%</span></span>
+      <span class="quadrante"><b>время установления</b><span>—</span></span>
+      <span class="quadrante bene"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">1.</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">а</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">в</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+</div>
+<template data-dir="cianotipia"><style>.direzione[data-dir="cianotipia"]{--кегль:1;--пол:0px;
+  --лазурь:#1b3a52;
+  --лазурь-тень:#122938;
+  --линия:#dbe9f2;
+  --линия-тихая:#8fb0c6;
+  --бумага:#eef5f9;
+  --карандаш:#0d1a24;
+  --правка:#e8b04a;
+  --сетка:#2d5871;
+}
+.direzione[data-dir="cianotipia"] *{box-sizing:border-box}
+.direzione[data-dir="cianotipia"]{min-height:100%;position:relative}
+.direzione[data-dir="cianotipia"]{
+  margin:0;color:var(--линия);
+  font-family:'Oswald',"Helvetica Neue",sans-serif;font-weight:400;
+  font-size:max(calc(15px*var(--кегль)),var(--пол));line-height:1.62;letter-spacing:.012em;
+  -webkit-font-smoothing:antialiased;
+}
+.direzione[data-dir="cianotipia"] .reticolo{
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;opacity:.5;
+  background:
+    repeating-linear-gradient(to right, color-mix(in srgb,var(--сетка) 70%, transparent) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(to bottom, color-mix(in srgb,var(--сетка) 70%, transparent) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(to right, color-mix(in srgb,var(--сетка) 95%, transparent) 0 1px, transparent 1px 50px),
+    repeating-linear-gradient(to bottom, color-mix(in srgb,var(--сетка) 95%, transparent) 0 1px, transparent 1px 50px);
+  mask-image:linear-gradient(#000 70%, transparent 100%);
+}
+.direzione[data-dir="cianotipia"] main{max-width:800px;margin:0 auto;padding:34px 26px 90px}
+.direzione[data-dir="cianotipia"] .foglio{
+  position:relative;padding:26px 28px 30px;
+}
+.direzione[data-dir="cianotipia"] .foglio::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' preserveAspectRatio='none'><path d='M8,6 C120,3 300,4 392,7 C396,7.4 397,12 397,20 C398,110 397,240 396,290 C395.6,295 391,296 384,296 C260,299 120,298 14,296 C9,295.6 7,291 7,284 C5,190 6,60 7,18 C7,10 9,7 15,6.4' fill='none' stroke='%23dbe9f2' stroke-width='1.1' stroke-linecap='round' opacity='.55'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="cianotipia"] .cartiglio{
+  display:flex;gap:0;flex-wrap:wrap;margin-bottom:30px;
+  border:1px solid color-mix(in srgb,var(--линия) 45%, transparent);
+}
+.direzione[data-dir="cianotipia"] .cella{padding:7px 14px;border-right:1px solid color-mix(in srgb,var(--линия) 30%, transparent)}
+.direzione[data-dir="cianotipia"] .cella:last-child{border-right:0;margin-left:auto}
+.direzione[data-dir="cianotipia"] .cella b{display:block;font-size:max(calc(9.5px*var(--кегль)),var(--пол));letter-spacing:.22em;text-transform:uppercase;color:var(--линия-тихая);font-weight:400}
+.direzione[data-dir="cianotipia"] .cella span{font-size:max(calc(15px*var(--кегль)),var(--пол));color:var(--линия)}
+.direzione[data-dir="cianotipia"] .cella .grande{font-size:max(calc(19px*var(--кегль)),var(--пол));letter-spacing:.04em}
+.direzione[data-dir="cianotipia"] h1{
+  margin:0 0 4px;font-family:'Oswald',sans-serif;font-weight:600;
+  font-size:clamp(34px,5.6vw,54px);line-height:1.02;letter-spacing:.005em;
+  text-transform:uppercase;color:#fff;text-wrap:balance;
+}
+.direzione[data-dir="cianotipia"] .sotto{margin:0 0 26px;font-size:max(calc(16px*var(--кегль)),var(--пол));color:var(--линия-тихая);letter-spacing:.06em;text-transform:uppercase}
+.direzione[data-dir="cianotipia"] p{margin:0 0 17px;max-width:66ch;color:#e4eef5}
+.direzione[data-dir="cianotipia"] .occhiello{font-size:max(calc(16.5px*var(--кегль)),var(--пол))}
+.direzione[data-dir="cianotipia"] .postilla{
+  font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));line-height:1.2;color:var(--карандаш);
+  background:color-mix(in srgb,var(--бумага) 88%, transparent);
+  display:inline-block;padding:4px 12px 6px;margin:0 0 20px;
+  transform:rotate(-.7deg);
+}
+.direzione[data-dir="cianotipia"] .postilla::before{content:"→ ";color:var(--правка)}
+.direzione[data-dir="cianotipia"] figure{margin:0 0 24px}
+.direzione[data-dir="cianotipia"] .schema{display:block;width:100%;height:auto}
+.direzione[data-dir="cianotipia"] figcaption{
+  margin-top:8px;font-size:max(calc(11px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:var(--линия-тихая);
+}
+.direzione[data-dir="cianotipia"] .strumento{position:relative;margin:0 0 26px;padding:18px 20px 16px}
+.direzione[data-dir="cianotipia"] .strumento::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='240' preserveAspectRatio='none'><path d='M6,5 C120,2 300,3 393,6 C397,6.4 398,10 398,17 C399,90 398,200 397,232 C396.6,237 392,238 386,238 C260,241 120,240 12,238 C7,237.6 5,233 5,227 C3,160 4,40 5,14 C5,8 7,6 12,5.4' fill='none' stroke='%23dbe9f2' stroke-width='1.2' stroke-linecap='round' opacity='.7'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="cianotipia"] .titolo-strumento{margin:0 0 2px;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:#fff}
+.direzione[data-dir="cianotipia"] .suggerimento{margin:0 0 14px;font-size:max(calc(13.5px*var(--кегль)),var(--пол));color:var(--линия-тихая);letter-spacing:.03em}
+.direzione[data-dir="cianotipia"] .grafico{display:block;width:100%;height:auto;margin-bottom:12px}
+.direzione[data-dir="cianotipia"] .quadranti{display:flex;flex-wrap:wrap;gap:2px 0;margin-bottom:16px;
+  border-top:1px solid color-mix(in srgb,var(--линия) 28%, transparent);
+  border-bottom:1px solid color-mix(in srgb,var(--линия) 28%, transparent)}
+.direzione[data-dir="cianotipia"] .quadrante{flex:1 1 130px;padding:8px 12px 7px;border-right:1px solid color-mix(in srgb,var(--линия) 18%, transparent)}
+.direzione[data-dir="cianotipia"] .quadrante:last-child{border-right:0}
+.direzione[data-dir="cianotipia"] .quadrante b{display:block;font-size:max(calc(9px*var(--кегль)),var(--пол));letter-spacing:.18em;text-transform:uppercase;color:var(--линия-тихая);font-weight:400}
+.direzione[data-dir="cianotipia"] .quadrante span{font-family:'PT Mono',monospace;font-size:max(calc(17px*var(--кегль)),var(--пол));color:#fff}
+.direzione[data-dir="cianotipia"] .quadrante.male span{color:var(--правка)}
+.direzione[data-dir="cianotipia"] .manopole{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.direzione[data-dir="cianotipia"] .manopola label{display:flex;justify-content:space-between;font-size:max(calc(10.5px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая)}
+.direzione[data-dir="cianotipia"] .manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:0;color:#fff}
+.direzione[data-dir="cianotipia"] input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:crosshair;margin-top:2px}
+.direzione[data-dir="cianotipia"] input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--линия-тихая)}
+.direzione[data-dir="cianotipia"] input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:1px;height:15px;margin-top:-7px;background:#fff;
+  box-shadow:-3px 0 0 -1px #fff, 3px 0 0 -1px #fff;
+}
+.direzione[data-dir="cianotipia"] .pastiglie{display:flex;flex-wrap:wrap;gap:0 22px;margin:0 0 24px}
+.direzione[data-dir="cianotipia"] .pastiglia{
+  border:0;background:none;cursor:pointer;padding:4px 0;
+  font:inherit;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая);
+}
+.direzione[data-dir="cianotipia"] .pastiglia[aria-pressed=true]{color:#fff}
+.direzione[data-dir="cianotipia"] .pastiglia[aria-pressed=true]::before{content:"[ "}
+.direzione[data-dir="cianotipia"] .pastiglia[aria-pressed=true]::after{content:" ]"}
+.direzione[data-dir="cianotipia"] .domanda{margin:0 0 12px;font-size:max(calc(16px*var(--кегль)),var(--пол));color:#eaf3f8}
+.direzione[data-dir="cianotipia"] .numero{font-family:'PT Mono',monospace;color:var(--линия-тихая);margin-right:8px}
+.direzione[data-dir="cianotipia"] .opzioni{display:grid;gap:1px;margin:0 0 26px;padding:0;list-style:none}
+.direzione[data-dir="cianotipia"] .opzione{
+  display:flex;gap:14px;align-items:baseline;width:100%;text-align:left;
+  border:0;background:none;cursor:pointer;padding:9px 10px 9px 0;font:inherit;font-size:max(calc(15px*var(--кегль)),var(--пол));color:#dce8f0;
+}
+.direzione[data-dir="cianotipia"] .opzione .lettera{font-family:'PT Mono',monospace;font-size:max(calc(13px*var(--кегль)),var(--пол));color:var(--линия-тихая)}
+.direzione[data-dir="cianotipia"] .opzione:hover{color:#fff}
+.direzione[data-dir="cianotipia"] .opzione[aria-checked=true]{color:#fff}
+.direzione[data-dir="cianotipia"] .opzione[aria-checked=true] .lettera{color:var(--правка)}
+.direzione[data-dir="cianotipia"] .opzione[aria-checked=true] .lettera::after{content:" ×"}
+.direzione[data-dir="cianotipia"] .azioni{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.direzione[data-dir="cianotipia"] .bottone{
+  position:relative;border:0;background:none;cursor:pointer;
+  font:inherit;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:#fff;
+  padding:11px 24px;transform:translateY(calc(var(--premuto,0) * .6px));
+}
+.direzione[data-dir="cianotipia"] .bottone::before{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='44' preserveAspectRatio='none'><path d='M4,3 C50,1 130,2 165,4 C168,4.2 169,7 169,11 C169,24 168,36 167,40 C166.6,42 163,42.6 158,42.6 C110,44 40,43 7,41.6 C4,41.4 3,38 3,34 C2,22 3,10 3.4,6 C3.6,4 5,3.4 8,3.2' fill='none' stroke='%23dbe9f2' stroke-width='1.2' stroke-linecap='round'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="cianotipia"] .bottone--pieno{color:var(--лазурь)}
+.direzione[data-dir="cianotipia"] .bottone--pieno::after{content:"";position:absolute;inset:3px 4px;z-index:-1;background:var(--линия)}
+.direzione[data-dir="cianotipia"] .bottone:active{transform:translateY(1px)}
+.direzione[data-dir="cianotipia"] .legenda{font-size:max(calc(11px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая)}
+@media (max-width:640px){.direzione[data-dir="cianotipia"]{--кегль:1.12;--пол:15px}
+.direzione[data-dir="cianotipia"] main{padding-left:16px;padding-right:16px}
+.direzione[data-dir="cianotipia"] figure,.direzione[data-dir="cianotipia"] *:has(> svg.schema),.direzione[data-dir="cianotipia"] *:has(> svg.grafico),.direzione[data-dir="cianotipia"] pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+.direzione[data-dir="cianotipia"] svg.schema,.direzione[data-dir="cianotipia"] svg.grafico{min-width:min(820px,200vw)}
+.direzione[data-dir="cianotipia"] button{min-height:44px}}</style>
+
+<div class="reticolo" data-scorre></div>
+
+<main>
+<div class="foglio">
+  <div class="cartiglio">
+    <span class="cella"><b>курс</b><span class="grande">Кибернетика</span></span>
+    <span class="cella"><b>лист</b><span>07 / 17</span></span>
+    <span class="cella"><b>виток</b><span>второй</span></span>
+    <span class="cella"><b>разряд</b><span>Регулятор</span></span>
+  </div>
+
+  <h1>Запаздывание и предел усиления</h1>
+  <p class="sotto">Обратная связь · уровень 2</p>
+
+  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="postilla">душ с длинной трубой — тот же контур</p>
+
+  <p>Регулятор всегда исправляет прошлое. Коррекция, рассчитанная для состояния «полминуты назад»,
+  приходит, когда система уже в другом состоянии, и оказывается воздействием не в ту сторону.
+  При достаточном усилении она перестаёт гасить отклонение и начинает его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 700 170" role="img" aria-label="Схема контура">
+      <g fill="none" stroke="#dbe9f2" stroke-width="1.2" stroke-linecap="round">
+        <path d="M24,40 L154,40 L154,74 L24,74 L24,41"/>
+        <path d="M198,40 L328,40 L328,74 L198,74 L198,41"/>
+        <path d="M372,40 L502,40 L502,74 L372,74 L372,41"/>
+        <path d="M546,40 L676,40 L676,74 L546,74 L546,41"/>
+        <path d="M155,57 L196,57 M188,53 L197,57 L188,61"/>
+        <path d="M329,57 L370,57 M362,53 L371,57 L362,61"/>
+        <path d="M503,57 L544,57 M536,53 L545,57 L536,61"/>
+        <path d="M611,75 L611,122 L89,122 L89,76 M85,84 L89,76 L93,84"/>
+      </g>
+      <g font-family="Oswald, sans-serif" font-size="13" fill="#eaf3f8" text-anchor="middle" letter-spacing="1.5">
+        <text x="89" y="62">ЦЕЛЬ</text><text x="263" y="62">РЕГУЛЯТОР</text>
+        <text x="437" y="62">ОБЪЕКТ</text><text x="611" y="62">ДАТЧИК</text>
+      </g>
+      <!-- размерная линия на участке запаздывания -->
+      <g stroke="#e8b04a" stroke-width="1" fill="none">
+        <path d="M300,134 L300,150 M420,134 L420,150 M300,142 L420,142 M308,138 L300,142 L308,146 M412,138 L420,142 L412,146"/>
+      </g>
+      <text x="360" y="164" font-family="Oswald, sans-serif" font-size="11" fill="#e8b04a" text-anchor="middle" letter-spacing="1.6">ЗАПАЗДЫВАНИЕ 0,60 с</text>
+    </svg>
+    <figcaption>рис. 4 — контур с транспортным запаздыванием в цепи измерения</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Стенд · усиление и запаздывание</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно. Верните усиление и двигайте запаздывание.</p>
+
+    <svg class="grafico" viewBox="0 0 640 168" role="img" aria-label="Переходный процесс">
+      <g stroke="#2d5871" stroke-width="1" fill="none" opacity=".8">
+        <path d="M46,20 H628 M46,52 H628 M46,84 H628 M46,116 H628"/>
+        <path d="M150,14 V150 M280,14 V150 M410,14 V150 M540,14 V150"/>
+      </g>
+      <path d="M46,44 H628" stroke="#e8b04a" stroke-width="1" stroke-dasharray="8 6" fill="none"/>
+      <text x="626" y="36" font-family="Oswald, sans-serif" font-size="11" fill="#e8b04a" text-anchor="end" letter-spacing="1.4">УСТАВКА</text>
+      <path d="M46,148 C66,146 74,116 90,74 C104,34 118,14 134,26 C150,38 156,86 172,98 C190,112 204,72 222,58 C242,42 256,62 276,70 C298,79 314,54 340,52 C374,49 410,58 448,54 C492,49 540,52 628,50"
+            fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M46,148 C68,148 88,146 112,138 C142,129 170,118 214,110 C270,100 338,94 628,90"
+            fill="none" stroke="#8fb0c6" stroke-width="1.1" stroke-dasharray="5 5"/>
+      <path d="M46,10 V152 M42,150 H630" stroke="#dbe9f2" stroke-width="1.1" fill="none"/>
+      <g font-family="PT Mono, monospace" font-size="10" fill="#8fb0c6">
+        <text x="40" y="48" text-anchor="end">1,0</text><text x="40" y="152" text-anchor="end">0</text>
+        <text x="150" y="164" text-anchor="middle">5</text><text x="280" y="164" text-anchor="middle">10</text>
+        <text x="410" y="164" text-anchor="middle">15</text><text x="540" y="164" text-anchor="middle">20</text>
+      </g>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>стат. ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулир.</b><span>34 %</span></span>
+      <span class="quadrante"><b>установление</b><span>—</span></span>
+      <span class="quadrante"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6.0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0.50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0.60 c</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">01</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</div>
+</main>
+
+</template>
+<template data-dir="telescrivente"><style>.direzione[data-dir="telescrivente"]{--кегль:1;--пол:0px;
+  --рулон:#efe7d6;
+  --лента:#2a2622;
+  --лента-слабо:#6b6459;
+  --красная:#a3352a;
+  --штрих:#c9bfa8;
+  --знак:9.6px;
+}
+.direzione[data-dir="telescrivente"] *{box-sizing:border-box}
+.direzione[data-dir="telescrivente"]{min-height:100%;position:relative}
+.direzione[data-dir="telescrivente"]{
+  margin:0;color:var(--лента);
+  font-family:'PT Mono',monospace;font-size:max(calc(15px*var(--кегль)),var(--пол));line-height:22px;
+  -webkit-font-smoothing:antialiased;
+}
+.direzione[data-dir="telescrivente"] .nastro{
+  position:absolute;left:0;top:0;height:100vh;width:52px;z-index:-1;pointer-events:none;
+  background:
+    linear-gradient(var(--штрих),var(--штрих)) left 51px top 0/1px 100% no-repeat,
+    radial-gradient(circle 3.4px at 26px 11px, rgba(0,0,0,.42) 96%, transparent 100%) 0 0/52px 22px repeat-y,
+    radial-gradient(circle 1.5px at 40px 11px, rgba(0,0,0,.3) 96%, transparent 100%) 0 0/52px 22px repeat-y;
+  opacity:.5;
+}
+.direzione[data-dir="telescrivente"] main{max-width:74ch;margin:0 auto;padding:26px 26px 90px 78px}
+.direzione[data-dir="telescrivente"] .battuta{display:inline-block}
+.direzione[data-dir="telescrivente"] .battuta:nth-of-type(3n){transform:translateY(.4px)}
+.direzione[data-dir="telescrivente"] .battuta:nth-of-type(5n){transform:translateY(-.35px)}
+.direzione[data-dir="telescrivente"] .intestazione{
+  border-top:2px solid var(--лента);border-bottom:1px solid var(--лента);
+  padding:6px 0 5px;margin-bottom:26px;display:flex;gap:16px;flex-wrap:wrap;
+  font-size:max(calc(12.5px*var(--кегль)),var(--пол));letter-spacing:.06em;text-transform:uppercase;
+}
+.direzione[data-dir="telescrivente"] .intestazione b{font-weight:400;color:var(--лента-слабо)}
+.direzione[data-dir="telescrivente"] .intestazione .fine{margin-left:auto}
+.direzione[data-dir="telescrivente"] h1{
+  margin:22px 0 4px;font-family:'PT Mono',monospace;font-weight:400;
+  font-size:clamp(26px,4.4vw,40px);line-height:1.12;letter-spacing:-.01em;
+  text-transform:uppercase;text-wrap:balance;
+}
+.direzione[data-dir="telescrivente"] h1 mark{background:none;color:var(--красная)}
+.direzione[data-dir="telescrivente"] .sotto{margin:0 0 26px;color:var(--лента-слабо);font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase}
+.direzione[data-dir="telescrivente"] p{margin:0 0 22px;max-width:70ch}
+.direzione[data-dir="telescrivente"] .correzione{
+  font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));line-height:1.15;color:var(--красная);
+  margin:-8px 0 22px;transform:rotate(-.5deg);
+}
+.direzione[data-dir="telescrivente"] .schema-testo{
+  white-space:pre;overflow-x:auto;font-size:max(calc(13.5px*var(--кегль)),var(--пол));line-height:19px;
+  color:var(--лента);margin:0 0 8px;
+}
+.direzione[data-dir="telescrivente"] .schema-testo b{font-weight:400;color:var(--красная)}
+.direzione[data-dir="telescrivente"] figcaption{margin:0 0 26px;font-size:max(calc(12px*var(--кегль)),var(--пол));color:var(--лента-слабо);letter-spacing:.08em;text-transform:uppercase}
+.direzione[data-dir="telescrivente"] .strumento{
+  border-top:1px solid var(--лента);border-bottom:2px solid var(--лента);
+  padding:14px 0 16px;margin:0 0 26px;
+}
+.direzione[data-dir="telescrivente"] .titolo-strumento{margin:0 0 2px;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase}
+.direzione[data-dir="telescrivente"] .suggerimento{margin:0 0 14px;font-size:max(calc(13px*var(--кегль)),var(--пол));color:var(--лента-слабо)}
+.direzione[data-dir="telescrivente"] .grafico{display:block;width:100%;height:auto;margin-bottom:10px}
+.direzione[data-dir="telescrivente"] .quadranti{display:grid;gap:0;margin-bottom:14px;font-size:max(calc(13.5px*var(--кегль)),var(--пол))}
+.direzione[data-dir="telescrivente"] .quadrante{display:flex;gap:8px;align-items:baseline}
+.direzione[data-dir="telescrivente"] .quadrante b{font-weight:400;color:var(--лента-слабо)}
+.direzione[data-dir="telescrivente"] .quadrante i{flex:1;border-bottom:1px dotted var(--штрих);transform:translateY(-4px)}
+.direzione[data-dir="telescrivente"] .quadrante span{font-variant-numeric:tabular-nums}
+.direzione[data-dir="telescrivente"] .quadrante.male span{color:var(--красная)}
+.direzione[data-dir="telescrivente"] .manopole{display:grid;gap:8px}
+.direzione[data-dir="telescrivente"] .manopola{display:grid;grid-template-columns:16ch 1fr 7ch;gap:10px;align-items:center;font-size:max(calc(13px*var(--кегль)),var(--пол))}
+.direzione[data-dir="telescrivente"] .manopola label{color:var(--лента-слабо)}
+.direzione[data-dir="telescrivente"] .manopola output{text-align:right;font-variant-numeric:tabular-nums}
+.direzione[data-dir="telescrivente"] input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:ew-resize}
+.direzione[data-dir="telescrivente"] input[type=range]::-webkit-slider-runnable-track{height:14px;background:
+  repeating-linear-gradient(to right, var(--штрих) 0 1px, transparent 1px 8px) center/100% 8px no-repeat}
+.direzione[data-dir="telescrivente"] input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:9px;height:16px;margin-top:-1px;background:var(--лента);border-radius:1px;
+}
+.direzione[data-dir="telescrivente"] .pastiglie{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+.direzione[data-dir="telescrivente"] .pastiglia{
+  border:1px solid var(--штрих);background:none;cursor:pointer;padding:5px 11px;
+  font:inherit;font-size:max(calc(12.5px*var(--кегль)),var(--пол));letter-spacing:.05em;text-transform:uppercase;color:var(--лента-слабо);
+  border-radius:2px;
+  box-shadow:calc(var(--luce-dx,0) * -2px) calc(var(--luce-dy,0) * 2px + 1.5px) 0 var(--штрих);
+}
+.direzione[data-dir="telescrivente"] .pastiglia[aria-pressed=true]{color:var(--рулон);background:var(--лента);border-color:var(--лента);box-shadow:none;transform:translateY(1.5px)}
+.direzione[data-dir="telescrivente"] .domanda{margin:0 0 10px}
+.direzione[data-dir="telescrivente"] .opzioni{display:grid;gap:0;margin:0 0 26px;padding:0}
+.direzione[data-dir="telescrivente"] .opzione{
+  display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;
+  border:0;background:none;cursor:pointer;padding:5px 0;font:inherit;font-size:max(calc(14.5px*var(--кегль)),var(--пол));color:var(--лента);
+}
+.direzione[data-dir="telescrivente"] .opzione .lettera{color:var(--лента-слабо)}
+.direzione[data-dir="telescrivente"] .opzione[aria-checked=true] .lettera{color:var(--красная)}
+.direzione[data-dir="telescrivente"] .opzione[aria-checked=true] .lettera::before{content:"×"}
+.direzione[data-dir="telescrivente"] .opzione[aria-checked=true]{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.direzione[data-dir="telescrivente"] .azioni{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.direzione[data-dir="telescrivente"] .bottone{
+  border:1px solid var(--лента);background:var(--рулон);cursor:pointer;
+  font:inherit;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase;color:var(--лента);
+  padding:10px 20px;border-radius:2px;
+  box-shadow:calc(var(--luce-dx,0) * -3px) calc(var(--luce-dy,0) * 3px + 2.5px) 0 var(--лента-слабо);
+  transform:translateY(calc(var(--premuto,0) * 1.6px));
+}
+.direzione[data-dir="telescrivente"] .bottone--pieno{background:var(--лента);color:var(--рулон)}
+.direzione[data-dir="telescrivente"] .bottone:active{transform:translateY(2.5px);box-shadow:none}
+.direzione[data-dir="telescrivente"] .legenda{font-size:max(calc(12px*var(--кегль)),var(--пол));color:var(--лента-слабо);text-transform:uppercase;letter-spacing:.08em}
+@media (max-width:640px){.direzione[data-dir="telescrivente"]{--кегль:1.12;--пол:15px}
+.direzione[data-dir="telescrivente"] main{padding-left:16px;padding-right:16px}
+.direzione[data-dir="telescrivente"] figure,.direzione[data-dir="telescrivente"] *:has(> svg.schema),.direzione[data-dir="telescrivente"] *:has(> svg.grafico),.direzione[data-dir="telescrivente"] pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+.direzione[data-dir="telescrivente"] svg.schema,.direzione[data-dir="telescrivente"] svg.grafico{min-width:min(820px,200vw)}
+.direzione[data-dir="telescrivente"] button{min-height:44px}}</style>
+
+<div class="nastro" data-scorre></div>
+
+<main>
+  <div class="intestazione">
+    <span><b>курс</b> КИБЕРНЕТИКА</span>
+    <span><b>лист</b> 07/17</span>
+    <span><b>разряд</b> РЕГУЛЯТОР</span>
+    <span class="fine"><b>опыт</b> 640</span>
+  </div>
+
+  <p class="sotto">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и <mark>предел усиления</mark></h1>
+
+  <p class="battuta">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="correzione">душ с длинной трубой — тот же контур!</p>
+
+  <p class="battuta">Регулятор всегда исправляет прошлое. Коррекция, рассчитанная для состояния
+  «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается воздействием
+  не в ту сторону. При достаточном усилении она перестаёт гасить отклонение и начинает его
+  поддерживать.</p>
+
+  <figure>
+<pre class="schema-testo">   +----------+     +------------+     +----------+     +----------+
+   |   ЦЕЛЬ   |---->| РЕГУЛЯТОР  |---->|  ОБЪЕКТ  |---->|  ДАТЧИК  |
+   +----------+     +------------+     +----------+     +----------+
+        ^                                                     |
+        |                                                     v
+        +-----------------------&lt;&lt;&lt;-----------------------------+
+                        <b>здесь теряется время</b></pre>
+    <figcaption>рис. 4 — контур с запаздыванием в цепи измерения</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Стенд · усиление и запаздывание</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно; верните усиление и двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 640 150" role="img" aria-label="Переходный процесс">
+      <path d="M40,40 H630" stroke="#6b6459" stroke-width="1" stroke-dasharray="2 4" fill="none"/>
+      <text x="630" y="33" font-family="PT Mono, monospace" font-size="10" fill="#6b6459" text-anchor="end">УСТАВКА</text>
+      <path d="M40,132 C60,130 68,100 84,60 C98,22 112,4 128,16 C144,28 150,74 166,86 C184,100 198,60 216,46 C236,30 250,50 270,58 C292,67 308,42 334,40 C368,37 404,46 442,42 C486,37 540,40 630,38"
+            fill="none" stroke="#2a2622" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M40,132 C62,132 82,130 106,122 C136,113 164,102 208,94 C264,84 332,78 630,74"
+            fill="none" stroke="#a3352a" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <path d="M40,6 V136 M36,134 H632" stroke="#2a2622" stroke-width="1.1" fill="none"/>
+      <g font-family="PT Mono, monospace" font-size="10" fill="#6b6459">
+        <text x="34" y="44" text-anchor="end">1.0</text><text x="34" y="136" text-anchor="end">0</text>
+        <text x="628" y="148" text-anchor="end">СЕК</text>
+      </g>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>СТАТИЧЕСКАЯ ОШИБКА</b><i></i><span>0.182</span></span>
+      <span class="quadrante male"><b>ПЕРЕРЕГУЛИРОВАНИЕ</b><i></i><span>34 %</span></span>
+      <span class="quadrante"><b>ВРЕМЯ УСТАНОВЛЕНИЯ</b><i></i><span>—</span></span>
+      <span class="quadrante"><b>ПЕРЕСЕЧЕНИЙ УСТАВКИ</b><i></i><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>УСИЛЕНИЕ P</label><input type="range" min="0" max="16" value="6"><output>6.0</output></span>
+      <span class="manopola"><label>ИНТЕГРАЛ I</label><input type="range" min="0" max="4" step=".05" value="0.5"><output>0.50</output></span>
+      <span class="manopola"><label>ЗАПАЗДЫВАНИЕ</label><input type="range" min="0" max="40" value="12"><output>0.60c</output></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda">01. Контур с заметным запаздыванием реагирует вяло. Инженер увеличивает усиление
+  вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А.</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б.</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В.</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+</template>
+<template data-dir="lavagna"><style>.direzione[data-dir="lavagna"]{--кегль:1;--пол:0px;
+  --доска:#243029;
+  --мел:#eae6dc;
+  --мел-тихий:#9aa79c;
+  --мел-синий:#8fb8d8;
+  --мел-жёлтый:#e6c66a;
+  --мел-красный:#d98878;
+  --мел-зелёный:#93c9a1;
+}
+.direzione[data-dir="lavagna"] *{box-sizing:border-box}
+.direzione[data-dir="lavagna"]{min-height:100%;position:relative}
+.direzione[data-dir="lavagna"]{
+  margin:0;color:var(--мел);
+  font-family:'Literata',Georgia,serif;font-size:max(calc(16px*var(--кегль)),var(--пол));line-height:26px;
+  -webkit-font-smoothing:antialiased;
+}
+.direzione[data-dir="lavagna"] .spugna{
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;opacity:.5;
+  background:
+    radial-gradient(ellipse 460px 90px at 22% 18%, rgba(234,230,220,.10), transparent 70%),
+    radial-gradient(ellipse 520px 70px at 78% 42%, rgba(234,230,220,.075), transparent 70%),
+    radial-gradient(ellipse 380px 110px at 45% 74%, rgba(234,230,220,.06), transparent 70%),
+    radial-gradient(ellipse 300px 60px at 88% 88%, rgba(234,230,220,.05), transparent 70%);
+}
+.direzione[data-dir="lavagna"] main{max-width:750px;margin:0 auto;padding:34px 26px 96px}
+.direzione[data-dir="lavagna"] .testata{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:32px}
+.direzione[data-dir="lavagna"] .marchio{font-family:'Caveat',cursive;font-size:max(calc(28px*var(--кегль)),var(--пол));font-weight:700;color:var(--мел)}
+.direzione[data-dir="lavagna"] .grado{margin-left:auto;font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));color:var(--мел-тихий);display:flex;gap:11px;align-items:center}
+.direzione[data-dir="lavagna"] .barra{width:112px;height:8px;background:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='112' height='8'><path d='M2,5 C22,4 44,5.6 68,4.6' fill='none' stroke='%23e6c66a' stroke-width='3.4' stroke-linecap='round' opacity='.85' stroke-dasharray='17 3 9 2 21 4'/><path d='M70,4.8 C86,4.2 98,5 110,4.4' fill='none' stroke='%239aa79c' stroke-width='2' stroke-linecap='round' opacity='.5' stroke-dasharray='11 4 6 3'/></svg>") no-repeat}
+.direzione[data-dir="lavagna"] .riga-corso{font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));color:var(--мел-тихий);margin:0 0 2px}
+.direzione[data-dir="lavagna"] h1{
+  font-family:'Caveat',cursive;font-weight:700;color:#f6f2e8;
+  font-size:clamp(46px,8.4vw,72px);line-height:.95;margin:0 0 8px;text-wrap:balance;
+  
+  text-shadow:0 0 12px rgba(234,230,220,.12), 0 1px 0 rgba(0,0,0,.25);
+}
+.direzione[data-dir="lavagna"] .sottotitolo{font-family:'Caveat',cursive;font-size:max(calc(27px*var(--кегль)),var(--пол));color:var(--мел-жёлтый);margin:0 0 30px}
+.direzione[data-dir="lavagna"] p{margin:0 0 24px;max-width:64ch;color:#ddd9cf}
+.direzione[data-dir="lavagna"] .termine{color:#fff;position:relative;white-space:nowrap}
+.direzione[data-dir="lavagna"] .termine::after{
+  content:"";position:absolute;left:-2px;right:-3px;bottom:-5px;height:5px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='5' preserveAspectRatio='none'><path d='M2,2.6 C38,1.4 92,3.4 148,2' fill='none' stroke='%23e6c66a' stroke-width='2.6' stroke-linecap='round' stroke-dasharray='28 4 46 3 40'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="lavagna"] .replica{
+  font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));line-height:1.2;color:var(--мел-синий);
+  margin:-6px 0 24px;padding-left:16px;transform:rotate(-.6deg);
+}
+.direzione[data-dir="lavagna"] figure{margin:0 0 26px}
+.direzione[data-dir="lavagna"] .schema{display:block;width:100%;height:auto}
+.direzione[data-dir="lavagna"] figcaption{font-family:'Caveat',cursive;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--мел-тихий);margin-top:4px}
+.direzione[data-dir="lavagna"] .strumento{position:relative;padding:20px 22px 18px;margin:0 0 26px}
+.direzione[data-dir="lavagna"] .strumento::before{
+  content:"";position:absolute;inset:-4px -6px;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='210' preserveAspectRatio='none'><path d='M16,8 C100,4 224,6 306,10 C312,10.4 314,16 314,26 C315,92 314,164 313,192 C312.6,199 306,201 296,201 C200,204 90,203 20,201 C12,200.6 8,194 8,186 C6,120 7,44 8,20 C8,12 11,9 18,8.6' fill='none' stroke='%23eae6dc' stroke-width='2.2' stroke-linecap='round' opacity='.55' stroke-dasharray='120 5 90 4 160 6 70'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="lavagna"] .titolo-strumento{font-family:'Caveat',cursive;font-size:max(calc(25px*var(--кегль)),var(--пол));color:#f6f2e8;margin:0 0 2px}
+.direzione[data-dir="lavagna"] .suggerimento{font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--мел-тихий);margin:0 0 14px;line-height:1.2}
+.direzione[data-dir="lavagna"] .grafico{display:block;width:100%;height:auto;margin-bottom:12px}
+.direzione[data-dir="lavagna"] .quadranti{display:flex;flex-wrap:wrap;gap:8px 28px;margin-bottom:16px}
+.direzione[data-dir="lavagna"] .quadrante b{display:block;font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));font-weight:500;color:var(--мел-тихий);line-height:1.05}
+.direzione[data-dir="lavagna"] .quadrante span{font-family:'PT Mono',monospace;font-size:max(calc(16px*var(--кегль)),var(--пол));color:var(--мел)}
+.direzione[data-dir="lavagna"] .quadrante.male span{color:var(--мел-красный)}
+.direzione[data-dir="lavagna"] .quadrante.bene span{color:var(--мел-зелёный)}
+.direzione[data-dir="lavagna"] .manopole{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
+.direzione[data-dir="lavagna"] .manopola label{display:flex;justify-content:space-between;gap:8px;font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--мел-тихий)}
+.direzione[data-dir="lavagna"] .manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:max(calc(14px*var(--кегль)),var(--пол));color:var(--мел-жёлтый)}
+.direzione[data-dir="lavagna"] input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:none;cursor:grab}
+.direzione[data-dir="lavagna"] input[type=range]::-webkit-slider-runnable-track{height:4px;background:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='4' preserveAspectRatio='none'><path d='M1,2.4 C56,1.4 140,3 199,1.8' fill='none' stroke='%239aa79c' stroke-width='2.2' stroke-linecap='round' stroke-dasharray='46 4 70 3 60'/></svg>") no-repeat center/100% 100%}
+.direzione[data-dir="lavagna"] input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:15px;height:15px;margin-top:-6px;border-radius:50%;
+  background:var(--мел-жёлтый);box-shadow:0 0 8px rgba(230,198,106,.4);
+}
+.direzione[data-dir="lavagna"] .pastiglie{display:flex;flex-wrap:wrap;gap:9px 14px;margin:0 0 26px}
+.direzione[data-dir="lavagna"] .pastiglia{
+  position:relative;border:0;background:none;cursor:pointer;padding:5px 13px;
+  font-family:'Caveat',cursive;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--мел-тихий);
+}
+.direzione[data-dir="lavagna"] .pastiglia[aria-pressed=true]{color:#f6f2e8}
+.direzione[data-dir="lavagna"] .pastiglia[aria-pressed=true]::before{
+  content:"";position:absolute;inset:-3px -6px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='36' preserveAspectRatio='none'><path d='M24,4 C64,1.6 100,4 116,8 C124,11 124,26 113,30 C96,35 42,35 17,32 C7,30 4,17 10,10 C13,6.4 18,5 23,4.4' fill='none' stroke='%23e6c66a' stroke-width='2' stroke-linecap='round' stroke-dasharray='60 4 44 3 70' opacity='.8'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="lavagna"] .domanda{margin:0 0 12px;color:#e6e2d8}
+.direzione[data-dir="lavagna"] .numero{font-family:'Caveat',cursive;font-size:max(calc(24px*var(--кегль)),var(--пол));color:var(--мел-жёлтый);margin-right:7px}
+.direzione[data-dir="lavagna"] .opzioni{display:grid;gap:3px;margin:0 0 26px}
+.direzione[data-dir="lavagna"] .opzione{
+  position:relative;display:flex;gap:13px;align-items:baseline;width:100%;text-align:left;
+  border:0;background:none;cursor:pointer;padding:7px 8px 7px 4px;font:inherit;font-size:max(calc(16px*var(--кегль)),var(--пол));color:#d8d4ca;
+}
+.direzione[data-dir="lavagna"] .opzione .lettera{font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));color:var(--мел-тихий);min-width:17px}
+.direzione[data-dir="lavagna"] .opzione:hover{color:#f6f2e8}
+.direzione[data-dir="lavagna"] .opzione[aria-checked=true]{color:#f6f2e8}
+.direzione[data-dir="lavagna"] .opzione[aria-checked=true] .lettera{color:var(--мел-зелёный)}
+.direzione[data-dir="lavagna"] .opzione[aria-checked=true]::after{
+  content:"";position:absolute;left:-10px;top:6px;width:24px;height:24px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><path d='M3,12 C6,16 8,19 10,21 C13,14 17,7 22,2' fill='none' stroke='%2393c9a1' stroke-width='2.4' stroke-linecap='round'/></svg>") no-repeat center;
+}
+.direzione[data-dir="lavagna"] .azioni{display:flex;gap:15px;align-items:center;flex-wrap:wrap}
+.direzione[data-dir="lavagna"] .bottone{
+  position:relative;border:0;background:none;cursor:pointer;
+  font-family:'Caveat',cursive;font-size:max(calc(23px*var(--кегль)),var(--пол));color:var(--мел);
+  padding:9px 22px;transform:translateY(calc(var(--premuto,0) * .8px));
+}
+.direzione[data-dir="lavagna"] .bottone::before{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='48' preserveAspectRatio='none'><path d='M18,5 C64,2 124,3.6 152,6.6 C160,7.6 163,15 162,25 C161,35 159,41 152,43 C118,46 50,45 18,43 C9,42.4 6,35 6.6,25 C7,15 9,8 17,6' fill='none' stroke='%23eae6dc' stroke-width='2.2' stroke-linecap='round' stroke-dasharray='90 4 60 3 110' opacity='.75'/></svg>") no-repeat center/100% 100%;
+}
+.direzione[data-dir="lavagna"] .bottone--pieno{color:#f8f4ea}
+.direzione[data-dir="lavagna"] .bottone--pieno::after{
+  content:"";position:absolute;inset:4px 6px;z-index:-1;border-radius:16px 12px 18px 10px/10px 17px 9px 15px;
+  
+  background:repeating-linear-gradient(58deg, rgba(230,198,106,.36) 0 2px, transparent 2px 5px);
+}
+.direzione[data-dir="lavagna"] .bottone:active{transform:translateY(1.4px)}
+.direzione[data-dir="lavagna"] .legenda{font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--мел-тихий)}
+@media (max-width:640px){.direzione[data-dir="lavagna"]{--кегль:1.12;--пол:15px}
+.direzione[data-dir="lavagna"] main{padding-left:16px;padding-right:16px}
+.direzione[data-dir="lavagna"] figure,.direzione[data-dir="lavagna"] *:has(> svg.schema),.direzione[data-dir="lavagna"] *:has(> svg.grafico),.direzione[data-dir="lavagna"] pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+.direzione[data-dir="lavagna"] svg.schema,.direzione[data-dir="lavagna"] svg.grafico{min-width:min(820px,200vw)}
+.direzione[data-dir="lavagna"] button{min-height:44px}}</style>
+
+<div class="spugna" data-scorre></div>
+
+<main>
+  <header class="testata">
+    <div class="marchio">Кибернетика</div>
+    <div class="grado"><span class="barra"></span>Регулятор</div>
+  </header>
+
+  <p class="riga-corso">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и предел усиления</h1>
+  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
+
+  <p>На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так не работают.
+  Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты, данные по
+  инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="replica">душ с длинной трубой — тот же контур,<br>и ведёт себя точно так же</p>
+
+  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
+  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
+  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение
+  и начинает его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 640 155" role="img" aria-label="Схема контура">
+      <g fill="none" stroke="#eae6dc" stroke-width="2" stroke-linecap="round" stroke-dasharray="70 3 50 3 90">
+        <path d="M28,44 C70,41 108,42 132,44 C140,45 142,50 141,59 C140,70 139,74 131,76 C106,79 66,78 32,76 C24,75 22,68 23,59 C24,50 25,46 30,44.6"/>
+        <path d="M196,44 C238,41 276,42 300,44 C308,45 310,50 309,59 C308,70 307,74 299,76 C274,79 234,78 200,76 C192,75 190,68 191,59 C192,50 193,46 198,44.6"/>
+        <path d="M364,44 C406,41 444,42 468,44 C476,45 478,50 477,59 C476,70 475,74 467,76 C442,79 402,78 368,76 C360,75 358,68 359,59 C360,50 361,46 366,44.6"/>
+        <path d="M520,44 C562,41 600,42 624,44 C632,45 634,50 633,59 C632,70 631,74 623,76 C598,79 558,78 524,76 C516,75 514,68 515,59 C516,50 517,46 522,44.6"/>
+      </g>
+      <g fill="none" stroke="#eae6dc" stroke-width="1.8" stroke-linecap="round">
+        <path d="M143,60 L192,60 M184,56 L193,60 L184,64"/>
+        <path d="M311,60 L360,60 M352,56 L361,60 L352,64"/>
+        <path d="M479,60 L514,60 M506,56 L515,60 L506,64"/>
+      </g>
+      <path d="M578,78 C577,98 576,112 574,122 C572,130 564,132 550,132 C400,135 190,134 96,132 C84,131.6 78,124 77,114 C76,100 76,90 77,78 M81,88 L77,78 L73,88"
+            fill="none" stroke="#8fb8d8" stroke-width="2" stroke-linecap="round" stroke-dasharray="120 4 90 3 140"/>
+      <g font-family="Caveat, cursive" font-size="21" fill="#f6f2e8" text-anchor="middle">
+        <text x="82" y="66">цель</text><text x="250" y="66">регулятор</text>
+        <text x="418" y="66">объект</text><text x="574" y="66">датчик</text>
+      </g>
+      <text x="330" y="151" font-family="Caveat, cursive" font-size="20" fill="#d98878" text-anchor="middle">здесь теряется время</text>
+    </svg>
+    <figcaption>обход круга занимает время — и в этом всё дело</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Ручка усиления и ручка запаздывания</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно;<br>верните усиление и медленно двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 600 165" role="img" aria-label="Переходный процесс">
+      <path d="M44,42 H588" stroke="#93c9a1" stroke-width="1.8" stroke-dasharray="9 7" fill="none" opacity=".9"/>
+      <text x="588" y="34" font-family="Caveat, cursive" font-size="19" fill="#93c9a1" text-anchor="end">уставка</text>
+      <path d="M44,146 C62,144 70,114 86,72 C100,32 114,12 130,24 C146,36 152,84 168,96 C186,110 200,70 218,56 C238,40 252,60 272,68 C294,77 310,52 336,50 C370,47 406,56 444,52 C488,47 540,50 588,48"
+            fill="none" stroke="#eae6dc" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M44,146 C66,146 86,144 110,136 C140,127 168,116 212,108 C268,98 336,92 588,88"
+            fill="none" stroke="#8fb8d8" stroke-width="1.6" stroke-dasharray="6 5" opacity=".8"/>
+      <path d="M44,10 V150 M40,148 H590" fill="none" stroke="#9aa79c" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="90 4 60"/>
+      <text x="586" y="106" font-family="Caveat, cursive" font-size="18" fill="#8fb8d8" text-anchor="end">усилие регулятора</text>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>статическая ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулирование</b><span>34%</span></span>
+      <span class="quadrante"><b>время установления</b><span>—</span></span>
+      <span class="quadrante bene"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">1.</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">а</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">в</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+</template>
+<template data-dir="incisione"><style>.direzione[data-dir="incisione"]{--кегль:1;--пол:0px;
+  --бумага:#efe6d3;
+  --краска:#231f1c;
+  --краска-слабо:#6f665c;
+  --сангина:#8c3a26;
+  --поле:#c9bda3;
+}
+.direzione[data-dir="incisione"] *{box-sizing:border-box}
+.direzione[data-dir="incisione"]{min-height:100%;position:relative}
+.direzione[data-dir="incisione"]{
+  margin:0;color:var(--краска);
+  font-family:'Literata',Georgia,serif;font-size:max(calc(16.5px*var(--кегль)),var(--пол));line-height:27px;
+  -webkit-font-smoothing:antialiased;
+}
+.direzione[data-dir="incisione"] main{max-width:700px;margin:0 auto;padding:44px 26px 96px}
+.direzione[data-dir="incisione"] .impresso{
+  text-shadow:
+    calc(var(--luce-dx,0) * .6px) calc(var(--luce-dy,0) * .6px - .5px) 0 rgba(255,252,244,.55),
+    calc(var(--luce-dx,0) * -.5px) calc(var(--luce-dy,0) * -.5px + .6px) 0 rgba(35,31,28,.22);
+}
+.direzione[data-dir="incisione"] .testata{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding-bottom:7px;margin-bottom:6px;
+  border-bottom:2px solid var(--краска);
+}
+.direzione[data-dir="incisione"] .testata::after{content:"";display:block;width:100%;height:1px;background:var(--краска);margin-top:3px}
+.direzione[data-dir="incisione"] .marchio{
+  font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:max(calc(19px*var(--кегль)),var(--пол));
+  letter-spacing:.24em;text-transform:uppercase;
+}
+.direzione[data-dir="incisione"] .grado{margin-left:auto;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:var(--краска-слабо)}
+.direzione[data-dir="incisione"] .barra{display:inline-block;width:96px;height:9px;margin-left:10px;border:1px solid var(--краска);vertical-align:-1px}
+.direzione[data-dir="incisione"] .barra i{display:block;height:100%;width:62%;
+  background:repeating-linear-gradient(90deg,var(--краска) 0 1px,transparent 1px 3px)}
+.direzione[data-dir="incisione"] .riga-corso{
+  margin:26px 0 8px;font-size:max(calc(11.5px*var(--кегль)),var(--пол));letter-spacing:.3em;text-transform:uppercase;color:var(--краска-слабо);
+  text-align:center;
+}
+.direzione[data-dir="incisione"] h1{
+  margin:0 0 10px;font-family:'Playfair Display',Georgia,serif;font-weight:700;
+  font-size:clamp(36px,6.2vw,58px);line-height:1.04;text-align:center;text-wrap:balance;
+}
+.direzione[data-dir="incisione"] .sottotitolo{
+  margin:0 0 6px;text-align:center;font-family:'Playfair Display',Georgia,serif;
+  font-style:italic;font-weight:400;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--краска-слабо);
+}
+.direzione[data-dir="incisione"] .fregio{
+  display:block;margin:16px auto 30px;width:150px;height:12px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='12'><path d='M0,6 H52 M98,6 H150' stroke='%23231f1c' stroke-width='1'/><path d='M75,1.5 L82,6 L75,10.5 L68,6 Z' fill='none' stroke='%23231f1c' stroke-width='1'/><path d='M60,6 L66,6 M84,6 L90,6' stroke='%23231f1c' stroke-width='1'/></svg>") no-repeat center;
+}
+.direzione[data-dir="incisione"] p{margin:0 0 24px}
+.direzione[data-dir="incisione"] .occhiello::first-letter{
+  float:left;font-family:'Playfair Display',Georgia,serif;font-weight:700;
+  font-size:max(calc(60px*var(--кегль)),var(--пол));line-height:.82;padding:4px 9px 0 0;
+}
+.direzione[data-dir="incisione"] .termine{font-weight:600;position:relative;white-space:nowrap}
+.direzione[data-dir="incisione"] .termine::after{content:"";position:absolute;left:0;right:0;bottom:1px;height:2px;background:var(--краска)}
+.direzione[data-dir="incisione"] .marginale{
+  font-family:'Playfair Display',serif;font-style:italic;font-size:max(calc(17px*var(--кегль)),var(--пол));color:var(--сангина);
+  border-left:2px solid var(--сангина);padding-left:14px;margin:0 0 24px;line-height:1.45;
+}
+.direzione[data-dir="incisione"] figure{margin:0 0 26px}
+.direzione[data-dir="incisione"] .schema{display:block;width:100%;height:auto}
+.direzione[data-dir="incisione"] figcaption{
+  margin-top:9px;text-align:center;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;
+  color:var(--краска-слабо);
+}
+.direzione[data-dir="incisione"] .strumento{
+  margin:0 0 28px;padding:18px 20px 16px;
+  border-top:2px solid var(--краска);border-bottom:2px solid var(--краска);
+  box-shadow:inset 0 3px 0 -2px var(--краска), inset 0 -3px 0 -2px var(--краска);
+}
+.direzione[data-dir="incisione"] .titolo-strumento{
+  margin:0 0 3px;font-family:'Playfair Display',serif;font-weight:700;font-size:max(calc(17px*var(--кегль)),var(--пол));
+  letter-spacing:.03em;
+}
+.direzione[data-dir="incisione"] .suggerimento{margin:0 0 14px;font-size:max(calc(14px*var(--кегль)),var(--пол));color:var(--краска-слабо);font-style:italic;font-family:'Playfair Display',serif}
+.direzione[data-dir="incisione"] .grafico{display:block;width:100%;height:auto;margin-bottom:12px}
+.direzione[data-dir="incisione"] .quadranti{display:flex;flex-wrap:wrap;gap:0;margin-bottom:16px;border-top:1px solid var(--поле)}
+.direzione[data-dir="incisione"] .quadrante{flex:1 1 128px;padding:8px 12px;border-right:1px solid var(--поле);border-bottom:1px solid var(--поле)}
+.direzione[data-dir="incisione"] .quadrante:last-child{border-right:0}
+.direzione[data-dir="incisione"] .quadrante b{display:block;font-size:max(calc(9.5px*var(--кегль)),var(--пол));letter-spacing:.17em;text-transform:uppercase;color:var(--краска-слабо);font-weight:400}
+.direzione[data-dir="incisione"] .quadrante span{font-family:'PT Mono',monospace;font-size:max(calc(16px*var(--кегль)),var(--пол))}
+.direzione[data-dir="incisione"] .quadrante.male span{color:var(--сангина)}
+.direzione[data-dir="incisione"] .manopole{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.direzione[data-dir="incisione"] .manopola label{display:flex;justify-content:space-between;font-size:max(calc(10.5px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase;color:var(--краска-слабо)}
+.direzione[data-dir="incisione"] .manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:max(calc(13.5px*var(--кегль)),var(--пол));letter-spacing:0;color:var(--краска)}
+.direzione[data-dir="incisione"] input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:ew-resize;margin-top:3px}
+.direzione[data-dir="incisione"] input[type=range]::-webkit-slider-runnable-track{height:5px;border:1px solid var(--краска);
+  background:repeating-linear-gradient(90deg,var(--поле) 0 1px,transparent 1px 4px)}
+.direzione[data-dir="incisione"] input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:11px;height:15px;margin-top:-6px;background:var(--краска);
+  
+  box-shadow:inset calc(var(--luce-dx,0) * 1.4px) calc(var(--luce-dy,0) * 1.4px - 1px) 0 rgba(255,252,244,.35);
+}
+.direzione[data-dir="incisione"] .pastiglie{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 28px}
+.direzione[data-dir="incisione"] .pastiglia{
+  border:1px solid var(--краска);background:none;cursor:pointer;padding:5px 12px;
+  font:inherit;font-family:'Playfair Display',serif;font-size:max(calc(13.5px*var(--кегль)),var(--пол));
+  letter-spacing:.1em;text-transform:uppercase;color:var(--краска-слабо);
+}
+.direzione[data-dir="incisione"] .pastiglia[aria-pressed=true]{color:var(--бумага);
+  background:repeating-linear-gradient(45deg,var(--краска) 0 2px,rgba(35,31,28,.72) 2px 4px)}
+.direzione[data-dir="incisione"] .domanda{margin:0 0 12px}
+.direzione[data-dir="incisione"] .numero{font-family:'Playfair Display',serif;font-weight:700;margin-right:8px}
+.direzione[data-dir="incisione"] .opzioni{display:grid;gap:0;margin:0 0 28px}
+.direzione[data-dir="incisione"] .opzione{
+  display:flex;gap:14px;align-items:baseline;width:100%;text-align:left;
+  border:0;border-bottom:1px solid var(--поле);background:none;cursor:pointer;
+  padding:9px 4px;font:inherit;font-size:max(calc(16px*var(--кегль)),var(--пол));color:var(--краска);
+}
+.direzione[data-dir="incisione"] .opzione:last-child{border-bottom:0}
+.direzione[data-dir="incisione"] .opzione .lettera{font-family:'Playfair Display',serif;font-weight:700;color:var(--краска-слабо)}
+.direzione[data-dir="incisione"] .opzione[aria-checked=true] .lettera{color:var(--сангина)}
+.direzione[data-dir="incisione"] .opzione[aria-checked=true] .lettera::before{content:"☞ "}
+.direzione[data-dir="incisione"] .opzione[aria-checked=true]{background:repeating-linear-gradient(90deg,rgba(140,58,38,.10) 0 2px,transparent 2px 5px)}
+.direzione[data-dir="incisione"] .azioni{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.direzione[data-dir="incisione"] .bottone{
+  border:1.5px solid var(--краска);background:none;cursor:pointer;
+  font-family:'Playfair Display',serif;font-size:max(calc(14px*var(--кегль)),var(--пол));letter-spacing:.18em;text-transform:uppercase;
+  color:var(--краска);padding:11px 24px;
+  box-shadow:
+    calc(var(--luce-dx,0) * -3px) calc(var(--luce-dy,0) * 3px + 2px) 0 -0.5px var(--поле),
+    inset calc(var(--luce-dx,0) * 1.6px) calc(var(--luce-dy,0) * 1.6px - 1.2px) 0 rgba(255,252,244,.4);
+  transform:translateY(calc(var(--premuto,0) * 1.4px));
+}
+.direzione[data-dir="incisione"] .bottone--pieno{
+  color:var(--бумага);
+  background:repeating-linear-gradient(45deg,var(--краска) 0 3px,rgba(35,31,28,.78) 3px 6px);
+}
+.direzione[data-dir="incisione"] .bottone:active{transform:translateY(2px);box-shadow:none}
+.direzione[data-dir="incisione"] .legenda{font-family:'Playfair Display',serif;font-style:italic;font-size:max(calc(14px*var(--кегль)),var(--пол));color:var(--краска-слабо)}
+@media (max-width:640px){.direzione[data-dir="incisione"]{--кегль:1.12;--пол:15px}
+.direzione[data-dir="incisione"] main{padding-left:16px;padding-right:16px}
+.direzione[data-dir="incisione"] figure,.direzione[data-dir="incisione"] *:has(> svg.schema),.direzione[data-dir="incisione"] *:has(> svg.grafico),.direzione[data-dir="incisione"] pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+.direzione[data-dir="incisione"] svg.schema,.direzione[data-dir="incisione"] svg.grafico{min-width:min(820px,200vw)}
+.direzione[data-dir="incisione"] button{min-height:44px}}</style>
+
+
+<main>
+  <header class="testata">
+    <span class="marchio impresso">Кибернетика</span>
+    <span class="grado">Регулятор<span class="barra"><i></i></span></span>
+  </header>
+
+  <p class="riga-corso">Обратная связь · виток второй</p>
+  <h1 class="impresso">Запаздывание<br>и предел усиления</h1>
+  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
+  <span class="fregio"></span>
+
+  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры
+  так не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="marginale">Душ с длинной трубой — тот же контур, и ведёт он себя точно так же.</p>
+
+  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
+  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
+  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение
+  и начинает его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 620 160" role="img" aria-label="Схема контура">
+      <defs>
+        <pattern id="tratteggio" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <path d="M0,0 V4" stroke="#231f1c" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <g fill="none" stroke="#231f1c" stroke-width="1.4">
+        <rect x="22" y="40" width="120" height="36"/>
+        <rect x="188" y="40" width="120" height="36" fill="url(#tratteggio)" opacity=".9"/>
+        <rect x="354" y="40" width="120" height="36"/>
+        <rect x="500" y="40" width="98" height="36"/>
+        <path d="M143,58 H186 M178,54 L187,58 L178,62"/>
+        <path d="M309,58 H352 M344,54 L353,58 L344,62"/>
+        <path d="M475,58 H498 M490,54 L499,58 L490,62"/>
+        <path d="M549,77 V118 H82 V78 M78,86 L82,78 L86,86"/>
+      </g>
+      <g font-family="Playfair Display, serif" font-size="14" fill="#231f1c" text-anchor="middle" letter-spacing="1">
+        <text x="82" y="63">ЦЕЛЬ</text>
+        <text x="248" y="63" fill="#efe6d3">РЕГУЛЯТОР</text>
+        <text x="414" y="63">ОБЪЕКТ</text><text x="549" y="63">ДАТЧИК</text>
+      </g>
+      <text x="315" y="140" font-family="Playfair Display, serif" font-style="italic" font-size="15" fill="#8c3a26" text-anchor="middle">здесь теряется время</text>
+    </svg>
+    <figcaption>рис. IV — контур с запаздыванием в цепи измерения</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Стенд: усиление и запаздывание</p>
+    <p class="suggerimento">Поставьте запаздывание на ноль и поднимите усиление до упора — спокойно. Верните усиление и двигайте запаздывание.</p>
+
+    <svg class="grafico" viewBox="0 0 600 160" role="img" aria-label="Переходный процесс">
+      <path d="M42,42 H586" stroke="#231f1c" stroke-width="1" stroke-dasharray="6 5" fill="none"/>
+      <text x="586" y="34" font-family="Playfair Display, serif" font-size="13" fill="#231f1c" text-anchor="end" font-style="italic">уставка</text>
+      <path d="M42,142 C60,140 68,110 84,68 C98,28 112,10 128,22 C144,34 150,82 166,94 C184,108 198,68 216,54 C236,38 250,58 270,66 C292,75 308,50 334,48 C368,45 404,54 442,50 C486,45 540,48 586,46"
+            fill="none" stroke="#231f1c" stroke-width="2"/>
+      <path d="M42,142 C64,142 84,140 108,132 C138,123 166,112 210,104 C266,94 334,88 586,84"
+            fill="none" stroke="#8c3a26" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <path d="M42,8 V146 M38,144 H588" stroke="#231f1c" stroke-width="1.3" fill="none"/>
+      <g font-family="PT Mono, monospace" font-size="10" fill="#6f665c">
+        <text x="36" y="46" text-anchor="end">1,0</text><text x="36" y="146" text-anchor="end">0</text>
+        <text x="586" y="158" text-anchor="end">секунды</text>
+      </g>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>стат. ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулир.</b><span>34 %</span></span>
+      <span class="quadrante"><b>установление</b><span>—</span></span>
+      <span class="quadrante"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">I.</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+</template>
+
+<div class="pannello" data-fisso>
+  <div class="scelte" role="group" aria-label="Направление">
+      <button type="button" class="scelta" data-scelta="quaderno" aria-pressed="true">
+        <b>Тетрадь</b><i>клетка, поля, паста</i>
+      </button>
+      <button type="button" class="scelta" data-scelta="cianotipia" aria-pressed="false">
+        <b>Синька</b><i>светокопия, только линии</i>
+      </button>
+      <button type="button" class="scelta" data-scelta="telescrivente" aria-pressed="false">
+        <b>Телетайп</b><i>1948, знакоместо</i>
+      </button>
+      <button type="button" class="scelta" data-scelta="lavagna" aria-pressed="false">
+        <b>Доска</b><i>мел с прорехами</i>
+      </button>
+      <button type="button" class="scelta" data-scelta="incisione" aria-pressed="false">
+        <b>Гравюра</b><i>высокая печать</i>
+      </button>
+  </div>
+  <p class="consiglio"></p>
+</div>
+
+<script src="materia.js"></script>
+<script>
+/* Переключение направления: меняются и разметка, и сорт материала —
+   лампа остаётся той же, меняется бумага под ней. */
+(function () {
+  'use strict';
+  var STOCKS = {
+  "quaderno": {
+    "carta": "f7f3e8",
+    "ombra": "9a917f",
+    "luce": "fff7e6",
+    "rilievo": "11",
+    "fibra": "0.055",
+    "calore": "0.05"
+  },
+  "cianotipia": {
+    "carta": "1b3a52",
+    "ombra": "0a1721",
+    "luce": "cfe6f2",
+    "rilievo": "13",
+    "fibra": "0.06",
+    "calore": "0.10"
+  },
+  "telescrivente": {
+    "carta": "efe7d6",
+    "ombra": "9c907a",
+    "luce": "fff4dd",
+    "rilievo": "10",
+    "fibra": "0.05",
+    "calore": "0.045"
+  },
+  "lavagna": {
+    "carta": "243029",
+    "ombra": "0d130f",
+    "luce": "fff3d4",
+    "rilievo": "14",
+    "fibra": "0.07",
+    "calore": "0.09"
+  },
+  "incisione": {
+    "carta": "efe6d3",
+    "ombra": "9b8f77",
+    "luce": "fff5e0",
+    "rilievo": "12",
+    "fibra": "0.06",
+    "calore": "0.05"
+  }
+};
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-scelta]'));
+
+  function apri(dir) {
+    var gia = document.querySelector('.direzione[data-dir="' + dir + '"]');
+    if (gia) return gia;
+    var tpl = document.querySelector('template[data-dir="' + dir + '"]');
+    if (!tpl) return null;
+    var blocco = document.createElement('div');
+    blocco.className = 'direzione';
+    blocco.dataset.dir = dir;
+    blocco.appendChild(tpl.content.cloneNode(true));
+    // Лист лежит внутри .foglio — туда же кладём и развёрнутое направление.
+    (document.querySelector('.foglio') || document.body).appendChild(blocco);
+    return blocco;
+  }
+
+  function choose(dir) {
+    apri(dir);
+    document.querySelectorAll('.direzione').forEach(function (block) {
+      block.hidden = block.dataset.dir !== dir;
+    });
+    buttons.forEach(function (button) {
+      button.setAttribute('aria-pressed', String(button.dataset.scelta === dir));
+    });
+    var stock = STOCKS[dir];
+    document.body.style.background = '#' + stock.carta;
+    if (window.materia) {
+      window.materia.setStock(stock);
+      window.materia.rileggi();
+    }
+    window.scrollTo({ top: 0 });
+  }
+
+  buttons.forEach(function (button) {
+    button.addEventListener('click', function () { choose(button.dataset.scelta); });
+  });
+})();
+</script>

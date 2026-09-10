@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Под не чинят — Под — Кибернетика</title><meta name="description" content="Единица, которую Kubernetes создаёт, размещает и заменяет. Не контейнер и не машина — и обе ошибки дорого стоят."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/kubernetes/">Kubernetes: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="kubernetes/pod:2" data-lavori="2"> <p class="sopra mano"> Под · виток 2 из 3 </p> <h1>Под не чинят</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/kubernetes/pod/1/" class="giro" data-livello="kubernetes/pod:1"> <b>1</b> <span>Не контейнер</span> </a><a href="/Courses/kubernetes/pod/2/" class="giro corrente" data-livello="kubernetes/pod:2" aria-current="page"> <b>2</b> <span>Под не чинят</span> </a><a href="/Courses/kubernetes/pod/3/" class="giro" data-livello="kubernetes/pod:3"> <b>3</b> <span>Живой и готовый</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>называть фазы жизни пода и то, какая из них тупиковая</li><li>объяснять, почему под не переезжает и не правится на месте</li><li>отличать перезапуск контейнера от замены пода</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (9)</summary> <ul><li>отличать императивную команду от заявленного состояния</li><li>объяснять, почему заявку можно подать дважды и ничего не сломается</li><li>называть, что именно происходит при `kubectl apply`</li><li>объяснять, что под — это группа контейнеров с общей сетью и жизнью</li><li>называть случаи, когда контейнеров в поде больше одного</li><li>понимать, почему единицей размещения выбран под, а не контейнер</li><li>описывать цикл сверки тремя действиями и называть его вход и выход</li><li>объяснять, почему упавший экземпляр восстанавливается без чьей-либо команды</li><li>отличать существующий экземпляр от готового</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 2</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Виртуальную машину чинят: заходят внутрь, правят настройку, перезагружают службу. С подом так нельзя, и дело не в запрете, а в том, что понятия «починить под» в системе просто нет.</p>
+<h2 id="pod-neizmenyaem-pochti-celikom">Под неизменяем почти целиком</h2>
+<p>После создания у пода можно поменять считанные поля — образ контейнера, метки, пометки, допуски. Всё остальное: ресурсы, тома, узел, сетевые настройки — зафиксировано. Попытка изменить получает отказ.</p>
+<p>Это выглядит суровым ограничением, а на деле — то, что делает поведение системы предсказуемым. Раз под не меняется, то под, который вы видите, и есть тот, что был создан; раз он не переезжает, то узел в его описании — правда всё время его жизни. Всякое «а вдруг оно поменялось» из рассуждений исчезает.</p>
+<p>Изменение заявки, следовательно, означает не правку, а <b class="termine">замену</b>: создать новый под по новому описанию, дождаться его готовности, убрать старый. Именно это делает Deployment, и именно поэтому выкатка выглядит как появление новых подов рядом со старыми, а не как их превращение.</p>
+<figure class="tabella"><table><thead><tr><th scope="col">Фаза</th><th scope="col">Что означает</th><th scope="col">Тупиковая</th></tr></thead><tbody><tr><th scope="row"><code>Pending</code></th><td>принят, но ещё не работает: нет узла или тянется образ</td><td>нет</td></tr><tr><th scope="row"><code>Running</code></th><td>размещён, хотя бы один контейнер запущен</td><td>нет</td></tr><tr><th scope="row"><code>Succeeded</code></th><td>все контейнеры завершились успешно и не будут перезапущены</td><td>да</td></tr><tr><th scope="row"><code>Failed</code></th><td>все контейнеры завершились, хотя бы один — с ошибкой</td><td>да</td></tr><tr><th scope="row"><code>Unknown</code></th><td>связь с узлом потеряна, состояние неизвестно</td><td>нет</td></tr></tbody></table><figcaption>Из тупиковых фаз выхода нет: такой под навсегда останется таким. Заменять его — работа контроллера, а не пода.</figcaption></figure>
+<h2 id="perezapusk-kontejnera-ne-zamena-poda">Перезапуск контейнера — не замена пода</h2>
+<p>Эти два события легко перепутать, а разница большая. Упавший <em>контейнер</em> перезапускает kubelet прямо на месте: под остаётся тот же, имя то же, адрес тот же, счётчик перезапусков растёт. Упавший <em>под</em> не перезапускается никем — его заменяет контроллер новым, с новым именем и новым адресом.</p>
+<figure class="codice"><pre><code>NAME         READY   STATUS             RESTARTS       AGE
+web-7f9c2    1/1     Running            0              4d
+web-k3m8x    0/1     CrashLoopBackOff   7 (2m11s ago)  19m
+web-p2l4z    0/1     Pending            0              19m</code></pre><figcaption>Три разные беды. Второй под жив, но его контейнер падает при запуске уже седьмой раз. Третий вообще не размещён — у него и логов нет.</figcaption></figure>
+<dl class="definizione" id="crashloopbackoff"><dt><b class="termine">CrashLoopBackOff</b></dt><dd>Не отдельная беда, а состояние ожидания: контейнер упал, kubelet ждёт перед очередной попыткой, и ждёт всё дольше. Само по себе оно ничего не говорит о причине — причину надо искать в логах предыдущего запуска.</dd></dl>
+<aside class="nota">Логи упавшего контейнера доступны по <code>kubectl logs --previous</code>. Без этого ключа вы читаете логи текущей попытки, которая ещё и не началась — и видите пустоту, из-за чего многие решают, что программа «ничего не пишет».</aside>
+<h2 id="pod-ne-pereezzhaet">Под не переезжает</h2>
+<p>Узел выбирается один раз, при размещении, и на всю жизнь пода. Освободился соседний узел, перекосило нагрузку, приехала машина помощнее — под останется там, где стоял. Переезда в Kubernetes нет вовсе.</p>
+<p>Есть только вытеснение: под убивают, а контроллер создаёт новый — и вот он уже размещается заново, по нынешней обстановке. Со стороны похоже на переезд, по существу — замена. Разница видна сразу, как только у пода есть состояние в памяти: при «переезде» оно исчезает.</p>
+<section class="strumento incastro" data-tono="storia"><p class="titolo-strumento">Почему это оказалось удачным решением</p><p>Живая миграция — переезд работающей машины без остановки — в мире виртуализации считалась вершиной инженерии, и стоила соответственно: общее хранилище, быстрая сеть, перенос страниц памяти, долгая отладка редких случаев.</p>
+<p>Kubernetes выбрал ровно противоположное: ничего не переносить, всё пересоздавать. Это работает только при одном условии — программа должна переживать внезапную смерть без потерь. Условие суровое, но, приняв его однажды, вы получаете систему, где переезд, обновление, отказ узла и масштабирование — одно и то же действие.</p></section>
+<cy-riconciliazione class="isola" data-blocco="reconcile" data-props="{&quot;kind&quot;:&quot;reconcile&quot;,&quot;title&quot;:&quot;Замена, а не починка&quot;,&quot;hint&quot;:&quot;Уроните под и следите за именем. Вернувшийся под — не тот же самый: имя другое, возраст нулевой. Кластер не воскресил его, а создал нового по той же заявке.&quot;,&quot;desired&quot;:3,&quot;startup&quot;:2.5}" style="min-height:970px"></cy-riconciliazione>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;pod-2-restart&quot;,&quot;prompt&quot;:&quot;У пода `RESTARTS 7`, имя не менялось четыре дня. Что происходило?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Имя то же — значит, под тот же. Замена дала бы новое имя и нулевой возраст. Перезапускался контейнер, и делал это kubelet на месте.&quot;,&quot;options&quot;:[&quot;Контроллер семь раз заменял под новым&quot;,&quot;Контейнер внутри пода падал и перезапускался на месте&quot;,&quot;Под семь раз переезжал между узлами&quot;,&quot;Kubelet семь раз терял связь с apiserver&quot;],&quot;answer&quot;:1}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;pod-2-move&quot;,&quot;prompt&quot;:&quot;В кластер добавили мощный узел. Что произойдёт с работающими подами?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Переезда нет. Новый узел получит те поды, что будут созданы после его появления, а существующие останутся на месте — пока их что-нибудь не заменит.&quot;,&quot;options&quot;:[&quot;Часть переедет на него для выравнивания нагрузки&quot;,&quot;Ничего: узел выбирается один раз и навсегда&quot;,&quot;Переедут только те, которым не хватает ресурсов&quot;,&quot;Планировщик пересчитает размещение всех подов&quot;],&quot;answer&quot;:1}}" style="min-height:541px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/kubernetes/pod/3/" class="rinvio">Следующий виток: как кластер узнаёт, что под жив</a></p></article> <nav class="avanti" aria-label="Дальше"> <a class="prossimo-giro" href="/Courses/kubernetes/pod/3/"> <b class="mano">Глубже по той же теме</b> <span>Виток 3: Живой и готовый</span> </a> <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/kubernetes/pod/3/">Под · виток 3: Живой и готовый</a> </li><li> <a href="/Courses/kubernetes/scheduler/1/">Планировщик · виток 1: Отсеять и оценить</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/kubernetes/pod/1/"> <b class="mano">← Назад</b> <span>Под · виток 1: Не контейнер</span> </a> <a class="successivo" href="/Courses/kubernetes/pod/3/"> <b class="mano">Дальше →</b> <span>Под · виток 3: Живой и готовый</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

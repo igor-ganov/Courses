@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incisione — гравюра</title>
+<link rel="stylesheet" href="../fonts/caratteri.css">
+<style>
+/* 05 — INCISIONE
+   Высокая печать. Литера вдавлена в лист, поэтому у каждой формы есть
+   рельеф: светлая грань сверху, тень снизу, и она разворачивается вместе
+   с лампой — свет один на всю страницу. Полутонов нет и быть не может:
+   краска либо легла, либо нет, так что все оттенки набраны штриховкой,
+   как в гравюре на дереве. Никаких скруглений — резец их не делает;
+   и никаких серых заливок — только плотность штриха.
+   Наборные линейки вместо рамок, спусковая полоса вместо «шапки». */
+
+:root{--кегль:1;--пол:0px;
+  --бумага:#efe6d3;
+  --краска:#231f1c;
+  --краска-слабо:#6f665c;
+  --сангина:#8c3a26;
+  --поле:#c9bda3;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{min-height:100%;position:relative}
+body{
+  margin:0;color:var(--краска);
+  font-family:'Literata',Georgia,serif;font-size:max(calc(16.5px*var(--кегль)),var(--пол));line-height:27px;
+  -webkit-font-smoothing:antialiased;
+}
+canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
+main{max-width:700px;margin:0 auto;padding:44px 26px 96px}
+
+/* Оттиск: краска вдавлена, поэтому фаска сверху светлая, снизу тёмная,
+   и обе поворачиваются за лампой. */
+.impresso{
+  text-shadow:
+    calc(var(--luce-dx,0) * .6px) calc(var(--luce-dy,0) * .6px - .5px) 0 rgba(255,252,244,.55),
+    calc(var(--luce-dx,0) * -.5px) calc(var(--luce-dy,0) * -.5px + .6px) 0 rgba(35,31,28,.22);
+}
+
+/* ── спусковая полоса ──────────────────────────────────────── */
+.testata{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding-bottom:7px;margin-bottom:6px;
+  border-bottom:2px solid var(--краска);
+}
+.testata::after{content:"";display:block;width:100%;height:1px;background:var(--краска);margin-top:3px}
+.marchio{
+  font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:max(calc(19px*var(--кегль)),var(--пол));
+  letter-spacing:.24em;text-transform:uppercase;
+}
+.grado{margin-left:auto;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:var(--краска-слабо)}
+/* Полоса опыта набрана штриховкой, а не залита. */
+.barra{display:inline-block;width:96px;height:9px;margin-left:10px;border:1px solid var(--краска);vertical-align:-1px}
+.barra i{display:block;height:100%;width:62%;
+  background:repeating-linear-gradient(90deg,var(--краска) 0 1px,transparent 1px 3px)}
+
+/* ── титул ─────────────────────────────────────────────────── */
+.riga-corso{
+  margin:26px 0 8px;font-size:max(calc(11.5px*var(--кегль)),var(--пол));letter-spacing:.3em;text-transform:uppercase;color:var(--краска-слабо);
+  text-align:center;
+}
+h1{
+  margin:0 0 10px;font-family:'Playfair Display',Georgia,serif;font-weight:700;
+  font-size:clamp(36px,6.2vw,58px);line-height:1.04;text-align:center;text-wrap:balance;
+}
+.sottotitolo{
+  margin:0 0 6px;text-align:center;font-family:'Playfair Display',Georgia,serif;
+  font-style:italic;font-weight:400;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--краска-слабо);
+}
+/* Виньетка: наборный орнамент между титулом и текстом. */
+.fregio{
+  display:block;margin:16px auto 30px;width:150px;height:12px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='12'><path d='M0,6 H52 M98,6 H150' stroke='%23231f1c' stroke-width='1'/><path d='M75,1.5 L82,6 L75,10.5 L68,6 Z' fill='none' stroke='%23231f1c' stroke-width='1'/><path d='M60,6 L66,6 M84,6 L90,6' stroke='%23231f1c' stroke-width='1'/></svg>") no-repeat center;
+}
+p{margin:0 0 24px}
+/* Буквица: первая литера набрана крупно, как в книге. */
+.occhiello::first-letter{
+  float:left;font-family:'Playfair Display',Georgia,serif;font-weight:700;
+  font-size:max(calc(60px*var(--кегль)),var(--пол));line-height:.82;padding:4px 9px 0 0;
+}
+
+/* Подчёркивание — наборная линейка под словом, а не блок в потоке. */
+.termine{font-weight:600;position:relative;white-space:nowrap}
+.termine::after{content:"";position:absolute;left:0;right:0;bottom:1px;height:2px;background:var(--краска)}
+
+/* Замечание на поле: курсив, отбито линейкой. */
+.marginale{
+  font-family:'Playfair Display',serif;font-style:italic;font-size:max(calc(17px*var(--кегль)),var(--пол));color:var(--сангина);
+  border-left:2px solid var(--сангина);padding-left:14px;margin:0 0 24px;line-height:1.45;
+}
+
+/* ── схема: штриховка вместо заливки ───────────────────────── */
+figure{margin:0 0 26px}
+.schema{display:block;width:100%;height:auto}
+figcaption{
+  margin-top:9px;text-align:center;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;
+  color:var(--краска-слабо);
+}
+
+/* ── прибор: врезка, отбитая двойной линейкой ──────────────── */
+.strumento{
+  margin:0 0 28px;padding:18px 20px 16px;
+  border-top:2px solid var(--краска);border-bottom:2px solid var(--краска);
+  box-shadow:inset 0 3px 0 -2px var(--краска), inset 0 -3px 0 -2px var(--краска);
+}
+.titolo-strumento{
+  margin:0 0 3px;font-family:'Playfair Display',serif;font-weight:700;font-size:max(calc(17px*var(--кегль)),var(--пол));
+  letter-spacing:.03em;
+}
+.suggerimento{margin:0 0 14px;font-size:max(calc(14px*var(--кегль)),var(--пол));color:var(--краска-слабо);font-style:italic;font-family:'Playfair Display',serif}
+.grafico{display:block;width:100%;height:auto;margin-bottom:12px}
+
+.quadranti{display:flex;flex-wrap:wrap;gap:0;margin-bottom:16px;border-top:1px solid var(--поле)}
+.quadrante{flex:1 1 128px;padding:8px 12px;border-right:1px solid var(--поле);border-bottom:1px solid var(--поле)}
+.quadrante:last-child{border-right:0}
+.quadrante b{display:block;font-size:max(calc(9.5px*var(--кегль)),var(--пол));letter-spacing:.17em;text-transform:uppercase;color:var(--краска-слабо);font-weight:400}
+.quadrante span{font-family:'PT Mono',monospace;font-size:max(calc(16px*var(--кегль)),var(--пол))}
+.quadrante.male span{color:var(--сангина)}
+
+.manopole{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.manopola label{display:flex;justify-content:space-between;font-size:max(calc(10.5px*var(--кегль)),var(--пол));letter-spacing:.14em;text-transform:uppercase;color:var(--краска-слабо)}
+.manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:max(calc(13.5px*var(--кегль)),var(--пол));letter-spacing:0;color:var(--краска)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:ew-resize;margin-top:3px}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border:1px solid var(--краска);
+  background:repeating-linear-gradient(90deg,var(--поле) 0 1px,transparent 1px 4px)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:11px;height:15px;margin-top:-6px;background:var(--краска);
+  /* Ползунок тоже вдавлен: фаска берётся из положения лампы. */
+  box-shadow:inset calc(var(--luce-dx,0) * 1.4px) calc(var(--luce-dy,0) * 1.4px - 1px) 0 rgba(255,252,244,.35);
+}
+
+/* ── чипы: наборные литеры в рамке ─────────────────────────── */
+.pastiglie{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 28px}
+.pastiglia{
+  border:1px solid var(--краска);background:none;cursor:pointer;padding:5px 12px;
+  font:inherit;font-family:'Playfair Display',serif;font-size:max(calc(13.5px*var(--кегль)),var(--пол));
+  letter-spacing:.1em;text-transform:uppercase;color:var(--краска-слабо);
+}
+.pastiglia[aria-pressed=true]{color:var(--бумага);
+  background:repeating-linear-gradient(45deg,var(--краска) 0 2px,rgba(35,31,28,.72) 2px 4px)}
+
+/* ── вопрос ────────────────────────────────────────────────── */
+.domanda{margin:0 0 12px}
+.numero{font-family:'Playfair Display',serif;font-weight:700;margin-right:8px}
+.opzioni{display:grid;gap:0;margin:0 0 28px}
+.opzione{
+  display:flex;gap:14px;align-items:baseline;width:100%;text-align:left;
+  border:0;border-bottom:1px solid var(--поле);background:none;cursor:pointer;
+  padding:9px 4px;font:inherit;font-size:max(calc(16px*var(--кегль)),var(--пол));color:var(--краска);
+}
+.opzione:last-child{border-bottom:0}
+.opzione .lettera{font-family:'Playfair Display',serif;font-weight:700;color:var(--краска-слабо)}
+.opzione[aria-checked=true] .lettera{color:var(--сангина)}
+/* Отмечено наборным указателем ☞, а не галочкой. */
+.opzione[aria-checked=true] .lettera::before{content:"☞ "}
+.opzione[aria-checked=true]{background:repeating-linear-gradient(90deg,rgba(140,58,38,.10) 0 2px,transparent 2px 5px)}
+
+/* ── кнопки: клише, вдавленное в лист ──────────────────────── */
+.azioni{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.bottone{
+  border:1.5px solid var(--краска);background:none;cursor:pointer;
+  font-family:'Playfair Display',serif;font-size:max(calc(14px*var(--кегль)),var(--пол));letter-spacing:.18em;text-transform:uppercase;
+  color:var(--краска);padding:11px 24px;
+  box-shadow:
+    calc(var(--luce-dx,0) * -3px) calc(var(--luce-dy,0) * 3px + 2px) 0 -0.5px var(--поле),
+    inset calc(var(--luce-dx,0) * 1.6px) calc(var(--luce-dy,0) * 1.6px - 1.2px) 0 rgba(255,252,244,.4);
+  transform:translateY(calc(var(--premuto,0) * 1.4px));
+}
+.bottone--pieno{
+  color:var(--бумага);
+  background:repeating-linear-gradient(45deg,var(--краска) 0 3px,rgba(35,31,28,.78) 3px 6px);
+}
+.bottone:active{transform:translateY(2px);box-shadow:none}
+.legenda{font-family:'Playfair Display',serif;font-style:italic;font-size:max(calc(14px*var(--кегль)),var(--пол));color:var(--краска-слабо)}
+
+/* ── ТЕЛЕФОН ──────────────────────────────────────────────────
+   У кегля появляется пол: подпись в 9 px становится 15 px, а
+   крупное растёт всего на десятую — иначе в ладони страница
+   превращается в серую полосу. Схемы не ужимаются до нечитаемого,
+   а уезжают вбок под палец; кнопке дают 44 px, чтобы попасть в
+   неё в поезде. */
+@media (max-width:640px){
+  :root{--кегль:1.12;--пол:15px}
+  main{padding-left:16px;padding-right:16px}
+  /* Схема не ужимается до нечитаемого, а уезжает вбок в своей рамке:
+     подписи в ней набраны под настольный размер, поэтому дешевле возить
+     её пальцем, чем пытаться прочесть восьмипиксельную ось. Рамкой
+     работает тот элемент, в котором схема лежит, — у графика это не
+     figure, поэтому берём его через :has(). */
+  figure, *:has(> svg.schema), *:has(> svg.grafico), pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+  svg.schema, svg.grafico{min-width:min(820px,200vw)}
+  button{min-height:44px}
+}
+</style>
+</head>
+<body>
+<canvas data-materia data-carta="efe6d3" data-ombra="9b8f77" data-luce="fff5e0" data-rilievo="12" data-fibra="0.06" data-calore="0.05"></canvas>
+
+<main>
+  <header class="testata">
+    <span class="marchio impresso">Кибернетика</span>
+    <span class="grado">Регулятор<span class="barra"><i></i></span></span>
+  </header>
+
+  <p class="riga-corso">Обратная связь · виток второй</p>
+  <h1 class="impresso">Запаздывание<br>и предел усиления</h1>
+  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
+  <span class="fregio"></span>
+
+  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры
+  так не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="marginale">Душ с длинной трубой — тот же контур, и ведёт он себя точно так же.</p>
+
+  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
+  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
+  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение
+  и начинает его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 620 160" role="img" aria-label="Схема контура">
+      <defs>
+        <pattern id="tratteggio" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <path d="M0,0 V4" stroke="#231f1c" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <g fill="none" stroke="#231f1c" stroke-width="1.4">
+        <rect x="22" y="40" width="120" height="36"/>
+        <rect x="188" y="40" width="120" height="36" fill="url(#tratteggio)" opacity=".9"/>
+        <rect x="354" y="40" width="120" height="36"/>
+        <rect x="500" y="40" width="98" height="36"/>
+        <path d="M143,58 H186 M178,54 L187,58 L178,62"/>
+        <path d="M309,58 H352 M344,54 L353,58 L344,62"/>
+        <path d="M475,58 H498 M490,54 L499,58 L490,62"/>
+        <path d="M549,77 V118 H82 V78 M78,86 L82,78 L86,86"/>
+      </g>
+      <g font-family="Playfair Display, serif" font-size="14" fill="#231f1c" text-anchor="middle" letter-spacing="1">
+        <text x="82" y="63">ЦЕЛЬ</text>
+        <text x="248" y="63" fill="#efe6d3">РЕГУЛЯТОР</text>
+        <text x="414" y="63">ОБЪЕКТ</text><text x="549" y="63">ДАТЧИК</text>
+      </g>
+      <text x="315" y="140" font-family="Playfair Display, serif" font-style="italic" font-size="15" fill="#8c3a26" text-anchor="middle">здесь теряется время</text>
+    </svg>
+    <figcaption>рис. IV — контур с запаздыванием в цепи измерения</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Стенд: усиление и запаздывание</p>
+    <p class="suggerimento">Поставьте запаздывание на ноль и поднимите усиление до упора — спокойно. Верните усиление и двигайте запаздывание.</p>
+
+    <svg class="grafico" viewBox="0 0 600 160" role="img" aria-label="Переходный процесс">
+      <path d="M42,42 H586" stroke="#231f1c" stroke-width="1" stroke-dasharray="6 5" fill="none"/>
+      <text x="586" y="34" font-family="Playfair Display, serif" font-size="13" fill="#231f1c" text-anchor="end" font-style="italic">уставка</text>
+      <path d="M42,142 C60,140 68,110 84,68 C98,28 112,10 128,22 C144,34 150,82 166,94 C184,108 198,68 216,54 C236,38 250,58 270,66 C292,75 308,50 334,48 C368,45 404,54 442,50 C486,45 540,48 586,46"
+            fill="none" stroke="#231f1c" stroke-width="2"/>
+      <path d="M42,142 C64,142 84,140 108,132 C138,123 166,112 210,104 C266,94 334,88 586,84"
+            fill="none" stroke="#8c3a26" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <path d="M42,8 V146 M38,144 H588" stroke="#231f1c" stroke-width="1.3" fill="none"/>
+      <g font-family="PT Mono, monospace" font-size="10" fill="#6f665c">
+        <text x="36" y="46" text-anchor="end">1,0</text><text x="36" y="146" text-anchor="end">0</text>
+        <text x="586" y="158" text-anchor="end">секунды</text>
+      </g>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>стат. ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулир.</b><span>34 %</span></span>
+      <span class="quadrante"><b>установление</b><span>—</span></span>
+      <span class="quadrante"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">I.</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+<script src="../materia.js"></script>
+</body>
+</html>

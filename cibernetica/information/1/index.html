@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Сколько бит в сообщении — Информация — Кибернетика</title><meta name="description" content="Мера снятой неопределённости. Не «сведения» и не «смысл»: величина, которую можно посчитать и сравнить."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/cibernetica/">Кибернетика: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="cibernetica/information:1" data-lavori="3"> <p class="sopra mano"> Информация · виток 1 из 2 </p> <h1>Сколько бит в сообщении</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/cibernetica/information/1/" class="giro corrente" data-livello="cibernetica/information:1" aria-current="page"> <b>1</b> <span>Сколько бит в сообщении</span> </a><a href="/Courses/cibernetica/information/2/" class="giro" data-livello="cibernetica/information:2"> <b>2</b> <span>Шум, избыточность и предел канала</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>считать энтропию распределения и понимать, что она означает</li><li>объяснять, почему предсказуемое сообщение не несёт информации</li><li>связывать энтропию с длиной кода</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (9)</summary> <ul><li>узнавать контур управления в устройствах, в живом и в обществе</li><li>называть четыре части контура и говорить, что происходит при обрыве каждой</li><li>объяснять, почему кибернетика говорит о поведении, а не об устройстве</li><li>рисовать контур из четырёх частей и показывать направление обхода</li><li>отличать разомкнутое управление от замкнутого</li><li>называть, что именно возвращается по обратной связи</li><li>считать разнообразие как число различимых состояний</li><li>формулировать закон Эшби и применять его к конкретной системе</li><li>показывать, что нехватка ходов не лечится хитростью</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 3</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Слово «информация» в обиходе означает содержание. У Шеннона оно означает другое: <b class="termine">меру того, насколько сообщение уменьшило неопределённость</b>. Смысл сюда не входит вовсе, и это не упущение, а условие того, чтобы величину можно было считать.</p>
+<p>Проверка на понимание: сообщение «завтра будет день» несёт ноль информации. Не потому, что оно глупое, а потому, что вы и так это знали — неопределённость была нулевой, снимать было нечего.</p>
+<figure class="formula-blocco"><div class="formula" translate="no">H = − Σ pᵢ · log₂ pᵢ</div><figcaption>Энтропия распределения, в битах. Максимальна при равновероятных исходах, равна нулю при определённости.</figcaption></figure>
+<dl class="definizione" id="bit"><dt><b class="termine">Бит</b></dt><dd>Столько информации несёт ответ на вопрос, у которого два равновероятных исхода. Та же единица, которой меряется <a href="/Courses/cibernetica/variety/1/" class="rinvio">разнообразие</a>, — и это одна и та же величина.</dd></dl>
+<h2 id="chto-shennon-vybrosil-narochno">Что Шеннон выбросил нарочно</h2>
+<p>В первой же странице статьи 1948 года сказано прямо: смысловые аспекты сообщения не имеют отношения к инженерной задаче. Это выглядит как обеднение, а на деле — условие успеха. Пока «информация» означала «содержание», её нельзя было ни измерить, ни сравнить, ни ограничить теоремой.</p>
+<p>Цена размена честная. Сообщение «дом сгорел» и случайный набор той же длины несут одинаковую информацию по Шеннону. Для инженера связи это верно: провод не различает. Для всего остального — нет, и путать одно с другим значит городить чепуху, которой в популярных пересказах предостаточно.</p>
+<cy-entropia class="isola" data-blocco="entropy" data-props="{&quot;kind&quot;:&quot;entropy&quot;,&quot;title&quot;:&quot;Стол с буквами&quot;,&quot;hint&quot;:&quot;Двигайте частоты. Смотрите, как энтропия падает при перекосе — и как код Хаффмана сам собой укорачивает частые буквы.&quot;}" style="min-height:530px"></cy-entropia>
+<h2 id="pochemu-kod-sam-ukorachivaet-chastoe">Почему код сам укорачивает частое</h2>
+<p>Никто не договаривался давать частым буквам короткий код. Он получается такой из счёта: алгоритм Хаффмана каждый раз объединяет две самые редкие ветви, и частая буква просто дольше остаётся наверху дерева.</p>
+<p>Морзе пришёл к тому же на век раньше и без теории: он посчитал литеры в типографской кассе и дал самой частой английской букве E одну точку. Теория потом объяснила, почему он не мог сделать сильно лучше.</p>
+<figure class="formula-blocco"><div class="formula" translate="no">H ≤ L &lt; H + 1</div><figcaption>Теорема Шеннона о кодировании: средняя длина кода не может быть меньше энтропии, а хороший код укладывается в энтропию плюс бит. Это предел, а не рекомендация.</figcaption></figure>
+<figure class="tabella"><table><thead><tr><th scope="col">Распределение</th><th scope="col">Энтропия</th><th scope="col">Что это значит</th></tr></thead><tbody><tr><th scope="row">Монета честная</th><td>1 бит</td><td>предсказать нельзя, экономить нечем</td></tr><tr><th scope="row">Монета 90/10</th><td>0,47 бита</td><td>почти предсказуемо, код сжимается вдвое</td></tr><tr><th scope="row">Всегда орёл</th><td>0 бит</td><td>сообщение не нужно вовсе</td></tr><tr><th scope="row">Русский текст, буквы</th><td>≈4,4 бита</td><td>но с учётом сочетаний — около 1,5</td></tr></tbody></table></figure>
+<aside class="nota">Последняя строчка объясняет, почему текст сжимается впятеро, а случайный шум не сжимается вовсе. Сжатие — это ровно вычитание предсказуемости.</aside>
+<p>Сам Шеннон посчитал энтропию английского текста экспериментально — предлагая людям угадывать следующую букву. Получилось около одного бита на букву вместо 4,7 у равномерного алфавита. Разница и есть та избыточность, благодаря которой мы читаем текст с опечатками и слышим речь в шуме.</p>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;numeric&quot;,&quot;id&quot;:&quot;inf-1-coin&quot;,&quot;prompt&quot;:&quot;Сколько бит несёт результат броска честной монеты?&quot;,&quot;difficulty&quot;:1,&quot;explain&quot;:&quot;Два равновероятных исхода: log₂2 = 1.&quot;,&quot;answer&quot;:1,&quot;tolerance&quot;:0.01,&quot;unit&quot;:&quot;бит&quot;}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;inf-1-zero&quot;,&quot;prompt&quot;:&quot;Почему сообщение «завтра взойдёт солнце» несёт ноль информации?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Информация — снятая неопределённость. Нечего было снимать, значит и информации ноль. Смысл в эту меру не входит вовсе.&quot;,&quot;options&quot;:[&quot;Потому что оно короткое&quot;,&quot;Потому что неопределённости не было: исход был известен заранее&quot;,&quot;Потому что оно не про получателя&quot;,&quot;Потому что его нельзя закодировать&quot;],&quot;answer&quot;:1}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:3,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;inf-1-code&quot;,&quot;prompt&quot;:&quot;Средняя длина кода Хаффмана оказалась 2,1 бита при энтропии 2,0. Это&quot;,&quot;difficulty&quot;:3,&quot;explain&quot;:&quot;Кодовое слово — целое число бит, поэтому точно совпасть с энтропией обычно нельзя. Теорема гарантирует, что перерасход меньше одного бита на символ.&quot;,&quot;options&quot;:[&quot;ошибка: код не может быть длиннее энтропии&quot;,&quot;нормально: теорема разрешает H ≤ L &lt; H+1&quot;,&quot;признак плохого кода: должно быть ровно 2,0&quot;,&quot;невозможно&quot;],&quot;answer&quot;:1}}" style="min-height:513px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/cibernetica/information/2/" class="rinvio">Дальше: что происходит, когда в канале шум</a></p></article> <nav class="avanti" aria-label="Дальше"> <a class="prossimo-giro" href="/Courses/cibernetica/information/2/"> <b class="mano">Глубже по той же теме</b> <span>Виток 2: Шум, избыточность и предел канала</span> </a> <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/cibernetica/whatis/2/">Что такое кибернетика · виток 2: Дисциплина без предмета</a> </li><li> <a href="/Courses/cibernetica/feedback/3/">Обратная связь · виток 3: Запаздывание как главный враг</a> </li><li> <a href="/Courses/cibernetica/variety/2/">Необходимое разнообразие · виток 2: Разнообразие и информация — одна мера</a> </li><li> <a href="/Courses/cibernetica/information/2/">Информация · виток 2: Шум, избыточность и предел канала</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/cibernetica/blackbox/1/"> <b class="mano">← Назад</b> <span>Чёрный ящик · виток 1: Опознание без вскрытия</span> </a> <a class="successivo" href="/Courses/cibernetica/information/2/"> <b class="mano">Дальше →</b> <span>Информация · виток 2: Шум, избыточность и предел канала</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

@@ -1,0 +1,50 @@
+{
+  "name": "Тетрадь по кибернетике",
+  "short_name": "Кибернетика",
+  "description": "Курс по кибернетике с приборами, которые крутятся руками. Работает без сети; прогресс хранится на устройстве.",
+  "id": "/Courses/",
+  "start_url": "/Courses/",
+  "scope": "/Courses/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "ru",
+  "dir": "ltr",
+  "background_color": "#f3efe4",
+  "theme_color": "#f3efe4",
+  "categories": [
+    "education",
+    "science"
+  ],
+  "icons": [
+    {
+      "src": "/Courses/icona-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Courses/icona-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Courses/icona-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Courses/icona.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Повторение",
+      "url": "/Courses/ripasso/",
+      "description": "Витки, чей срок повторения настал"
+    }
+  ]
+}

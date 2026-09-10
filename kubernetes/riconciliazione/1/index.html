@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Посмотреть и сделать шаг — Цикл сверки — Кибернетика</title><meta name="description" content="Единственное движение Kubernetes: посмотреть, что заявлено, посмотреть, что есть, сделать шаг к сближению. Всё остальное — надстройки над ним."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/kubernetes/">Kubernetes: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="kubernetes/riconciliazione:1" data-lavori="2"> <p class="sopra mano"> Цикл сверки · виток 1 из 3 </p> <h1>Посмотреть и сделать шаг</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/kubernetes/riconciliazione/1/" class="giro corrente" data-livello="kubernetes/riconciliazione:1" aria-current="page"> <b>1</b> <span>Посмотреть и сделать шаг</span> </a><a href="/Courses/kubernetes/riconciliazione/2/" class="giro" data-livello="kubernetes/riconciliazione:2"> <b>2</b> <span>Очередь и повтор</span> </a><a href="/Courses/kubernetes/riconciliazione/3/" class="giro" data-livello="kubernetes/riconciliazione:3"> <b>3</b> <span>Когда цикл вредит</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>описывать цикл сверки тремя действиями и называть его вход и выход</li><li>объяснять, почему упавший экземпляр восстанавливается без чьей-либо команды</li><li>отличать существующий экземпляр от готового</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (3)</summary> <ul><li>отличать императивную команду от заявленного состояния</li><li>объяснять, почему заявку можно подать дважды и ничего не сломается</li><li>называть, что именно происходит при `kubectl apply`</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 2</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Заявка лежит в хранилище. Сама по себе она ничего не делает — это просто запись. Делает её действительной программа, которая устроена до неприличия просто.</p>
+<ol class="elenco"><li>Посмотреть, что заявлено.</li><li>Посмотреть, что есть на самом деле.</li><li>Сделать один шаг, сокращающий разницу.</li><li>Вернуться к первому пункту.</li></ol>
+<p>Это всё. Не упрощение для начинающих — это буквально то, что делает контроллер тиража, и то же самое, с точностью до предмета, делают контроллер узлов, контроллер служб и полсотни остальных.</p>
+<dl class="definizione" id="sverka"><dt><b class="termine">Сверка</b></dt><dd>Повторяющееся сравнение заявленного состояния с наблюдаемым и действие, сокращающее разницу. Не разовое приведение, а непрерывное: расхождение может появиться в любой момент и без чьего-либо участия.</dd></dl>
+<h2 id="pochemu-eto-ne-to-zhe-samoe-chto-storozh">Почему это не то же самое, что сторож</h2>
+<p>Сторож из первого витка тоже проверял и поднимал. Разница в том, <em>на что он смотрит</em>. Сторож смотрит на событие: «контейнер умер — подними». Контроллер смотрит на состояние: «заявлено три, есть два — создай одного».</p>
+<figure class="tabella"><table><thead><tr><th scope="col"></th><th scope="col">По событию</th><th scope="col">По состоянию</th></tr></thead><tbody><tr><th scope="row">Вход</th><td>сообщение о случившемся</td><td>текущая картина целиком</td></tr><tr><th scope="row">Пропущенное сообщение</th><td>потеряно навсегда</td><td>ни на что не влияет</td></tr><tr><th scope="row">Повтор сообщения</th><td>действие выполнится дважды</td><td>второй раз делать нечего</td></tr><tr><th scope="row">Перезапуск программы</th><td>состояние потеряно</td><td>следующий взгляд всё восстановит</td></tr><tr><th scope="row">Отставшая картина</th><td>решение уже неверно</td><td>решение будет исправлено на следующем круге</td></tr></tbody></table><figcaption>Kubernetes весь построен на правом столбце. Именно поэтому его части можно перезапускать в любой момент, не боясь ничего.</figcaption></figure>
+<p>Это старая мысль из электроники: сигнал бывает <b class="termine">фронтовым</b> — важен момент переключения — и <b class="termine">уровневым</b>, когда важно текущее значение. Уровневый переживает потерю: пропустив момент, вы всё равно видите уровень. Фронтовой — нет.</p>
+<p>Разница не философская, а практическая, и видна она в день, когда что-нибудь сломается. Программа по событиям после перезапуска не знает, что случилось, пока её не было: события ушли в никуда, и она либо восстанавливает их из журнала, либо начинает врать. Программа по состоянию после перезапуска просто смотрит — и видит всё, что есть, включая случившееся в её отсутствие.</p>
+<p>Отсюда свойство, которое поражает всех, кто впервые останавливает контроллер посреди рабочего дня: <b class="termine">ничего не ломается</b>. Кластер замирает в том состоянии, в каком был, расхождения копятся, а пущенный обратно контроллер разбирает их все разом и без единого напоминания. Никакой очереди пропущенных дел нет, потому что дела и не хранились: хранится только то, как должно быть.</p>
+<h2 id="posmotrite-sami">Посмотрите сами</h2>
+<cy-riconciliazione class="isola" data-blocco="reconcile" data-props="{&quot;kind&quot;:&quot;reconcile&quot;,&quot;title&quot;:&quot;Цикл сверки&quot;,&quot;hint&quot;:&quot;Уроните под пальцем. Никто не давал команды его восстановить — контроллер просто увидел, что заявленному числу не хватает одного. Потом остановите контроллер и уроните снова: вот чем он занимался.&quot;,&quot;desired&quot;:3,&quot;resync&quot;:0.5,&quot;startup&quot;:2.5,&quot;goal&quot;:{&quot;hold&quot;:20}}" style="min-height:970px"></cy-riconciliazione>
+<p>Обратите внимание на числа «существуют» и «готовы»: они расходятся, пока экземпляр поднимается. Это различие важнее, чем кажется. Контроллер тиража считает <b class="termine">существующих</b> — иначе, пока экземпляр запускается, он выглядел бы недостающим, и на каждом круге создавался бы ещё один.</p>
+<section class="strumento incastro" data-tono="attenzione"><p class="titolo-strumento">Ошибка, которую делает каждый, кто пишет свой первый контроллер</p><p>Считать готовых вместо существующих. Заявлено три, готовых ноль — создать три. Через полсекунды: готовых по-прежнему ноль, они ещё поднимаются — создать ещё три. Через минуту в кластере сто восемьдесят подов, и все они честно поднимаются.</p>
+<p>Лечится не задержкой и не блокировкой, а правильным вопросом: считать надо то, что уже существует, включая незавершённое. Задержка только отодвигает беду, а верно поставленный вопрос убирает её совсем.</p></section>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;ric-1-who&quot;,&quot;prompt&quot;:&quot;Под упал и через несколько секунд появился новый. Кто отдал команду его создать?&quot;,&quot;difficulty&quot;:1,&quot;explain&quot;:&quot;Команды не было вовсе. Была заявка «пусть будет три» и наблюдение «есть два». Всё остальное — следствие.&quot;,&quot;options&quot;:[&quot;kubelet на том же узле&quot;,&quot;Никто: контроллер увидел расхождение с заявкой&quot;,&quot;apiserver, обнаружив пропажу записи&quot;,&quot;Тот, кто в последний раз делал apply&quot;],&quot;answer&quot;:1}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;goal&quot;,&quot;id&quot;:&quot;ric-1-hold&quot;,&quot;prompt&quot;:&quot;Продержите готовых столько же, сколько заявлено, двадцать секунд подряд — роняя поды и меняя заявку. Прибор выше засчитает сам.&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Обратите внимание, что вы делали: меняли заявку и мешали. Ни разу не пришлось сказать «создай» — и это единственный способ работы с Kubernetes, который не ломается.&quot;,&quot;widget&quot;:&quot;reconcile&quot;,&quot;goal&quot;:&quot;held&quot;}}" style="min-height:500px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/kubernetes/riconciliazione/2/" class="rinvio">Следующий виток: почему контроллер не спешит</a></p></article> <nav class="avanti" aria-label="Дальше"> <a class="prossimo-giro" href="/Courses/kubernetes/riconciliazione/2/"> <b class="mano">Глубже по той же теме</b> <span>Виток 2: Очередь и повтор</span> </a> <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/kubernetes/riconciliazione/2/">Цикл сверки · виток 2: Очередь и повтор</a> </li><li> <a href="/Courses/kubernetes/pod/2/">Под · виток 2: Под не чинят</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/kubernetes/dichiarativo/3/"> <b class="mano">← Назад</b> <span>Заявка вместо команды · виток 3: Единственная дверь</span> </a> <a class="successivo" href="/Courses/kubernetes/riconciliazione/2/"> <b class="mano">Дальше →</b> <span>Цикл сверки · виток 2: Очередь и повтор</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

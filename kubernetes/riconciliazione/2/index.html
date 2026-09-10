@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Очередь и повтор — Цикл сверки — Кибернетика</title><meta name="description" content="Единственное движение Kubernetes: посмотреть, что заявлено, посмотреть, что есть, сделать шаг к сближению. Всё остальное — надстройки над ним."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/kubernetes/">Kubernetes: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="kubernetes/riconciliazione:2" data-lavori="2"> <p class="sopra mano"> Цикл сверки · виток 2 из 3 </p> <h1>Очередь и повтор</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/kubernetes/riconciliazione/1/" class="giro" data-livello="kubernetes/riconciliazione:1"> <b>1</b> <span>Посмотреть и сделать шаг</span> </a><a href="/Courses/kubernetes/riconciliazione/2/" class="giro corrente" data-livello="kubernetes/riconciliazione:2" aria-current="page"> <b>2</b> <span>Очередь и повтор</span> </a><a href="/Courses/kubernetes/riconciliazione/3/" class="giro" data-livello="kubernetes/riconciliazione:3"> <b>3</b> <span>Когда цикл вредит</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>объяснять, зачем контроллеру очередь, а не прямая реакция на событие</li><li>называть, почему обработка должна быть безопасна при повторе</li><li>предсказывать поведение при частых изменениях одного объекта</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (12)</summary> <ul><li>отличать императивную команду от заявленного состояния</li><li>объяснять, почему заявку можно подать дважды и ничего не сломается</li><li>называть, что именно происходит при `kubectl apply`</li><li>описывать цикл сверки тремя действиями и называть его вход и выход</li><li>объяснять, почему упавший экземпляр восстанавливается без чьей-либо команды</li><li>отличать существующий экземпляр от готового</li><li>разбирать любой объект на apiVersion, kind, metadata, spec и status</li><li>объяснять, зачем нужны метки и чем они отличаются от имени</li><li>предсказывать, что произойдёт при изменении метки, по которой идёт отбор</li><li>называть роли apiserver и etcd и не путать их</li><li>объяснять, почему части кластера не разговаривают друг с другом напрямую</li><li>описывать, что даёт слежение (watch) по сравнению с опросом</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 2</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>На первом витке контроллер «смотрел и делал шаг». На деле между «увидел» и «сделал» стоит очередь, и она там не для порядка, а по необходимости.</p>
+<h2 id="pochemu-ne-srazu">Почему не сразу</h2>
+<p>Изменения приходят потоком, и приходят пачками: выкатка трогает десяток подов за секунду, падение узла — сотню за миг. Обрабатывать каждое сообщение отдельно значит сделать сто раз то, что достаточно сделать один раз.</p>
+<p>Поэтому контроллер кладёт в очередь не событие, а <b class="termine">ключ объекта</b>, который надо пересмотреть. Ключ в очереди уникален: пришло сто сообщений про один Deployment — в очереди один ключ. Взяв его, контроллер посмотрит на объект целиком, и текущая картина уже вобрала в себя все сто изменений.</p>
+<cy-coda class="isola" data-blocco="traffic" data-props="{&quot;kind&quot;:&quot;traffic&quot;,&quot;title&quot;:&quot;Очередь ключей&quot;,&quot;hint&quot;:&quot;Нажмите «выкатку»: она даёт сто изменений одного объекта. Посмотрите, сколько обработок из этого вышло и сколько времени очередь разбирается. Потом переключите способ и нажмите снова.&quot;,&quot;modo&quot;:&quot;coda&quot;}" style="min-height:830px"></cy-coda>
+<dl class="definizione" id="ochered-klyuchej"><dt><b class="termine">Очередь ключей</b></dt><dd>Очередь, хранящая не действия, а имена объектов, требующих пересмотра. Повторное добавление того же имени не удлиняет очередь: пересмотреть объект достаточно один раз, каким бы числом событий это ни было вызвано.</dd></dl>
+<p>Здесь видно, как одно решение поддерживает другое. Схлопывать события можно только потому, что обработка смотрит на состояние, а не на событие. Будь она фронтовой, схлопывание теряло бы работу — а так оно её только экономит.</p>
+<h2 id="povtor-pri-neudache">Повтор при неудаче</h2>
+<p>Обработка ключа может не удаться: apiserver ответил отказом, кто-то изменил объект между чтением и записью, кончилось место. Контроллер возвращает ключ в очередь — и вот здесь важна выдержка.</p>
+<p>Возвращать немедленно нельзя: если причина не исчезла, получится плотный цикл, который съест и процессор, и дверь. Поэтому повтор идёт с <b class="termine">растущей задержкой</b>: пять миллисекунд, десять, двадцать, и так до потолка в несколько минут. Удачная обработка сбрасывает счётчик.</p>
+<figure class="formula-blocco"><div class="formula" translate="no">задержка = min(база · 2^n, потолок)</div><figcaption>n — сколько раз подряд не получилось. Удвоение быстро уводит безнадёжные случаи на редкий повтор, а потолок не даёт им уйти совсем: причина может и исчезнуть.</figcaption></figure>
+<aside class="nota">Ту же выдержку вы видели в другом месте: под, который падает при запуске, перезапускается всё реже, и его состояние называется <code>CrashLoopBackOff</code>. Это не особая беда, а обычная растущая задержка — и слово <code>BackOff</code> в имени про неё.</aside>
+<h2 id="obrabotka-obyazana-perezhivat-povtor">Обработка обязана переживать повтор</h2>
+<p>Раз ключ возвращается в очередь, обработка выполнится ещё раз — возможно, уже сделав половину дела. Значит, она обязана быть безопасной при повторе: не «создать под», а «создать, если такого ещё нет».</p>
+<p>В Kubernetes это обеспечено не дисциплиной, а устройством записи: у объекта есть <b class="termine">версия</b>, и запись принимается, только если версия совпала с прочитанной. Не совпала — отказ, и контроллер начинает круг заново с новой картиной. Потерянных обновлений не бывает; бывают повторные круги, и они дёшевы.</p>
+<figure class="disegno"><div role="img" aria-label="Поток изменений идёт в очередь ключей, из очереди ключ берёт обработчик; при удаче круг завершается, при отказе ключ возвращается в очередь с растущей задержкой."><svg class="schema" viewBox="0 0 620 210" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#1b3a6b" stroke-width="1.6" stroke-linecap="round">
+    <path d="M28,52 C60,49 100,50 128,53 C134,54 135,61 135,71 C135,83 134,90 128,92 C100,95 60,94 28,91 C22,90 20,83 20,72 C20,61 22,54 27,52"/>
+    <path d="M212,52 C244,49 284,50 312,53 C318,54 319,61 319,71 C319,83 318,90 312,92 C284,95 244,94 212,91 C206,90 204,83 204,72 C204,61 206,54 211,52"/>
+    <path d="M396,52 C432,49 476,50 506,53 C512,54 513,61 513,71 C513,83 512,90 506,92 C476,95 432,94 396,91 C390,90 388,83 388,72 C388,61 390,54 395,52"/>
+    <path d="M136,72 L200,72"/><path d="M193,67 L202,72 L193,77"/>
+    <path d="M320,72 L384,72"/><path d="M377,67 L386,72 L377,77"/>
+    <path d="M514,72 L560,72 L560,26 L262,26"/><path d="M269,21 L260,26 L269,31"/>
+    <path d="M450,93 L450,150 L262,150 L262,95"/><path d="M257,102 L262,93 L267,102"/>
+  </g>
+  <g font-family="Caveat, cursive" font-size="19" fill="#1b3a6b">
+    <text x="34" y="78">изменения</text>
+    <text x="222" y="78">очередь ключей</text>
+    <text x="404" y="78">обработка</text>
+  </g>
+  <g font-family="Caveat, cursive" font-size="16" fill="#636a75">
+    <text x="146" y="66">ключ</text>
+    <text x="330" y="66">ключ</text>
+    <text x="292" y="20">удача: круг закрыт</text>
+    <text x="288" y="168">отказ: назад, но не сразу — с растущей задержкой</text>
+  </g>
+</svg></div><figcaption>Единственная петля, которая здесь есть, — возврат при отказе. Всё остальное разомкнуто: обработчик не отвечает потоку и ничего ему не сообщает.</figcaption></figure>
+<dl class="definizione" id="ogranichenie-po-versii"><dt><b class="termine">Ограничение по версии</b></dt><dd>Правило записи, при котором изменение принимается, только если объект не менялся с момента чтения. Тот, кто опоздал, получает отказ и перечитывает — вместо того чтобы затереть чужую работу.</dd></dl>
+<section class="strumento incastro" data-tono="prova"><p class="titolo-strumento">Отчего Deployment иногда «думает» несколько секунд</p><p>Вы поменяли образ и ждёте. Ничего не происходит две секунды, потом всё едет разом. Это не тормоза: ключ полежал в очереди, пока контроллер разбирался с предыдущей пачкой, а до того ещё дошло изменение через слежение.</p>
+<p>Задержка в секунды здесь заложена и полезна. Мгновенная реакция на каждое сообщение означала бы, что кластер дёргается при каждом чихе — и что выкатка десяти подов вызывает десять отдельных пересчётов вместо одного.</p></section>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;ric-2-queue&quot;,&quot;prompt&quot;:&quot;За секунду пришло сто изменений подов одного Deployment. Сколько ключей окажется в очереди?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Ключ уникален. Сто сообщений про один объект дают один ключ — а пересмотр объекта по текущему состоянию учтёт все сто изменений сразу.&quot;,&quot;options&quot;:[&quot;Сто&quot;,&quot;Сто, но обработаются они пачкой&quot;,&quot;Один&quot;,&quot;По одному на каждый узел&quot;],&quot;answer&quot;:2}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;ric-2-backoff&quot;,&quot;prompt&quot;:&quot;Зачем повтор неудавшейся обработки идёт с растущей задержкой?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Причина отказа обычно не исчезает мгновенно. Без выдержки контроллер крутил бы один и тот же отказ тысячи раз в секунду — и мешал бы всем остальным.&quot;,&quot;options&quot;:[&quot;Чтобы дать другим контроллерам поработать&quot;,&quot;Чтобы безнадёжный случай не съел процессор и apiserver плотным циклом&quot;,&quot;Чтобы соблюсти порядок обработки объектов&quot;,&quot;Чтобы объект успел измениться&quot;],&quot;answer&quot;:1}}" style="min-height:513px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/kubernetes/riconciliazione/3/" class="rinvio">Следующий виток: когда сверка начинает вредить</a></p></article> <nav class="avanti" aria-label="Дальше"> <a class="prossimo-giro" href="/Courses/kubernetes/riconciliazione/3/"> <b class="mano">Глубже по той же теме</b> <span>Виток 3: Когда цикл вредит</span> </a> <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/kubernetes/dichiarativo/3/">Заявка вместо команды · виток 3: Единственная дверь</a> </li><li> <a href="/Courses/kubernetes/riconciliazione/3/">Цикл сверки · виток 3: Когда цикл вредит</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/kubernetes/riconciliazione/1/"> <b class="mano">← Назад</b> <span>Цикл сверки · виток 1: Посмотреть и сделать шаг</span> </a> <a class="successivo" href="/Courses/kubernetes/riconciliazione/3/"> <b class="mano">Дальше →</b> <span>Цикл сверки · виток 3: Когда цикл вредит</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

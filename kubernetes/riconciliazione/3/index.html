@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Когда цикл вредит — Цикл сверки — Кибернетика</title><meta name="description" content="Единственное движение Kubernetes: посмотреть, что заявлено, посмотреть, что есть, сделать шаг к сближению. Всё остальное — надстройки над ним."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/kubernetes/">Kubernetes: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="kubernetes/riconciliazione:3" data-lavori="2"> <p class="sopra mano"> Цикл сверки · виток 3 из 3 </p> <h1>Когда цикл вредит</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/kubernetes/riconciliazione/1/" class="giro" data-livello="kubernetes/riconciliazione:1"> <b>1</b> <span>Посмотреть и сделать шаг</span> </a><a href="/Courses/kubernetes/riconciliazione/2/" class="giro" data-livello="kubernetes/riconciliazione:2"> <b>2</b> <span>Очередь и повтор</span> </a><a href="/Courses/kubernetes/riconciliazione/3/" class="giro corrente" data-livello="kubernetes/riconciliazione:3" aria-current="page"> <b>3</b> <span>Когда цикл вредит</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>объяснять, почему два контроллера на один объект дают дребезг</li><li>называть признак цикла, который никогда не сойдётся</li><li>связывать поведение цикла сверки с обратной связью и запаздыванием</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (15)</summary> <ul><li>отличать императивную команду от заявленного состояния</li><li>объяснять, почему заявку можно подать дважды и ничего не сломается</li><li>называть, что именно происходит при `kubectl apply`</li><li>описывать цикл сверки тремя действиями и называть его вход и выход</li><li>объяснять, почему упавший экземпляр восстанавливается без чьей-либо команды</li><li>отличать существующий экземпляр от готового</li><li>разбирать любой объект на apiVersion, kind, metadata, spec и status</li><li>объяснять, зачем нужны метки и чем они отличаются от имени</li><li>предсказывать, что произойдёт при изменении метки, по которой идёт отбор</li><li>называть роли apiserver и etcd и не путать их</li><li>объяснять, почему части кластера не разговаривают друг с другом напрямую</li><li>описывать, что даёт слежение (watch) по сравнению с опросом</li><li>объяснять, зачем контроллеру очередь, а не прямая реакция на событие</li><li>называть, почему обработка должна быть безопасна при повторе</li><li>предсказывать поведение при частых изменениях одного объекта</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 2</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Цикл сверки — это контур обратной связи, и все беды контуров у него в наличии. Два витка мы смотрели на то, как он помогает; этот — про случаи, когда он работает исправно и именно поэтому всё портит.</p>
+<h2 id="dva-hozyaina-u-odnogo-polya">Два хозяина у одного поля</h2>
+<p>Пусть за число экземпляров отвечают двое: контроллер автомасштабирования, считающий по нагрузке, и ваш файл, в котором записано <code>replicas: 3</code>. Каждый исправно приводит поле к своему значению.</p>
+<p>Масштабировщик ставит пять. Ваш инструмент выкладки видит расхождение с файлом и ставит три. Масштабировщик видит, что нагрузке мало трёх, и ставит пять. И так каждые тридцать секунд — месяцами, пока кто-нибудь не заметит, что поды непрерывно рождаются и умирают.</p>
+<figure class="disegno"><div role="img" aria-label="Пила: число экземпляров прыгает между тремя и пятью через равные промежутки. Сверху подписано, кто тянет вверх, снизу — кто вниз."><svg class="schema" viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#5c6068" stroke-width="1" stroke-dasharray="4 6">
+    <path d="M46,54 L586,52"/><path d="M46,126 L586,124"/>
+  </g>
+  <g fill="none" stroke="#1b3a6b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50,126 L96,125 L99,55 L168,53 L171,127 L242,126 L245,54 L314,52
+             L317,126 L388,125 L391,55 L460,53 L463,127 L534,126 L537,54 L584,53"/>
+  </g>
+  <g font-family="Caveat, cursive" font-size="18" fill="#636a75">
+    <text x="8" y="59">5</text>
+    <text x="8" y="131">3</text>
+    <text x="196" y="34">масштабировщик: нагрузке мало трёх</text>
+    <text x="212" y="160">выкладка: в файле записано три</text>
+  </g>
+</svg></div><figcaption>Ровный период и отсутствие ошибок — почерк дребезга. Ни один контур не сломан, и потому в логах пусто.</figcaption></figure>
+<cy-riconciliazione class="isola" data-blocco="reconcile" data-props="{&quot;kind&quot;:&quot;reconcile&quot;,&quot;title&quot;:&quot;Дребезг живьём&quot;,&quot;hint&quot;:&quot;Второй хозяин ставит пять каждые шесть секунд, выкладка возвращает записанное. Смотрите на пилу вверху и на ленту событий: поды непрерывно рождаются и гаснут, и ни одной ошибки при этом нигде нет. Подвиньте заявленное число к пяти — дребезг прекратится, потому что хозяева перестанут спорить.&quot;,&quot;desired&quot;:3,&quot;resync&quot;:0.5,&quot;startup&quot;:2,&quot;rival&quot;:{&quot;desired&quot;:5,&quot;every&quot;:6}}" style="min-height:1030px"></cy-riconciliazione>
+<p>Обратите внимание, что прекращает дребезг: не починка, а согласие. Пока два хозяина хотят разного, любой из них по отдельности исправен, а вместе они держат кластер в непрерывной работе. Поставьте в файле то же число, что у соперника, — и всё успокоится, не изменившись ни на строчку в остальном.</p>
+<dl class="definizione" id="drebezg"><dt><b class="termine">Дребезг</b></dt><dd>Незатухающие колебания состояния, вызванные тем, что на одно поле воздействуют два независимых контура с разными целями. Каждый в отдельности исправен.</dd></dl>
+<p>Лечится это только одним способом: <b class="termine">у каждого поля должен быть один хозяин</b>. Отдали число экземпляров масштабировщику — уберите его из файла совсем. Не «поставьте то же значение» — уберите: одинаковые значения сегодня разойдутся завтра.</p>
+<h2 id="cikl-kotoryj-ne-sojdetsya">Цикл, который не сойдётся</h2>
+<p>Заявлено пять экземпляров, а места на узлах хватает на три. Контроллер тиража исправно создаёт пятерых, планировщик исправно не может разместить двоих, и они висят в ожидании. Расхождение не закрывается никогда.</p>
+<p>И это правильное поведение. Система не врёт и не сдаётся: она держит заявку и показывает, что не может её выполнить. Добавится узел — оба пода поедут сами, без единого вмешательства. Но пока узла нет, <code>status</code> расходится со <code>spec</code>, и <b class="termine">читать надо именно это расхождение</b>, а не гадать по логам.</p>
+<aside class="nota">Отсюда практическое: <code>kubectl describe</code> полезнее <code>kubectl logs</code>, когда что-то не поднимается. Логов у неразмещённого пода нет вовсе — он не запускался; а причина отказа записана в его событиях словами.</aside>
+<h2 id="zapazdyvanie-i-usilenie">Запаздывание и усиление</h2>
+<p>Всякий контур с запаздыванием имеет предел усиления, за которым он перестаёт успокаивать и начинает раскачивать. Для цикла сверки усиление — это то, насколько большой шаг он делает за раз, а запаздывание — время между действием и тем, когда его последствия станут видны.</p>
+<figure class="tabella"><table><thead><tr><th scope="col">Что в контуре</th><th scope="col">Что это в Kubernetes</th></tr></thead><tbody><tr><th scope="row">задание</th><td><code>spec</code>: заявленное состояние</td></tr><tr><th scope="row">измерение</th><td><code>status</code> и кэш слежения — с отставанием</td></tr><tr><th scope="row">воздействие</th><td>создание и удаление объектов</td></tr><tr><th scope="row">запаздывание</th><td>запуск экземпляра, проверки готовности, отставание кэша</td></tr><tr><th scope="row">усиление</th><td>величина шага: на сколько меняем за один круг</td></tr></tbody></table><figcaption>Названия другие, устройство то же. Кто разбирался с регуляторами, узнает всё сразу; кто нет — узнает, встретив автомасштабирование.</figcaption></figure>
+<p>Поэтому у автомасштабирования есть окно стабилизации, у перезапусков — растущая задержка, а у выкатки — ограничение на число одновременно меняемых экземпляров. Всё это одно и то же лекарство: <b class="termine">уменьшить усиление там, где есть запаздывание</b>.</p>
+<section class="strumento incastro" data-tono="attenzione"><p class="titolo-strumento">Как это выглядит в жизни</p><p>Автомасштабирование по нагрузке процессора без окна стабилизации: нагрузка выросла — подняли десять подов. Пока они поднимались (полминуты), нагрузка на старых не упала, ведь новые ещё не принимают запросы. Подняли ещё десять.</p>
+<p>Через минуту двадцать лишних подов, нагрузка на каждом ничтожная, масштабировщик гасит восемнадцать. Нагрузка на оставшихся взлетает. Дальше по кругу. Это не ошибка настройки — это контур с запаздыванием и слишком большим усилением, и лечится он ровно тем же, чем всегда.</p></section>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;ric-3-owner&quot;,&quot;prompt&quot;:&quot;Поды непрерывно создаются и удаляются каждые тридцать секунд, ошибок нигде нет. Что проверить первым?&quot;,&quot;difficulty&quot;:3,&quot;explain&quot;:&quot;Ровный период и отсутствие ошибок — почерк дребезга. Каждый контур исправен, а вместе они тянут поле в разные стороны.&quot;,&quot;options&quot;:[&quot;Не кончается ли память на узлах&quot;,&quot;Не правят ли одно поле два разных контура&quot;,&quot;Не устарел ли образ контейнера&quot;,&quot;Не сбоит ли сеть между узлами&quot;],&quot;answer&quot;:1}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;ric-3-pending&quot;,&quot;prompt&quot;:&quot;Два пода из пяти уже час в ожидании. Что это означает?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Цикл работает: он держит заявку и сообщает, что выполнить её нечем. Появится место — поды поедут сами. Повторный apply не изменит ничего.&quot;,&quot;options&quot;:[&quot;Контроллер тиража сломался и его надо перезапустить&quot;,&quot;Заявка не может быть выполнена, и система честно это показывает&quot;,&quot;Поды удалены, но запись о них осталась&quot;,&quot;Нужно повторить apply, чтобы толкнуть создание&quot;],&quot;answer&quot;:1}}" style="min-height:513px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/kubernetes/pod/2/" class="rinvio">Дальше: что именно этот цикл создаёт и почему оно не чинится на месте</a></p></article> <nav class="avanti" aria-label="Дальше">  <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/kubernetes/pod/3/">Под · виток 3: Живой и готовый</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/kubernetes/riconciliazione/2/"> <b class="mano">← Назад</b> <span>Цикл сверки · виток 2: Очередь и повтор</span> </a> <a class="successivo" href="/Courses/kubernetes/pod/1/"> <b class="mano">Дальше →</b> <span>Под · виток 1: Не контейнер</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

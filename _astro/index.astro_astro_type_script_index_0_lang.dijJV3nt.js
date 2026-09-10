@@ -1,0 +1,1 @@
+const a=[...document.querySelectorAll("[data-vista]")].filter(e=>e.tagName==="BUTTON"),o=[...document.querySelectorAll("section.vista")];for(const e of a)e.addEventListener("click",()=>{const s=e.dataset.vista;for(const t of a)t.setAttribute("aria-pressed",String(t.dataset.vista===s));for(const t of o)t.hidden=t.dataset.vista!==s});

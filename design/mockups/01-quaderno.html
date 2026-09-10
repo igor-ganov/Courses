@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quaderno — тетрадь</title>
+<link rel="stylesheet" href="../fonts/caratteri.css">
+<style>
+/* 01 — QUADERNO
+   Тетрадь в клетку, в которой кто-то разбирался с предметом. Сетка не
+   декорация: по ней выровнено всё, и потому всё чуть-чуть не выровнено —
+   рука кладёт строку на клетку приблизительно. Рамок нет вообще: есть
+   поля, подчёркивания и обводки, сделанные пастой в один проход, которые
+   не смыкаются. Заголовки написаны от руки, набор — только там, где текст
+   должен читаться долго. */
+
+:root{--кегль:1;--пол:0px;
+  --клетка:#a8c0d6;
+  --поле:#d98b8b;
+  --паста:#1b3a6b;
+  --паста-тень:#16305a;
+  --грифель:#5c6068;
+  --текст:#20242c;
+  --тихий:#6f7682;
+  --красный:#a8402f;
+  --зелёный:#3f6b4a;
+  --шаг:26px;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{min-height:100%;position:relative}
+body{
+  margin:0;color:var(--текст);
+  font-family:'Literata',Georgia,serif;font-size:max(calc(16.5px*var(--кегль)),var(--пол));line-height:var(--шаг);
+  -webkit-font-smoothing:antialiased;
+}
+/* Освещённый лист живёт под всем; клетка печатается поверх него, как и
+   положено типографской сетке на настоящей бумаге. */
+canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
+.griglia{
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;
+  background:
+    repeating-linear-gradient(to right, color-mix(in srgb, var(--клетка) 78%, transparent) 0 1px, transparent 1px var(--шаг)),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--клетка) 78%, transparent) 0 1px, transparent 1px var(--шаг));
+  mask-image:radial-gradient(130% 100% at 50% 25%, #000 72%, transparent 100%);
+}
+/* Поле: две линии, потому что первую всегда проводят неудачно. */
+.margine{
+  position:absolute;top:0;height:100vh;left:calc(50% - 430px);width:2px;z-index:-1;pointer-events:none;
+  background:linear-gradient(var(--поле),var(--поле)) left 0 top 0/1.1px 100% no-repeat,
+             linear-gradient(var(--поле),var(--поле)) left 3px top 12px/1px calc(100% - 40px) no-repeat;
+  opacity:.5;
+}
+main{max-width:720px;margin:0 auto;padding:calc(var(--шаг)*2) 24px calc(var(--шаг)*4)}
+
+/* ── шапка ─────────────────────────────────────────────────── */
+.testata{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:calc(var(--шаг)*2)}
+.marchio{font-family:'Caveat',cursive;font-size:max(calc(27px*var(--кегль)),var(--пол));font-weight:700;color:var(--паста);letter-spacing:.01em}
+.marchio sup{font-family:'Literata',serif;font-size:max(calc(11px*var(--кегль)),var(--пол));font-weight:400;color:var(--тихий);letter-spacing:.08em;text-transform:uppercase}
+.grado{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:'Caveat',cursive;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--грифель)}
+/* Полоска опыта нарисована пастой: обводка не замыкается справа. */
+.barra{position:relative;width:110px;height:9px}
+.barra::before{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='110' height='9'><path d='M2,7.5 C24,6.6 66,6.9 105,7.2 M2,7.4 C3,5 2.6,3 3,1.4 M105,7.1 C106,5 105.6,3.2 106,1.8 M3,1.5 C30,.6 70,1 99,1.4' fill='none' stroke='%231b3a6b' stroke-width='1.1' stroke-linecap='round' opacity='.75'/></svg>") no-repeat;
+}
+.barra i{position:absolute;left:2px;top:2px;height:5px;width:62%;background:var(--паста);opacity:.22;border-radius:1px}
+
+/* ── титул ─────────────────────────────────────────────────── */
+.riga-corso{font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));color:var(--тихий);margin:0 0 2px}
+h1{
+  font-family:'Caveat',cursive;font-weight:700;
+  font-size:clamp(44px,8vw,68px);line-height:.94;letter-spacing:-.01em;
+  margin:0 0 6px;color:var(--паста);text-wrap:balance;
+}
+.sottotitolo{
+  font-family:'Caveat',cursive;font-size:max(calc(26px*var(--кегль)),var(--пол));color:var(--грифель);
+  margin:0 0 calc(var(--шаг)*1.5);
+}
+p{margin:0 0 var(--шаг);max-width:62ch}
+.occhiello{font-size:max(calc(18px*var(--кегль)),var(--пол));line-height:calc(var(--шаг)*1.15)}
+
+/* ── пометки на полях, карандашом ──────────────────────────── */
+.nota{
+  position:relative;font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--грифель);
+  line-height:1.25;margin:0 0 var(--шаг);padding-left:14px;
+}
+.nota::before{content:"";position:absolute;left:0;top:5px;bottom:4px;width:2px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='3' height='60'><path d='M1.6,2 C.8,16 2.2,34 1.4,57' fill='none' stroke='%235c6068' stroke-width='1.3' stroke-linecap='round'/></svg>") repeat-y;
+  opacity:.6}
+
+/* ── определение: подчёркнуто дважды ───────────────────────── */
+.termine{font-weight:600;color:var(--паста);position:relative;white-space:nowrap}
+.termine::after{
+  content:"";position:absolute;left:-2px;right:-4px;bottom:-4px;height:6px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='6' preserveAspectRatio='none'><path d='M2,2.4 C40,1.2 96,3 147,1.8' fill='none' stroke='%231b3a6b' stroke-width='1.4' stroke-linecap='round'/><path d='M6,5.1 C48,4 92,5.4 140,4.4' fill='none' stroke='%231b3a6b' stroke-width='1' stroke-linecap='round' opacity='.6'/></svg>") no-repeat center/100% 100%;
+}
+
+/* ── схема контура, нарисованная от руки ───────────────────── */
+figure{margin:0 0 var(--шаг)}
+.schema{width:100%;height:auto;display:block}
+figcaption{font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--тихий);margin-top:6px}
+
+/* ── прибор ────────────────────────────────────────────────── */
+/* Обводка прибора — один незамкнутый штрих: рука начала сверху слева,
+   обошла и остановилась, не дойдя до начала. */
+.strumento{
+  position:relative;padding:20px 22px 18px;margin:0 0 var(--шаг);
+  background:color-mix(in srgb, #fffdf6 62%, transparent);
+}
+.strumento::before{
+  content:"";position:absolute;inset:-6px -8px;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200' preserveAspectRatio='none'><path d='M14,10 C90,5 210,7 288,11 C295,12 296,20 296,34 C297,90 296,150 295,178 C294,188 286,190 274,190 C190,193 90,191 22,190 C11,189 7,182 7,170 C5,120 6,50 7,26 C7,16 11,12 22,11' fill='none' stroke='%231b3a6b' stroke-width='1.5' stroke-linecap='round' opacity='.55'/></svg>") no-repeat center/100% 100%;
+}
+.titolo-strumento{font-family:'Caveat',cursive;font-size:max(calc(23px*var(--кегль)),var(--пол));color:var(--паста);margin:0 0 2px}
+.suggerimento{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--тихий);margin:0 0 14px;line-height:1.2}
+
+/* график на клетчатой основе */
+.grafico{display:block;width:100%;height:auto;margin-bottom:12px}
+
+.quadranti{display:flex;flex-wrap:wrap;gap:6px 26px;margin-bottom:14px}
+.quadrante b{display:block;font-family:'Caveat',cursive;font-size:max(calc(17px*var(--кегль)),var(--пол));font-weight:500;color:var(--тихий);line-height:1.1}
+.quadrante span{font-family:'Literata',serif;font-size:max(calc(17px*var(--кегль)),var(--пол));font-variant-numeric:tabular-nums;color:var(--текст)}
+.quadrante.male span{color:var(--красный)}
+.quadrante.bene span{color:var(--зелёный)}
+
+.manopole{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.manopola{display:grid;gap:3px}
+.manopola label{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--грифель);display:flex;justify-content:space-between;gap:8px}
+.manopola label i{font-style:normal;font-family:'Literata',serif;font-size:max(calc(15px*var(--кегль)),var(--пол));color:var(--паста);font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:none;cursor:grab}
+input[type=range]::-webkit-slider-runnable-track{
+  height:3px;border-radius:2px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='3' preserveAspectRatio='none'><path d='M1,2 C60,1 140,2.2 199,1.2' fill='none' stroke='%235c6068' stroke-width='1.2' stroke-linecap='round'/></svg>") no-repeat center/100% 100%;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;margin-top:-7px;border:0;background:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><path d='M8,1.6 C11.6,1.4 14.4,4.4 14.4,8 C14.4,11.7 11.5,14.5 8,14.4 C4.5,14.3 1.7,11.5 1.7,8 C1.7,4.6 4.3,1.9 7.4,1.7' fill='%23fffdf6' stroke='%231b3a6b' stroke-width='1.5' stroke-linecap='round'/></svg>") no-repeat center;
+}
+
+/* ── чипы: обведены кружком, как в конспекте ───────────────── */
+.pastiglie{display:flex;flex-wrap:wrap;gap:8px 12px;margin:0 0 var(--шаг)}
+.pastiglia{
+  position:relative;border:0;background:none;cursor:pointer;padding:5px 12px;
+  font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--грифель);
+}
+.pastiglia[aria-pressed=true]{color:var(--паста)}
+.pastiglia[aria-pressed=true]::before{
+  content:"";position:absolute;inset:-3px -6px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' preserveAspectRatio='none'><path d='M22,3 C60,1 96,3 110,7 C118,10 118,24 108,28 C92,33 40,33 16,30 C6,28 3,16 9,9 C12,5.5 16,4 21,3.2' fill='none' stroke='%231b3a6b' stroke-width='1.4' stroke-linecap='round' opacity='.7'/></svg>") no-repeat center/100% 100%;
+}
+
+/* ── вопрос ────────────────────────────────────────────────── */
+.domanda{margin:0 0 10px;font-size:max(calc(17px*var(--кегль)),var(--пол))}
+.numero{font-family:'Caveat',cursive;font-size:max(calc(23px*var(--кегль)),var(--пол));color:var(--паста);margin-right:6px}
+.opzioni{display:grid;gap:2px;margin:0 0 var(--шаг);padding:0;list-style:none}
+.opzione{
+  position:relative;display:flex;gap:12px;align-items:baseline;width:100%;text-align:left;
+  border:0;background:none;cursor:pointer;padding:7px 8px 7px 6px;
+  font:inherit;font-size:max(calc(16.5px*var(--кегль)),var(--пол));color:var(--текст);
+}
+.opzione .lettera{font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));color:var(--тихий);min-width:18px}
+.opzione:hover .lettera{color:var(--паста)}
+/* Выбранный ответ обведён «галочкой» пастой, а не залит цветом. */
+.opzione[aria-checked=true]::before{
+  content:"";position:absolute;left:-4px;top:2px;width:26px;height:26px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26'><path d='M4,13 C7,17 9,20 11,22 C14,15 18,8 23,3' fill='none' stroke='%233f6b4a' stroke-width='2' stroke-linecap='round'/></svg>") no-repeat center;
+}
+.opzione[aria-checked=true] .lettera{opacity:0}
+.opzione[aria-checked=true]{color:var(--зелёный)}
+
+/* ── кнопки: вырезаны и обведены ───────────────────────────── */
+.azioni{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.bottone{
+  position:relative;border:0;background:none;cursor:pointer;
+  font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));color:var(--паста);
+  padding:9px 22px;
+  /* Свет один на всю страницу: сдвиг тени берётся из --luce-dx/dy. */
+  transform:translateY(calc(var(--premuto,0) * .7px));
+}
+.bottone::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='46' preserveAspectRatio='none'><path d='M18,4 C62,1.5 118,3 145,6 C153,7 155,14 154,23 C153,33 152,39 145,41 C112,44 48,43 17,41 C8,40.5 5,34 5.5,24 C6,14 8,7 16,5' fill='none' stroke='%231b3a6b' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat center/100% 100%;
+  filter:drop-shadow(calc(var(--luce-dx,0) * -6px) calc(var(--luce-dy,0) * 6px + 2px) 2px rgba(32,36,44,.18));
+}
+.bottone--pieno{color:#fffdf6}
+.bottone--pieno::after{
+  content:"";position:absolute;inset:2px 4px;z-index:-1;border-radius:14px 10px 16px 9px/9px 15px 8px 14px;
+  background:var(--паста);
+}
+.bottone:active{transform:translateY(1.2px)}
+.legenda{font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));color:var(--тихий)}
+
+/* ── ТЕЛЕФОН ──────────────────────────────────────────────────
+   У кегля появляется пол: подпись в 9 px становится 15 px, а
+   крупное растёт всего на десятую — иначе в ладони страница
+   превращается в серую полосу. Схемы не ужимаются до нечитаемого,
+   а уезжают вбок под палец; кнопке дают 44 px, чтобы попасть в
+   неё в поезде. */
+@media (max-width:640px){
+  :root{--кегль:1.12;--пол:15px}
+  main{padding-left:16px;padding-right:16px}
+  /* Схема не ужимается до нечитаемого, а уезжает вбок в своей рамке:
+     подписи в ней набраны под настольный размер, поэтому дешевле возить
+     её пальцем, чем пытаться прочесть восьмипиксельную ось. Рамкой
+     работает тот элемент, в котором схема лежит, — у графика это не
+     figure, поэтому берём его через :has(). */
+  figure, *:has(> svg.schema), *:has(> svg.grafico), pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+  svg.schema, svg.grafico{min-width:min(820px,200vw)}
+  button{min-height:44px}
+}
+</style>
+</head>
+<body>
+<canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas>
+<div class="griglia" data-scorre></div>
+<div class="margine" data-scorre></div>
+
+<main>
+  <header class="testata">
+    <div class="marchio">Кибернетика<sup> курс</sup></div>
+    <div class="grado">
+      <span class="barra"><i></i></span>
+      Регулятор
+    </div>
+  </header>
+
+  <p class="riga-corso">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и предел усиления</h1>
+  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
+
+  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="nota">душ с длинной трубой — тот же контур,<br>и ведёт он себя точно так же</p>
+
+  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
+  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
+  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение и начинает
+  его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 620 150" role="img" aria-label="Схема контура с запаздыванием">
+      <g fill="none" stroke="#1b3a6b" stroke-width="1.6" stroke-linecap="round">
+        <path d="M28,46 C64,43 96,44 122,46 C130,47 132,52 131,60 C130,70 129,74 122,76 C96,79 60,78 30,76 C22,75 20,69 21,60 C22,51 23,48 29,46.6"/>
+        <path d="M186,46 C222,43 254,44 280,46 C288,47 290,52 289,60 C288,70 287,74 280,76 C254,79 218,78 188,76 C180,75 178,69 179,60 C180,51 181,48 187,46.6"/>
+        <path d="M344,46 C380,43 412,44 438,46 C446,47 448,52 447,60 C446,70 445,74 438,76 C412,79 376,78 346,76 C338,75 336,69 337,60 C338,51 339,48 345,46.6"/>
+        <path d="M502,46 C538,43 570,44 596,46 C604,47 606,52 605,60 C604,70 603,74 596,76 C570,79 534,78 504,76 C496,75 494,69 495,60 C496,51 497,48 503,46.6"/>
+        <path d="M133,61 C148,60 162,61 176,61 M168,57 L177,61 L168,65"/>
+        <path d="M291,61 C306,60 320,61 334,61 M326,57 L335,61 L326,65"/>
+        <path d="M449,61 C464,60 478,61 492,61 M484,57 L493,61 L484,65"/>
+        <path d="M556,79 C555,96 554,108 552,118 C550,126 542,128 528,128 C400,131 200,130 96,128 C82,127.6 76,120 75,110 C74,98 74,88 75,79 M79,88 L75,79 L71,88"/>
+      </g>
+      <g font-family="Caveat, cursive" font-size="19" fill="#1b3a6b" text-anchor="middle">
+        <text x="76" y="66">цель</text><text x="234" y="66">регулятор</text>
+        <text x="392" y="66">объект</text><text x="550" y="66">датчик</text>
+      </g>
+      <g font-family="Caveat, cursive" font-size="18" fill="#a8402f">
+        <text x="300" y="146">здесь теряется время</text>
+        <path d="M296,138 C286,132 278,130 272,129" fill="none" stroke="#a8402f" stroke-width="1.3" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <figcaption>Обход круга занимает время — и в этом всё дело</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Ручка усиления и ручка запаздывания</p>
+    <p class="suggerimento">поставьте запаздывание на ноль и поднимите усиление до упора — спокойно;<br>верните усиление и медленно двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 560 170" role="img" aria-label="Переходный процесс">
+      <path d="M40,40 H548" stroke="#3f6b4a" stroke-width="1.2" stroke-dasharray="7 6" fill="none" opacity=".8"/>
+      <text x="548" y="32" font-family="Caveat, cursive" font-size="17" fill="#3f6b4a" text-anchor="end">уставка</text>
+      <path d="M40,150 C58,148 66,120 80,74 C92,34 104,14 118,26 C132,38 138,84 152,96 C168,110 180,72 196,58 C214,42 226,60 244,68 C264,77 278,54 300,52 C330,49 360,58 392,54 C430,49 470,52 548,51"
+            fill="none" stroke="#1b3a6b" stroke-width="2" stroke-linecap="round"/>
+      <path d="M40,150 C60,150 78,148 100,140 C126,131 150,120 190,112 C240,102 300,96 548,92"
+            fill="none" stroke="#5c6068" stroke-width="1.4" stroke-dasharray="4 5" opacity=".7"/>
+      <path d="M40,12 C39,60 40,120 40,158 M34,152 C50,151 120,152 548,151" fill="none" stroke="#5c6068" stroke-width="1.2" stroke-linecap="round"/>
+      <text x="546" y="110" font-family="Caveat, cursive" font-size="17" fill="#5c6068" text-anchor="end">усилие регулятора</text>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>статическая ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулирование</b><span>34%</span></span>
+      <span class="quadrante"><b>время установления</b><span>—</span></span>
+      <span class="quadrante bene"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">1.</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">а</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">в</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+<script src="../materia.js"></script>
+</body>
+</html>

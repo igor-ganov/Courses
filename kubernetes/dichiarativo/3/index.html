@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Единственная дверь — Заявка вместо команды — Кибернетика</title><meta name="description" content="Разница между «сделай» и «пусть будет». Самая переиспользуемая мысль курса: всё остальное — её частные случаи."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/kubernetes/">Kubernetes: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="kubernetes/dichiarativo:3" data-lavori="2"> <p class="sopra mano"> Заявка вместо команды · виток 3 из 3 </p> <h1>Единственная дверь</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/kubernetes/dichiarativo/1/" class="giro" data-livello="kubernetes/dichiarativo:1"> <b>1</b> <span>Сделай или пусть будет</span> </a><a href="/Courses/kubernetes/dichiarativo/2/" class="giro" data-livello="kubernetes/dichiarativo:2"> <b>2</b> <span>Устройство объекта</span> </a><a href="/Courses/kubernetes/dichiarativo/3/" class="giro corrente" data-livello="kubernetes/dichiarativo:3" aria-current="page"> <b>3</b> <span>Единственная дверь</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>называть роли apiserver и etcd и не путать их</li><li>объяснять, почему части кластера не разговаривают друг с другом напрямую</li><li>описывать, что даёт слежение (watch) по сравнению с опросом</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (6)</summary> <ul><li>отличать императивную команду от заявленного состояния</li><li>объяснять, почему заявку можно подать дважды и ничего не сломается</li><li>называть, что именно происходит при `kubectl apply`</li><li>разбирать любой объект на apiVersion, kind, metadata, spec и status</li><li>объяснять, зачем нужны метки и чем они отличаются от имени</li><li>предсказывать, что произойдёт при изменении метки, по которой идёт отбор</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 2</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Заявка «кладётся в хранилище кластера» — на первых двух витках этого хватало. Теперь важно, куда именно и через кого, потому что из этого устройства следует почти всё поведение системы, в том числе неприятное.</p>
+<h2 id="dve-veschi-kotorye-vse-putayut">Две вещи, которые все путают</h2>
+<p><b class="termine">etcd</b> — хранилище. Распределённое, последовательное, с согласием по Raft. Оно умеет хранить пары «ключ — значение» и сообщать об их изменениях. Про Kubernetes оно не знает ничего.</p>
+<p><b class="termine">apiserver</b> — дверь. Он проверяет права, проверяет форму объекта, подставляет умолчания, при необходимости отдаёт объект на доработку сторонним обработчикам и только потом пишет в etcd. Наружу он говорит объектами Kubernetes, внутрь — ключами.</p>
+<p>Дверь одна на всех. Ни планировщик, ни kubelet на узле, ни контроллер тиража не ходят в etcd и не ходят друг к другу: <b class="termine">все разговаривают только с apiserver</b>. Картинка получается звездой, а не сетью, и это решение стоит понять.</p>
+<figure class="disegno"><div role="img" aria-label="apiserver в середине, к нему сходятся планировщик, контроллеры и kubelet на узлах; за apiserver — etcd. Связей между частями по краям нет."><svg class="schema" viewBox="0 0 620 250" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#1b3a6b" stroke-width="1.6" stroke-linecap="round">
+    <path d="M246,102 C286,99 336,100 372,103 C378,104 379,112 379,124 C379,138 378,146 372,148 C336,151 286,150 246,147 C240,146 238,138 238,126 C238,113 240,105 245,103"/>
+    <path d="M470,104 C500,101 540,102 566,105 C572,106 573,113 573,124 C573,137 572,144 566,146 C540,149 500,148 470,145 C464,144 462,137 462,126 C462,114 464,106 469,104"/>
+    <path d="M52,26 C88,23 132,24 164,27 C170,28 171,35 171,45 C171,57 170,64 164,66 C132,69 88,68 52,65 C46,64 44,57 44,46 C44,35 46,28 51,26"/>
+    <path d="M52,102 C88,99 132,100 164,103 C170,104 171,111 171,121 C171,133 170,140 164,142 C132,145 88,144 52,141 C46,140 44,133 44,122 C44,111 46,104 51,102"/>
+    <path d="M52,178 C88,175 132,176 164,179 C170,180 171,187 171,197 C171,209 170,216 164,218 C132,221 88,220 52,217 C46,216 44,209 44,198 C44,187 46,180 51,178"/>
+    <path d="M172,46 C200,50 220,80 236,110"/><path d="M228,102 L237,113 L224,113"/>
+    <path d="M172,122 L235,124"/><path d="M228,119 L237,124 L228,129"/>
+    <path d="M172,198 C200,194 220,166 236,138"/><path d="M224,136 L237,136 L229,146"/>
+    <path d="M380,125 L458,125"/><path d="M451,120 L460,125 L451,130"/>
+  </g>
+  <g font-family="Caveat, cursive" font-size="20" fill="#1b3a6b">
+    <text x="252" y="132">apiserver</text>
+    <text x="486" y="132">etcd</text>
+    <text x="54" y="52">планировщик</text>
+    <text x="54" y="128">контроллеры</text>
+    <text x="54" y="204">kubelet на узлах</text>
+  </g>
+  <g font-family="Caveat, cursive" font-size="17" fill="#636a75">
+    <text x="188" y="242">между собой они не разговаривают вовсе</text>
+  </g>
+</svg></div><figcaption>Между планировщиком и kubelet нет линии — и это не упрощение схемы. Её нет и в жизни.</figcaption></figure>
+<figure class="formula-blocco"><div class="formula" translate="no">связей ~ N,   а не N · (N − 1) / 2</div><figcaption>При звезде каждая новая часть добавляет одну связь. При сети — по одной с каждой из уже существующих. Тридцать частей: тридцать связей против четырёхсот тридцати пяти.</figcaption></figure>
+<ul class="elenco"><li>Права проверяются в одном месте, а не в каждом: добавили часть — она уже под теми же правилами.</li><li>Отказавшая часть никого не тянет за собой: её собеседник — дверь, а дверь жива.</li><li>Часть можно перезапустить в любой момент: состояние не в ней, а в хранилище.</li><li>Новую часть можно добавить, не трогая старых: они о ней не узнают и не должны.</li></ul>
+<h2 id="slezhenie-vmesto-oprosa">Слежение вместо опроса</h2>
+<p>Контроллеру нужно знать об изменениях. Наивный способ — спрашивать apiserver каждую секунду: «покажи все поды». При тысяче подов и трёх десятках контроллеров это тридцать тысяч объектов в секунду через дверь, и дверь становится узким местом раньше, чем что-либо ещё.</p>
+<p>Поэтому есть <b class="termine">слежение</b>: клиент один раз забирает список и номер версии, а дальше держит открытым поток, в который apiserver шлёт только изменения начиная с этой версии. Клиент собирает из этого свою копию — и читает уже её, не трогая дверь вовсе.</p>
+<cy-coda class="isola" data-blocco="traffic" data-props="{&quot;kind&quot;:&quot;traffic&quot;,&quot;title&quot;:&quot;Одна дверь: опрос против слежения&quot;,&quot;hint&quot;:&quot;Тысяча объектов, тридцать наблюдателей. Переключите способ и посмотрите на поток через дверь — и на число «на изменение», ради которого всё и считается.&quot;,&quot;modo&quot;:&quot;porta&quot;}" style="min-height:760px"></cy-coda>
+<dl class="definizione" id="kesh-slezheniya"><dt><b class="termine">Кэш слежения</b></dt><dd>Локальная копия части состояния кластера, которую контроллер держит у себя и обновляет из потока изменений. Чтения контроллера идут в неё, а не в apiserver.</dd></dl>
+<section class="strumento incastro" data-tono="attenzione"><p class="titolo-strumento">Чем за это платят</p><p>Копия отстаёт. Всегда — на доли секунды, иногда на секунды. Поэтому контроллер принимает решения по слегка устаревшей картине, и с этим ничего нельзя сделать: в распределённой системе свежей картины не бывает ни у кого.</p>
+<p>Отсюда правило, по которому написаны все контроллеры Kubernetes: <b class="termine">решение должно быть безвредным, если картина устарела</b>. Не «создать под, потому что пришло событие», а «привести число к заявленному, каким бы оно сейчас ни было». Об этом — следующая тема.</p></section>
+<p>Есть и вторая плата: поток может оборваться, а версия, с которой клиент хочет продолжить, — уже устареть настолько, что apiserver её не помнит. Тогда клиент начинает сначала: полный список, новая версия, новый поток. Это штатное событие, и контроллер обязан переживать его без последствий.</p>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;decl-3-etcd&quot;,&quot;prompt&quot;:&quot;Планировщику нужно узнать список узлов. К кому он обратится?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;В etcd ходит только apiserver. Все остальные — через дверь, и это то самое решение, из-за которого части кластера можно менять и перезапускать по одной.&quot;,&quot;options&quot;:[&quot;Напрямую в etcd — там же лежат данные&quot;,&quot;К kubelet на каждом узле&quot;,&quot;К apiserver, и только к нему&quot;,&quot;К контроллеру узлов&quot;],&quot;answer&quot;:2}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;decl-3-watch&quot;,&quot;prompt&quot;:&quot;Зачем контроллеру держать свою копию состояния вместо запросов к apiserver?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Копия всегда чуть устаревшая — свежее apiserver она быть не может. Смысл в другом: чтения бесплатны, а дверь не превращается в узкое место.&quot;,&quot;options&quot;:[&quot;Чтобы работать при недоступном apiserver&quot;,&quot;Чтобы не создавать нагрузку опросом и читать мгновенно&quot;,&quot;Чтобы видеть более свежие данные, чем в apiserver&quot;,&quot;Чтобы иметь право писать в etcd напрямую&quot;],&quot;answer&quot;:1}}" style="min-height:541px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/kubernetes/riconciliazione/1/" class="rinvio">Дальше: кто и как закрывает расхождение</a></p></article> <nav class="avanti" aria-label="Дальше">  <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/kubernetes/riconciliazione/2/">Цикл сверки · виток 2: Очередь и повтор</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/kubernetes/dichiarativo/2/"> <b class="mano">← Назад</b> <span>Заявка вместо команды · виток 2: Устройство объекта</span> </a> <a class="successivo" href="/Courses/kubernetes/riconciliazione/1/"> <b class="mano">Дальше →</b> <span>Цикл сверки · виток 1: Посмотреть и сделать шаг</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

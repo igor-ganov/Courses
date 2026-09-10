@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cianotipia — синька</title>
+<link rel="stylesheet" href="../fonts/caratteri.css">
+<style>
+/* 02 — CIANOTIPIA
+   Светокопия. Лист был засвечен целиком, поэтому фон — не «тёмная тема»,
+   а берлинская лазурь с неровным прокрасом; всё, что нарисовано, —
+   незасвеченное, то есть белое. Отсюда правило: никаких заливок светлым,
+   только линии. Подписи набраны узким гротеском, как на кальке, а от руки
+   идут только пометки конструктора — их дописывали после печати, поэтому
+   они чёрные и единственные не-белые на листе.
+   Тёмный сорт бумаги: читать в поезде вечером. */
+
+:root{--кегль:1;--пол:0px;
+  --лазурь:#1b3a52;
+  --лазурь-тень:#122938;
+  --линия:#dbe9f2;
+  --линия-тихая:#8fb0c6;
+  --бумага:#eef5f9;
+  --карандаш:#0d1a24;
+  --правка:#e8b04a;
+  --сетка:#2d5871;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{min-height:100%;position:relative}
+body{
+  margin:0;color:var(--линия);
+  font-family:'Oswald',"Helvetica Neue",sans-serif;font-weight:400;
+  font-size:max(calc(15px*var(--кегль)),var(--пол));line-height:1.62;letter-spacing:.012em;
+  -webkit-font-smoothing:antialiased;
+}
+canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
+/* Миллиметровка проявляется под чертежом, а не поверх него. */
+.reticolo{
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;opacity:.5;
+  background:
+    repeating-linear-gradient(to right, color-mix(in srgb,var(--сетка) 70%, transparent) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(to bottom, color-mix(in srgb,var(--сетка) 70%, transparent) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(to right, color-mix(in srgb,var(--сетка) 95%, transparent) 0 1px, transparent 1px 50px),
+    repeating-linear-gradient(to bottom, color-mix(in srgb,var(--сетка) 95%, transparent) 0 1px, transparent 1px 50px);
+  mask-image:linear-gradient(#000 70%, transparent 100%);
+}
+main{max-width:800px;margin:0 auto;padding:34px 26px 90px}
+
+/* ── рамка чертежа: рейсфедер, обводка в один проход ───────── */
+.foglio{
+  position:relative;padding:26px 28px 30px;
+}
+.foglio::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' preserveAspectRatio='none'><path d='M8,6 C120,3 300,4 392,7 C396,7.4 397,12 397,20 C398,110 397,240 396,290 C395.6,295 391,296 384,296 C260,299 120,298 14,296 C9,295.6 7,291 7,284 C5,190 6,60 7,18 C7,10 9,7 15,6.4' fill='none' stroke='%23dbe9f2' stroke-width='1.1' stroke-linecap='round' opacity='.55'/></svg>") no-repeat center/100% 100%;
+}
+
+/* ── угловой штамп ─────────────────────────────────────────── */
+.cartiglio{
+  display:flex;gap:0;flex-wrap:wrap;margin-bottom:30px;
+  border:1px solid color-mix(in srgb,var(--линия) 45%, transparent);
+}
+.cella{padding:7px 14px;border-right:1px solid color-mix(in srgb,var(--линия) 30%, transparent)}
+.cella:last-child{border-right:0;margin-left:auto}
+.cella b{display:block;font-size:max(calc(9.5px*var(--кегль)),var(--пол));letter-spacing:.22em;text-transform:uppercase;color:var(--линия-тихая);font-weight:400}
+.cella span{font-size:max(calc(15px*var(--кегль)),var(--пол));color:var(--линия)}
+.cella .grande{font-size:max(calc(19px*var(--кегль)),var(--пол));letter-spacing:.04em}
+
+h1{
+  margin:0 0 4px;font-family:'Oswald',sans-serif;font-weight:600;
+  font-size:clamp(34px,5.6vw,54px);line-height:1.02;letter-spacing:.005em;
+  text-transform:uppercase;color:#fff;text-wrap:balance;
+}
+.sotto{margin:0 0 26px;font-size:max(calc(16px*var(--кегль)),var(--пол));color:var(--линия-тихая);letter-spacing:.06em;text-transform:uppercase}
+p{margin:0 0 17px;max-width:66ch;color:#e4eef5}
+.occhiello{font-size:max(calc(16.5px*var(--кегль)),var(--пол))}
+
+/* Пометка конструктора: дописана после печати, поэтому чёрная и от руки. */
+.postilla{
+  font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));line-height:1.2;color:var(--карандаш);
+  background:color-mix(in srgb,var(--бумага) 88%, transparent);
+  display:inline-block;padding:4px 12px 6px;margin:0 0 20px;
+  transform:rotate(-.7deg);
+}
+.postilla::before{content:"→ ";color:var(--правка)}
+
+/* ── схема с размерными линиями ────────────────────────────── */
+figure{margin:0 0 24px}
+.schema{display:block;width:100%;height:auto}
+figcaption{
+  margin-top:8px;font-size:max(calc(11px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:var(--линия-тихая);
+}
+
+/* ── прибор ────────────────────────────────────────────────── */
+.strumento{position:relative;margin:0 0 26px;padding:18px 20px 16px}
+.strumento::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='240' preserveAspectRatio='none'><path d='M6,5 C120,2 300,3 393,6 C397,6.4 398,10 398,17 C399,90 398,200 397,232 C396.6,237 392,238 386,238 C260,241 120,240 12,238 C7,237.6 5,233 5,227 C3,160 4,40 5,14 C5,8 7,6 12,5.4' fill='none' stroke='%23dbe9f2' stroke-width='1.2' stroke-linecap='round' opacity='.7'/></svg>") no-repeat center/100% 100%;
+}
+.titolo-strumento{margin:0 0 2px;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:#fff}
+.suggerimento{margin:0 0 14px;font-size:max(calc(13.5px*var(--кегль)),var(--пол));color:var(--линия-тихая);letter-spacing:.03em}
+.grafico{display:block;width:100%;height:auto;margin-bottom:12px}
+
+.quadranti{display:flex;flex-wrap:wrap;gap:2px 0;margin-bottom:16px;
+  border-top:1px solid color-mix(in srgb,var(--линия) 28%, transparent);
+  border-bottom:1px solid color-mix(in srgb,var(--линия) 28%, transparent)}
+.quadrante{flex:1 1 130px;padding:8px 12px 7px;border-right:1px solid color-mix(in srgb,var(--линия) 18%, transparent)}
+.quadrante:last-child{border-right:0}
+.quadrante b{display:block;font-size:max(calc(9px*var(--кегль)),var(--пол));letter-spacing:.18em;text-transform:uppercase;color:var(--линия-тихая);font-weight:400}
+.quadrante span{font-family:'PT Mono',monospace;font-size:max(calc(17px*var(--кегль)),var(--пол));color:#fff}
+.quadrante.male span{color:var(--правка)}
+
+.manopole{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.manopola label{display:flex;justify-content:space-between;font-size:max(calc(10.5px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая)}
+.manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:max(calc(13px*var(--кегль)),var(--пол));letter-spacing:0;color:#fff}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:none;cursor:crosshair;margin-top:2px}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--линия-тихая)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:1px;height:15px;margin-top:-7px;background:#fff;
+  box-shadow:-3px 0 0 -1px #fff, 3px 0 0 -1px #fff;
+}
+
+/* ── чипы: скобки, а не таблетки ───────────────────────────── */
+.pastiglie{display:flex;flex-wrap:wrap;gap:0 22px;margin:0 0 24px}
+.pastiglia{
+  border:0;background:none;cursor:pointer;padding:4px 0;
+  font:inherit;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая);
+}
+.pastiglia[aria-pressed=true]{color:#fff}
+.pastiglia[aria-pressed=true]::before{content:"[ "}
+.pastiglia[aria-pressed=true]::after{content:" ]"}
+
+/* ── вопрос ────────────────────────────────────────────────── */
+.domanda{margin:0 0 12px;font-size:max(calc(16px*var(--кегль)),var(--пол));color:#eaf3f8}
+.numero{font-family:'PT Mono',monospace;color:var(--линия-тихая);margin-right:8px}
+.opzioni{display:grid;gap:1px;margin:0 0 26px;padding:0;list-style:none}
+.opzione{
+  display:flex;gap:14px;align-items:baseline;width:100%;text-align:left;
+  border:0;background:none;cursor:pointer;padding:9px 10px 9px 0;font:inherit;font-size:max(calc(15px*var(--кегль)),var(--пол));color:#dce8f0;
+}
+.opzione .lettera{font-family:'PT Mono',monospace;font-size:max(calc(13px*var(--кегль)),var(--пол));color:var(--линия-тихая)}
+.opzione:hover{color:#fff}
+.opzione[aria-checked=true]{color:#fff}
+/* Отмечено как на чертеже: выноска с крестиком. */
+.opzione[aria-checked=true] .lettera{color:var(--правка)}
+.opzione[aria-checked=true] .lettera::after{content:" ×"}
+
+/* ── кнопки: рамка рейсфедером, незамкнутая ────────────────── */
+.azioni{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.bottone{
+  position:relative;border:0;background:none;cursor:pointer;
+  font:inherit;font-size:max(calc(12px*var(--кегль)),var(--пол));letter-spacing:.2em;text-transform:uppercase;color:#fff;
+  padding:11px 24px;transform:translateY(calc(var(--premuto,0) * .6px));
+}
+.bottone::before{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='44' preserveAspectRatio='none'><path d='M4,3 C50,1 130,2 165,4 C168,4.2 169,7 169,11 C169,24 168,36 167,40 C166.6,42 163,42.6 158,42.6 C110,44 40,43 7,41.6 C4,41.4 3,38 3,34 C2,22 3,10 3.4,6 C3.6,4 5,3.4 8,3.2' fill='none' stroke='%23dbe9f2' stroke-width='1.2' stroke-linecap='round'/></svg>") no-repeat center/100% 100%;
+}
+.bottone--pieno{color:var(--лазурь)}
+.bottone--pieno::after{content:"";position:absolute;inset:3px 4px;z-index:-1;background:var(--линия)}
+.bottone:active{transform:translateY(1px)}
+.legenda{font-size:max(calc(11px*var(--кегль)),var(--пол));letter-spacing:.16em;text-transform:uppercase;color:var(--линия-тихая)}
+
+/* ── ТЕЛЕФОН ──────────────────────────────────────────────────
+   У кегля появляется пол: подпись в 9 px становится 15 px, а
+   крупное растёт всего на десятую — иначе в ладони страница
+   превращается в серую полосу. Схемы не ужимаются до нечитаемого,
+   а уезжают вбок под палец; кнопке дают 44 px, чтобы попасть в
+   неё в поезде. */
+@media (max-width:640px){
+  :root{--кегль:1.12;--пол:15px}
+  main{padding-left:16px;padding-right:16px}
+  /* Схема не ужимается до нечитаемого, а уезжает вбок в своей рамке:
+     подписи в ней набраны под настольный размер, поэтому дешевле возить
+     её пальцем, чем пытаться прочесть восьмипиксельную ось. Рамкой
+     работает тот элемент, в котором схема лежит, — у графика это не
+     figure, поэтому берём его через :has(). */
+  figure, *:has(> svg.schema), *:has(> svg.grafico), pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+  svg.schema, svg.grafico{min-width:min(820px,200vw)}
+  button{min-height:44px}
+}
+</style>
+</head>
+<body>
+<canvas data-materia data-carta="1b3a52" data-ombra="0a1721" data-luce="cfe6f2" data-rilievo="13" data-fibra="0.06" data-calore="0.10"></canvas>
+<div class="reticolo" data-scorre></div>
+
+<main>
+<div class="foglio">
+  <div class="cartiglio">
+    <span class="cella"><b>курс</b><span class="grande">Кибернетика</span></span>
+    <span class="cella"><b>лист</b><span>07 / 17</span></span>
+    <span class="cella"><b>виток</b><span>второй</span></span>
+    <span class="cella"><b>разряд</b><span>Регулятор</span></span>
+  </div>
+
+  <h1>Запаздывание и предел усиления</h1>
+  <p class="sotto">Обратная связь · уровень 2</p>
+
+  <p class="occhiello">На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так
+  не работают. Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты,
+  данные по инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="postilla">душ с длинной трубой — тот же контур</p>
+
+  <p>Регулятор всегда исправляет прошлое. Коррекция, рассчитанная для состояния «полминуты назад»,
+  приходит, когда система уже в другом состоянии, и оказывается воздействием не в ту сторону.
+  При достаточном усилении она перестаёт гасить отклонение и начинает его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 700 170" role="img" aria-label="Схема контура">
+      <g fill="none" stroke="#dbe9f2" stroke-width="1.2" stroke-linecap="round">
+        <path d="M24,40 L154,40 L154,74 L24,74 L24,41"/>
+        <path d="M198,40 L328,40 L328,74 L198,74 L198,41"/>
+        <path d="M372,40 L502,40 L502,74 L372,74 L372,41"/>
+        <path d="M546,40 L676,40 L676,74 L546,74 L546,41"/>
+        <path d="M155,57 L196,57 M188,53 L197,57 L188,61"/>
+        <path d="M329,57 L370,57 M362,53 L371,57 L362,61"/>
+        <path d="M503,57 L544,57 M536,53 L545,57 L536,61"/>
+        <path d="M611,75 L611,122 L89,122 L89,76 M85,84 L89,76 L93,84"/>
+      </g>
+      <g font-family="Oswald, sans-serif" font-size="13" fill="#eaf3f8" text-anchor="middle" letter-spacing="1.5">
+        <text x="89" y="62">ЦЕЛЬ</text><text x="263" y="62">РЕГУЛЯТОР</text>
+        <text x="437" y="62">ОБЪЕКТ</text><text x="611" y="62">ДАТЧИК</text>
+      </g>
+      <!-- размерная линия на участке запаздывания -->
+      <g stroke="#e8b04a" stroke-width="1" fill="none">
+        <path d="M300,134 L300,150 M420,134 L420,150 M300,142 L420,142 M308,138 L300,142 L308,146 M412,138 L420,142 L412,146"/>
+      </g>
+      <text x="360" y="164" font-family="Oswald, sans-serif" font-size="11" fill="#e8b04a" text-anchor="middle" letter-spacing="1.6">ЗАПАЗДЫВАНИЕ 0,60 с</text>
+    </svg>
+    <figcaption>рис. 4 — контур с транспортным запаздыванием в цепи измерения</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Стенд · усиление и запаздывание</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно. Верните усиление и двигайте запаздывание.</p>
+
+    <svg class="grafico" viewBox="0 0 640 168" role="img" aria-label="Переходный процесс">
+      <g stroke="#2d5871" stroke-width="1" fill="none" opacity=".8">
+        <path d="M46,20 H628 M46,52 H628 M46,84 H628 M46,116 H628"/>
+        <path d="M150,14 V150 M280,14 V150 M410,14 V150 M540,14 V150"/>
+      </g>
+      <path d="M46,44 H628" stroke="#e8b04a" stroke-width="1" stroke-dasharray="8 6" fill="none"/>
+      <text x="626" y="36" font-family="Oswald, sans-serif" font-size="11" fill="#e8b04a" text-anchor="end" letter-spacing="1.4">УСТАВКА</text>
+      <path d="M46,148 C66,146 74,116 90,74 C104,34 118,14 134,26 C150,38 156,86 172,98 C190,112 204,72 222,58 C242,42 256,62 276,70 C298,79 314,54 340,52 C374,49 410,58 448,54 C492,49 540,52 628,50"
+            fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M46,148 C68,148 88,146 112,138 C142,129 170,118 214,110 C270,100 338,94 628,90"
+            fill="none" stroke="#8fb0c6" stroke-width="1.1" stroke-dasharray="5 5"/>
+      <path d="M46,10 V152 M42,150 H630" stroke="#dbe9f2" stroke-width="1.1" fill="none"/>
+      <g font-family="PT Mono, monospace" font-size="10" fill="#8fb0c6">
+        <text x="40" y="48" text-anchor="end">1,0</text><text x="40" y="152" text-anchor="end">0</text>
+        <text x="150" y="164" text-anchor="middle">5</text><text x="280" y="164" text-anchor="middle">10</text>
+        <text x="410" y="164" text-anchor="middle">15</text><text x="540" y="164" text-anchor="middle">20</text>
+      </g>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>стат. ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулир.</b><span>34 %</span></span>
+      <span class="quadrante"><b>установление</b><span>—</span></span>
+      <span class="quadrante"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6.0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0.50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0.60 c</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">01</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">А</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">Б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">В</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</div>
+</main>
+
+<script src="../materia.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Отсеять и оценить — Планировщик — Кибернетика</title><meta name="description" content="Как под получает узел: отсев по пригодности, оценка по предпочтительности, и почему заявленные ресурсы — это валюта, а не пожелание."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/kubernetes/">Kubernetes: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="kubernetes/scheduler:1" data-lavori="2"> <p class="sopra mano"> Планировщик · виток 1 из 2 </p> <h1>Отсеять и оценить</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/kubernetes/scheduler/1/" class="giro corrente" data-livello="kubernetes/scheduler:1" aria-current="page"> <b>1</b> <span>Отсеять и оценить</span> </a><a href="/Courses/kubernetes/scheduler/2/" class="giro" data-livello="kubernetes/scheduler:2"> <b>2</b> <span>Как влиять на выбор</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>описывать размещение как отсев с последующей оценкой</li><li>объяснять, почему планировщик считает заявленное, а не потребляемое</li><li>предсказывать, что будет с подом, для которого не нашлось узла</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (12)</summary> <ul><li>отличать императивную команду от заявленного состояния</li><li>объяснять, почему заявку можно подать дважды и ничего не сломается</li><li>называть, что именно происходит при `kubectl apply`</li><li>объяснять, что под — это группа контейнеров с общей сетью и жизнью</li><li>называть случаи, когда контейнеров в поде больше одного</li><li>понимать, почему единицей размещения выбран под, а не контейнер</li><li>описывать цикл сверки тремя действиями и называть его вход и выход</li><li>объяснять, почему упавший экземпляр восстанавливается без чьей-либо команды</li><li>отличать существующий экземпляр от готового</li><li>называть фазы жизни пода и то, какая из них тупиковая</li><li>объяснять, почему под не переезжает и не правится на месте</li><li>отличать перезапуск контейнера от замены пода</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 2</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Созданный под сначала не принадлежит никакому узлу: в его описании поле узла пусто. Заполнить его — работа отдельной программы, и работает она в два приёма.</p>
+<ol class="elenco"><li><b class="termine">Отсев.</b> Из всех узлов оставить те, где под <em>может</em> работать. Ответ — да или нет, без оттенков.</li><li><b class="termine">Оценка.</b> Оставшиеся узлы получают баллы, и под едет на лучший. Здесь всё в оттенках.</li></ol>
+<p>Разделение не формальность. Отсев отвечает за правильность: узел без нужного диска или без места не подойдёт никогда и ни при каких предпочтениях. Оценка отвечает за качество: подходящих узлов обычно много, и надо выбрать разумно.</p>
+<h2 id="chem-platyat-za-mesto">Чем платят за место</h2>
+<p>Главное правило размещения: планировщик смотрит на <b class="termine">заявленное</b> потребление (<code>requests</code>), а не на настоящее. Узел с восемью ядрами, на котором поды заявили семь с половиной, считается почти полным — даже если на деле все они спят и грузят процессор на два процента.</p>
+<dl class="definizione" id="requests"><dt><b class="termine">requests</b></dt><dd>Заявка на ресурсы: сколько процессора и памяти под просит гарантированно. Это валюта размещения — узел «продаёт» свою ёмкость по заявкам, а не по факту.</dd></dl>
+<p>Поначалу это кажется расточительным. На деле иначе нельзя: размещая по факту, планировщик поставил бы на спящий узел десять подов, а утром все десять проснулись бы одновременно. Заявка — это обещание кластера поду, и обещание надо чем-то обеспечить.</p>
+<aside class="nota">Отсюда же следует, что под без заявленных ресурсов почти невесом для планировщика — и его можно поставить куда угодно и сколько угодно. Кончается это тем, что узел, по учёту полупустой, на деле задыхается.</aside>
+<p>Второй приём — оценка — работает по нескольким правилам сразу, и одного из них всегда мало. Правило «где свободнее» размазывает нагрузку ровным слоем, но, взятое в одиночку, набивает узел процессорными подами до последнего ядра, оставляя память нетронутой и никому не нужной: ядер больше нет, а значит, и памятью воспользоваться некому.</p>
+<p>Поэтому рядом работает правило «где ровнее»: узел, у которого ядра и память съедены примерно одинаково, ценнее перекошенного. В настоящем планировщике таких правил больше десятка, у каждого свой вес, и набор можно менять — но два названных дают почти всё поведение, которое вы увидите.</p>
+<h2 id="poprobujte-razmestit">Попробуйте разместить</h2>
+<p>Сначала — заявкой. Три экземпляра просят больше, чем на узле есть; уменьшите заявку так, чтобы поместились все три. И не увлекайтесь: под без заявки почти невесом для планировщика, а узел от этого не становится больше.</p>
+<cy-officina class="isola" data-blocco="workshop" data-props="{&quot;kind&quot;:&quot;workshop&quot;,&quot;title&quot;:&quot;Мастерская: три пода, которые не влезли&quot;,&quot;hint&quot;:&quot;На узле 2 ядра и 4 ГБ. Правьте resources.requests и смотрите на свободное место в узле и на тех, кто остался в ожидании.&quot;,&quot;levels&quot;:[&quot;risorse&quot;]}" style="min-height:1420px"></cy-officina>
+<h2 id="kak-vybiraetsya-uzel">Как выбирается узел</h2>
+<cy-pianificatore class="isola" data-blocco="schedule" data-props="{&quot;kind&quot;:&quot;schedule&quot;,&quot;title&quot;:&quot;Куда поедет под&quot;,&quot;hint&quot;:&quot;Отправляйте поды по одному, в любом порядке. Приглушённые узлы отсеяны на первом приёме — рядом написано, чем именно не подошли; у прошедших отсев стоят баллы. Когда не подойдёт ни один, под останется в ожидании.&quot;,&quot;goal&quot;:{&quot;placed&quot;:5}}" style="min-height:800px"></cy-pianificatore>
+<p>Заметьте, что происходит к концу: свободного места в сумме ещё много, а поставить крупный под уже некуда — оно раскидано по узлам мелкими кусками. Это называется осколочностью и лечится не добавлением места, а размещением с самого начала.</p>
+<dl class="definizione" id="ozhidanie-pending"><dt><b class="termine">Ожидание (Pending)</b></dt><dd>Состояние пода, для которого не нашлось подходящего узла. Не ошибка: заявка остаётся в силе, и планировщик будет пробовать снова при каждом изменении в кластере. Появится место — под поедет сам.</dd></dl>
+<section class="strumento incastro" data-tono="attenzione"><p class="titolo-strumento">Планировщик не переставляет уже размещённых</p><p>Ему не приходит в голову подвинуть три мелких пода, чтобы освободить место под один крупный, — хотя это решило бы задачу. Размещение однократно, а подвинуть под можно только убив его.</p>
+<p>Убивать работающие поды ради красоты раскладки система не станет: чужая работа дороже. Существуют отдельные средства, которые именно этим и занимаются, но их ставят осознанно и отдельно — по умолчанию раскладка остаётся такой, какой сложилась.</p></section>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;sch-1-requests&quot;,&quot;prompt&quot;:&quot;На узле восемь ядер, поды заявили семь, а по факту используют одно. Сколько ядер видит планировщик свободными?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Считаются заявки, а не потребление. Свободным считается одно ядро — ровно то, что не обещано никому.&quot;,&quot;options&quot;:[&quot;Семь&quot;,&quot;Одно&quot;,&quot;Восемь&quot;,&quot;Ни одного: узел считается занятым&quot;],&quot;answer&quot;:0}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;goal&quot;,&quot;id&quot;:&quot;sch-1-place&quot;,&quot;prompt&quot;:&quot;Разместите все пять подов, не оставив ни одного в ожидании. Прибор выше засчитает сам.&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Порядок отправки решает: крупные поды надо ставить, пока места лежат крупными кусками. Планировщик так не умеет — он видит по одному поду за раз.&quot;,&quot;widget&quot;:&quot;schedule&quot;,&quot;goal&quot;:&quot;placed&quot;}}" style="min-height:500px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/kubernetes/scheduler/2/" class="rinvio">Следующий виток: как влиять на выбор</a></p></article> <nav class="avanti" aria-label="Дальше"> <a class="prossimo-giro" href="/Courses/kubernetes/scheduler/2/"> <b class="mano">Глубже по той же теме</b> <span>Виток 2: Как влиять на выбор</span> </a> <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/kubernetes/scheduler/2/">Планировщик · виток 2: Как влиять на выбор</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/kubernetes/pod/3/"> <b class="mano">← Назад</b> <span>Под · виток 3: Живой и готовый</span> </a> <a class="successivo" href="/Courses/kubernetes/scheduler/2/"> <b class="mano">Дальше →</b> <span>Планировщик · виток 2: Как влиять на выбор</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

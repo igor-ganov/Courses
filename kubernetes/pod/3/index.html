@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Живой и готовый — Под — Кибернетика</title><meta name="description" content="Единица, которую Kubernetes создаёт, размещает и заменяет. Не контейнер и не машина — и обе ошибки дорого стоят."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/kubernetes/">Kubernetes: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="kubernetes/pod:3" data-lavori="3"> <p class="sopra mano"> Под · виток 3 из 3 </p> <h1>Живой и готовый</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/kubernetes/pod/1/" class="giro" data-livello="kubernetes/pod:1"> <b>1</b> <span>Не контейнер</span> </a><a href="/Courses/kubernetes/pod/2/" class="giro" data-livello="kubernetes/pod:2"> <b>2</b> <span>Под не чинят</span> </a><a href="/Courses/kubernetes/pod/3/" class="giro corrente" data-livello="kubernetes/pod:3" aria-current="page"> <b>3</b> <span>Живой и готовый</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>различать пробу живости, готовности и запуска по последствиям</li><li>объяснять, чем опасна проба живости с коротким сроком</li><li>предсказывать поведение службы при неготовом поде</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (12)</summary> <ul><li>отличать императивную команду от заявленного состояния</li><li>объяснять, почему заявку можно подать дважды и ничего не сломается</li><li>называть, что именно происходит при `kubectl apply`</li><li>объяснять, что под — это группа контейнеров с общей сетью и жизнью</li><li>называть случаи, когда контейнеров в поде больше одного</li><li>понимать, почему единицей размещения выбран под, а не контейнер</li><li>описывать цикл сверки тремя действиями и называть его вход и выход</li><li>объяснять, почему упавший экземпляр восстанавливается без чьей-либо команды</li><li>отличать существующий экземпляр от готового</li><li>называть фазы жизни пода и то, какая из них тупиковая</li><li>объяснять, почему под не переезжает и не правится на месте</li><li>отличать перезапуск контейнера от замены пода</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 3</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Кластер должен как-то узнавать, что с программой внутри контейнера. Запущенный процесс — слабое свидетельство: он может висеть в мёртвой блокировке, ждать базу, которой нет, или прогревать кэш минуту. Процесс жив, толку ноль.</p>
+<p>Поэтому у контейнера бывают пробы — вопросы, которые kubelet задаёт программе по расписанию. Проб три вида, и путать их — самая частая причина того, что здоровая служба падает целиком.</p>
+<figure class="tabella"><table><thead><tr><th scope="col">Проба</th><th scope="col">Вопрос</th><th scope="col">Что будет при отказе</th></tr></thead><tbody><tr><th scope="row">живости</th><td>ты не завис?</td><td>контейнер убивают и запускают заново</td></tr><tr><th scope="row">готовности</th><td>тебе можно слать запросы?</td><td>под убирают из службы, но не трогают</td></tr><tr><th scope="row">запуска</th><td>ты ещё поднимаешься?</td><td>остальные пробы не задаются, пока не ответит</td></tr></tbody></table><figcaption>Последствия совершенно разные. Отказ готовности обратим и безобиден; отказ живости убивает.</figcaption></figure>
+<figure class="disegno"><div role="img" aria-label="Полоса времени жизни контейнера: сперва отвечает только проба запуска, затем включаются готовность и живость; отказ готовности выводит под из службы, отказ живости убивает контейнер."><svg class="schema" viewBox="0 0 620 230" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="#5c6068" stroke-width="1.2" stroke-linecap="round">
+    <path d="M40,196 C200,194 420,195 580,193"/>
+  </g>
+  <g fill="none" stroke="#1b3a6b" stroke-width="1.6" stroke-linecap="round">
+    <path d="M44,54 C120,51 180,52 236,55"/>
+    <path d="M244,54 L244,200"/>
+    <path d="M252,104 C340,101 460,102 576,105"/>
+    <path d="M252,150 C340,147 460,148 576,151"/>
+    <path d="M44,192 L44,60"/><path d="M576,192 L576,158"/>
+  </g>
+  <g fill="none" stroke="#a8402f" stroke-width="1.6" stroke-linecap="round">
+    <path d="M404,150 L420,166"/><path d="M420,150 L404,166"/>
+    <path d="M486,104 L502,120"/><path d="M502,104 L486,120"/>
+  </g>
+  <g font-family="Caveat, cursive" font-size="18" fill="#1b3a6b">
+    <text x="48" y="44">проба запуска</text>
+    <text x="256" y="96">готовность</text>
+    <text x="256" y="142">живость</text>
+  </g>
+  <g font-family="Caveat, cursive" font-size="16" fill="#636a75">
+    <text x="152" y="216">поднимается</text>
+    <text x="330" y="216">работает</text>
+    <text x="360" y="186">отказ живости: контейнер убит</text>
+    <text x="428" y="92">отказ готовности: выведен из службы</text>
+  </g>
+</svg></div><figcaption>Три пробы на одной полосе времени. Обратите внимание, где именно кончается проба запуска: до этого мига живость молчит, и в этом весь её смысл.</figcaption></figure>
+<h2 id="pochemu-gotovnost-vazhnee-chem-kazhetsya">Почему готовность важнее, чем кажется</h2>
+<p>Проба готовности — единственный способ сказать «сейчас не надо». Программа перегружена, потеряла связь с базой, чистит кэш — она отвечает «не готов», и запросы уходят к соседям. Через минуту отвечает «готов» и снова получает нагрузку.</p>
+<p>Без неё запросы идут в под с первой секунды его существования — то есть ровно тогда, когда программа ещё разбирает конфигурацию. Отсюда неизменное наблюдение после каждой выкатки: ровно на полминуты выросло число ошибок, и никто не может понять, почему.</p>
+<p>Дальше — не рассуждение, а прибор. Наплыв в приборе служба обязана пережить: очередь трёх экземпляров его держит, время ответа портится, но запросы не пропадают. Убить службу могут только ваши настройки — и настройка «срок одна секунда, один отказ», самая частая в жизни, теряет семь запросов из десяти.</p>
+<cy-sonde class="isola" data-blocco="probes" data-props="{&quot;kind&quot;:&quot;probes&quot;,&quot;title&quot;:&quot;Наплыв и пробы&quot;,&quot;hint&quot;:&quot;Начните как есть: срок одна секунда, один отказ. Потом двиньте срок к полутора — весь прогон пересчитается сразу, и обрыв будет виден на кривой. Переключатель готовности трогайте отдельно: он делает не то, что от него обычно ждут.&quot;,&quot;goal&quot;:{&quot;maxErrors&quot;:0.02}}" style="min-height:1010px"></cy-sonde>
+<p>Обрыв резкий и он настоящий: при сроке в секунду втроём под наплывом время ответа выходит около 1,1 с — проба считает исправные экземпляры зависшими. Убитый отдаёт свою долю выжившим, у тех время ответа становится 2,2 с, и проба валит следующего. При сроке в полторы секунды не срабатывает ни разу, и потерь нет вовсе.</p>
+<section class="strumento incastro" data-tono="attenzione"><p class="titolo-strumento">Как проба живости роняет здоровый кластер</p><p>Проба живости с таймаутом в одну секунду. Приходит наплыв запросов, программа отвечает медленнее — секунды не хватает. Kubelet считает контейнер зависшим и убивает его.</p>
+<p>Нагрузка перераспределяется на оставшихся, им становится ещё тяжелее, у них проба тоже не укладывается в секунду — убивают и их. За минуту служба выкашивается целиком, причём <b class="termine">ни одна программа не была сломана</b>. Это положительная обратная связь, и запустила её проверка здоровья.</p>
+<p>Отсюда правило: проба живости отвечает на вопрос «нужен ли перезапуск», а не «хорошо ли идут дела». Медленно — не значит зависла. Проверять в ней базу, соседние службы и вообще что-либо, кроме самой программы, — верный способ превратить чужую беду в свою.</p></section>
+<figure class="codice"><pre><code>livenessProbe:
+  httpGet: { path: /healthz, port: 8080 }
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+readinessProbe:
+  httpGet: { path: /ready, port: 8080 }
+  periodSeconds: 2
+  failureThreshold: 1</code></pre><figcaption>Живость — редко, терпеливо, с запасом на три отказа: полминуты до перезапуска. Готовность — часто и без запаса: убрать из-под нагрузки надо немедленно, это дёшево.</figcaption></figure>
+<p>Разные пути <code>/healthz</code> и <code>/ready</code> здесь не для красоты. Первый должен отвечать всегда, пока процесс не завис, и не трогать ничего внешнего. Второй имеет право проверять связь с базой — потому что его отказ никого не убивает.</p>
+<section class="strumento incastro" data-tono="prova"><p class="titolo-strumento">Готовность — лекарство от запуска, а не от перегрузки</p><p>Переключите готовность в приборе выше при сроке живости в одну секунду. Ожидание такое: стало лучше. На деле потерь становится <em>больше</em>, и перезапусков тоже.</p>
+<p>Причина проста, стоит её увидеть: снятый с нагрузки экземпляр отдаёт свою долю выжившим. Тем становится тяжелее, время ответа у них растёт, и тесная проба живости валит их быстрее. Готовность не убавляет нагрузку — она её <b class="termine">перераспределяет</b>.</p>
+<p>Что она убирает начисто — так это запросы в пустоту: счётчик «в пустоту» при включённой готовности всегда ноль. Это и есть её работа: не пускать запросы в того, кто ещё не отвечает. Та самая полминута ошибок после каждой выкатки.</p></section>
+<h2 id="proba-zapuska">Проба запуска</h2>
+<p>Есть программы, которые честно поднимаются три минуты: разворачивают кэш, прогревают индекс. Проба живости, начав задавать вопросы сразу, убьёт такую на первой же минуте — и так по кругу.</p>
+<p>Ставить живости огромный срок нельзя: тогда зависшая программа будет висеть все эти три минуты и в рабочем режиме. Для этого и нужна проба запуска: пока она не ответила «готово», остальные молчат. Ответила — включаются с обычными, короткими сроками.</p>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;goal&quot;,&quot;id&quot;:&quot;pod-3-endure&quot;,&quot;prompt&quot;:&quot;Настройте пробы в приборе выше так, чтобы наплыв прошёл с потерями ниже двух процентов.&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;Достаточно дать живости срок с запасом: она должна отвечать на вопрос «нужен ли перезапуск», а не «хорошо ли идут дела».&quot;,&quot;widget&quot;:&quot;probes&quot;,&quot;goal&quot;:&quot;endured&quot;}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;pod-3-ready&quot;,&quot;prompt&quot;:&quot;Проба готовности отказала. Что произойдёт с подом?&quot;,&quot;difficulty&quot;:1,&quot;explain&quot;:&quot;Готовность управляет только тем, слать ли запросы. Отказ обратим: ответит «готов» — вернётся под нагрузку сам.&quot;,&quot;options&quot;:[&quot;Контейнер будет перезапущен&quot;,&quot;Под будет заменён новым&quot;,&quot;Под уберут из службы, но трогать не станут&quot;,&quot;Под перейдёт в фазу Failed&quot;],&quot;answer&quot;:2}}" style="min-height:500px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:3,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;pod-3-liveness&quot;,&quot;prompt&quot;:&quot;Что не должна проверять проба живости?&quot;,&quot;difficulty&quot;:3,&quot;explain&quot;:&quot;Отказ живости убивает контейнер. Проверяя в ней базу, вы устраиваете перезапуск всех своих подов при недоступности базы — а перезапуск базе не поможет ни в чём.&quot;,&quot;options&quot;:[&quot;Что процесс отвечает на запрос&quot;,&quot;Что доступна база данных, с которой работает программа&quot;,&quot;Что главный цикл программы не заблокирован&quot;,&quot;Что программа слушает свой порт&quot;],&quot;answer&quot;:1}}" style="min-height:500px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/kubernetes/scheduler/1/" class="rinvio">Дальше: как под вообще попадает на узел</a></p></article> <nav class="avanti" aria-label="Дальше">   <div class="scorrimento"> <a class="precedente" href="/Courses/kubernetes/pod/2/"> <b class="mano">← Назад</b> <span>Под · виток 2: Под не чинят</span> </a> <a class="successivo" href="/Courses/kubernetes/scheduler/1/"> <b class="mano">Дальше →</b> <span>Планировщик · виток 1: Отсеять и оценить</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>

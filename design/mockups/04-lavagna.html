@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lavagna — доска</title>
+<link rel="stylesheet" href="../fonts/caratteri.css">
+<style>
+/* 04 — LAVAGNA
+   Доска после занятия. Мел не заливает — он оставляет полосу с прорехами,
+   поэтому здесь нет ни одной сплошной плашки: цвет набирается штриховкой.
+   Стёртое остаётся видимым: губка размазывает, а не убирает, и эти разводы
+   — единственный «фон», который тут есть. Написанное живёт ровно один урок,
+   так что почерк быстрый, а печатный набор появляется только там, где текст
+   надо читать дольше пары минут.
+   Тёмный сорт: для вечера и поезда. */
+
+:root{--кегль:1;--пол:0px;
+  --доска:#243029;
+  --мел:#eae6dc;
+  --мел-тихий:#9aa79c;
+  --мел-синий:#8fb8d8;
+  --мел-жёлтый:#e6c66a;
+  --мел-красный:#d98878;
+  --мел-зелёный:#93c9a1;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{min-height:100%;position:relative}
+body{
+  margin:0;color:var(--мел);
+  font-family:'Literata',Georgia,serif;font-size:max(calc(16px*var(--кегль)),var(--пол));line-height:26px;
+  -webkit-font-smoothing:antialiased;
+}
+canvas[data-materia]{position:fixed;inset:0;z-index:-2;display:block}
+
+/* Следы губки: широкие дуги, оставшиеся от того, кто стирал. */
+.spugna{
+  position:absolute;left:0;right:0;top:0;height:100vh;z-index:-1;pointer-events:none;opacity:.5;
+  background:
+    radial-gradient(ellipse 460px 90px at 22% 18%, rgba(234,230,220,.10), transparent 70%),
+    radial-gradient(ellipse 520px 70px at 78% 42%, rgba(234,230,220,.075), transparent 70%),
+    radial-gradient(ellipse 380px 110px at 45% 74%, rgba(234,230,220,.06), transparent 70%),
+    radial-gradient(ellipse 300px 60px at 88% 88%, rgba(234,230,220,.05), transparent 70%);
+}
+main{max-width:750px;margin:0 auto;padding:34px 26px 96px}
+
+/* ── шапка ─────────────────────────────────────────────────── */
+.testata{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:32px}
+.marchio{font-family:'Caveat',cursive;font-size:max(calc(28px*var(--кегль)),var(--пол));font-weight:700;color:var(--мел)}
+.grado{margin-left:auto;font-family:'Caveat',cursive;font-size:max(calc(21px*var(--кегль)),var(--пол));color:var(--мел-тихий);display:flex;gap:11px;align-items:center}
+/* Полоса опыта — мелом, с прорехами. */
+.barra{width:112px;height:8px;background:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='112' height='8'><path d='M2,5 C22,4 44,5.6 68,4.6' fill='none' stroke='%23e6c66a' stroke-width='3.4' stroke-linecap='round' opacity='.85' stroke-dasharray='17 3 9 2 21 4'/><path d='M70,4.8 C86,4.2 98,5 110,4.4' fill='none' stroke='%239aa79c' stroke-width='2' stroke-linecap='round' opacity='.5' stroke-dasharray='11 4 6 3'/></svg>") no-repeat}
+
+/* ── титул ─────────────────────────────────────────────────── */
+.riga-corso{font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));color:var(--мел-тихий);margin:0 0 2px}
+h1{
+  font-family:'Caveat',cursive;font-weight:700;color:#f6f2e8;
+  font-size:clamp(46px,8.4vw,72px);line-height:.95;margin:0 0 8px;text-wrap:balance;
+  /* Мел сидит на доске неплотно: слабый ореол вокруг штриха. */
+  text-shadow:0 0 12px rgba(234,230,220,.12), 0 1px 0 rgba(0,0,0,.25);
+}
+.sottotitolo{font-family:'Caveat',cursive;font-size:max(calc(27px*var(--кегль)),var(--пол));color:var(--мел-жёлтый);margin:0 0 30px}
+p{margin:0 0 24px;max-width:64ch;color:#ddd9cf}
+
+/* Подчёркнуто мелом: полоса с прорехами, не сплошная. */
+.termine{color:#fff;position:relative;white-space:nowrap}
+.termine::after{
+  content:"";position:absolute;left:-2px;right:-3px;bottom:-5px;height:5px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='150' height='5' preserveAspectRatio='none'><path d='M2,2.6 C38,1.4 92,3.4 148,2' fill='none' stroke='%23e6c66a' stroke-width='2.6' stroke-linecap='round' stroke-dasharray='28 4 46 3 40'/></svg>") no-repeat center/100% 100%;
+}
+
+/* Реплика с места — быстрым почерком, вбок. */
+.replica{
+  font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));line-height:1.2;color:var(--мел-синий);
+  margin:-6px 0 24px;padding-left:16px;transform:rotate(-.6deg);
+}
+
+/* ── схема мелом ───────────────────────────────────────────── */
+figure{margin:0 0 26px}
+.schema{display:block;width:100%;height:auto}
+figcaption{font-family:'Caveat',cursive;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--мел-тихий);margin-top:4px}
+
+/* ── прибор: обведён мелом в один заход ────────────────────── */
+.strumento{position:relative;padding:20px 22px 18px;margin:0 0 26px}
+.strumento::before{
+  content:"";position:absolute;inset:-4px -6px;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='210' preserveAspectRatio='none'><path d='M16,8 C100,4 224,6 306,10 C312,10.4 314,16 314,26 C315,92 314,164 313,192 C312.6,199 306,201 296,201 C200,204 90,203 20,201 C12,200.6 8,194 8,186 C6,120 7,44 8,20 C8,12 11,9 18,8.6' fill='none' stroke='%23eae6dc' stroke-width='2.2' stroke-linecap='round' opacity='.55' stroke-dasharray='120 5 90 4 160 6 70'/></svg>") no-repeat center/100% 100%;
+}
+.titolo-strumento{font-family:'Caveat',cursive;font-size:max(calc(25px*var(--кегль)),var(--пол));color:#f6f2e8;margin:0 0 2px}
+.suggerimento{font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--мел-тихий);margin:0 0 14px;line-height:1.2}
+.grafico{display:block;width:100%;height:auto;margin-bottom:12px}
+
+.quadranti{display:flex;flex-wrap:wrap;gap:8px 28px;margin-bottom:16px}
+.quadrante b{display:block;font-family:'Caveat',cursive;font-size:max(calc(18px*var(--кегль)),var(--пол));font-weight:500;color:var(--мел-тихий);line-height:1.05}
+.quadrante span{font-family:'PT Mono',monospace;font-size:max(calc(16px*var(--кегль)),var(--пол));color:var(--мел)}
+.quadrante.male span{color:var(--мел-красный)}
+.quadrante.bene span{color:var(--мел-зелёный)}
+
+.manopole{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
+.manopola label{display:flex;justify-content:space-between;gap:8px;font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--мел-тихий)}
+.manopola label i{font-style:normal;font-family:'PT Mono',monospace;font-size:max(calc(14px*var(--кегль)),var(--пол));color:var(--мел-жёлтый)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:none;cursor:grab}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='4' preserveAspectRatio='none'><path d='M1,2.4 C56,1.4 140,3 199,1.8' fill='none' stroke='%239aa79c' stroke-width='2.2' stroke-linecap='round' stroke-dasharray='46 4 70 3 60'/></svg>") no-repeat center/100% 100%}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:15px;height:15px;margin-top:-6px;border-radius:50%;
+  background:var(--мел-жёлтый);box-shadow:0 0 8px rgba(230,198,106,.4);
+}
+
+/* ── чипы: обведены мелом ──────────────────────────────────── */
+.pastiglie{display:flex;flex-wrap:wrap;gap:9px 14px;margin:0 0 26px}
+.pastiglia{
+  position:relative;border:0;background:none;cursor:pointer;padding:5px 13px;
+  font-family:'Caveat',cursive;font-size:max(calc(20px*var(--кегль)),var(--пол));color:var(--мел-тихий);
+}
+.pastiglia[aria-pressed=true]{color:#f6f2e8}
+.pastiglia[aria-pressed=true]::before{
+  content:"";position:absolute;inset:-3px -6px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='130' height='36' preserveAspectRatio='none'><path d='M24,4 C64,1.6 100,4 116,8 C124,11 124,26 113,30 C96,35 42,35 17,32 C7,30 4,17 10,10 C13,6.4 18,5 23,4.4' fill='none' stroke='%23e6c66a' stroke-width='2' stroke-linecap='round' stroke-dasharray='60 4 44 3 70' opacity='.8'/></svg>") no-repeat center/100% 100%;
+}
+
+/* ── вопрос ────────────────────────────────────────────────── */
+.domanda{margin:0 0 12px;color:#e6e2d8}
+.numero{font-family:'Caveat',cursive;font-size:max(calc(24px*var(--кегль)),var(--пол));color:var(--мел-жёлтый);margin-right:7px}
+.opzioni{display:grid;gap:3px;margin:0 0 26px}
+.opzione{
+  position:relative;display:flex;gap:13px;align-items:baseline;width:100%;text-align:left;
+  border:0;background:none;cursor:pointer;padding:7px 8px 7px 4px;font:inherit;font-size:max(calc(16px*var(--кегль)),var(--пол));color:#d8d4ca;
+}
+.opzione .lettera{font-family:'Caveat',cursive;font-size:max(calc(22px*var(--кегль)),var(--пол));color:var(--мел-тихий);min-width:17px}
+.opzione:hover{color:#f6f2e8}
+/* Правильный обведён и помечен галкой — мелом, поверх. */
+.opzione[aria-checked=true]{color:#f6f2e8}
+.opzione[aria-checked=true] .lettera{color:var(--мел-зелёный)}
+.opzione[aria-checked=true]::after{
+  content:"";position:absolute;left:-10px;top:6px;width:24px;height:24px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><path d='M3,12 C6,16 8,19 10,21 C13,14 17,7 22,2' fill='none' stroke='%2393c9a1' stroke-width='2.4' stroke-linecap='round'/></svg>") no-repeat center;
+}
+
+/* ── кнопки ────────────────────────────────────────────────── */
+.azioni{display:flex;gap:15px;align-items:center;flex-wrap:wrap}
+.bottone{
+  position:relative;border:0;background:none;cursor:pointer;
+  font-family:'Caveat',cursive;font-size:max(calc(23px*var(--кегль)),var(--пол));color:var(--мел);
+  padding:9px 22px;transform:translateY(calc(var(--premuto,0) * .8px));
+}
+.bottone::before{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='170' height='48' preserveAspectRatio='none'><path d='M18,5 C64,2 124,3.6 152,6.6 C160,7.6 163,15 162,25 C161,35 159,41 152,43 C118,46 50,45 18,43 C9,42.4 6,35 6.6,25 C7,15 9,8 17,6' fill='none' stroke='%23eae6dc' stroke-width='2.2' stroke-linecap='round' stroke-dasharray='90 4 60 3 110' opacity='.75'/></svg>") no-repeat center/100% 100%;
+}
+.bottone--pieno{color:#f8f4ea}
+.bottone--pieno::after{
+  content:"";position:absolute;inset:4px 6px;z-index:-1;border-radius:16px 12px 18px 10px/10px 17px 9px 15px;
+  /* Заливка тоже меловая: штриховка, а не плашка. */
+  background:repeating-linear-gradient(58deg, rgba(230,198,106,.36) 0 2px, transparent 2px 5px);
+}
+.bottone:active{transform:translateY(1.4px)}
+.legenda{font-family:'Caveat',cursive;font-size:max(calc(19px*var(--кегль)),var(--пол));color:var(--мел-тихий)}
+
+/* ── ТЕЛЕФОН ──────────────────────────────────────────────────
+   У кегля появляется пол: подпись в 9 px становится 15 px, а
+   крупное растёт всего на десятую — иначе в ладони страница
+   превращается в серую полосу. Схемы не ужимаются до нечитаемого,
+   а уезжают вбок под палец; кнопке дают 44 px, чтобы попасть в
+   неё в поезде. */
+@media (max-width:640px){
+  :root{--кегль:1.12;--пол:15px}
+  main{padding-left:16px;padding-right:16px}
+  /* Схема не ужимается до нечитаемого, а уезжает вбок в своей рамке:
+     подписи в ней набраны под настольный размер, поэтому дешевле возить
+     её пальцем, чем пытаться прочесть восьмипиксельную ось. Рамкой
+     работает тот элемент, в котором схема лежит, — у графика это не
+     figure, поэтому берём его через :has(). */
+  figure, *:has(> svg.schema), *:has(> svg.grafico), pre{
+    overflow-x:auto;overscroll-behavior-x:contain;
+  }
+  svg.schema, svg.grafico{min-width:min(820px,200vw)}
+  button{min-height:44px}
+}
+</style>
+</head>
+<body>
+<canvas data-materia data-carta="243029" data-ombra="0d130f" data-luce="fff3d4" data-rilievo="14" data-fibra="0.07" data-calore="0.09"></canvas>
+<div class="spugna" data-scorre></div>
+
+<main>
+  <header class="testata">
+    <div class="marchio">Кибернетика</div>
+    <div class="grado"><span class="barra"></span>Регулятор</div>
+  </header>
+
+  <p class="riga-corso">Обратная связь · второй виток</p>
+  <h1>Запаздывание<br>и предел усиления</h1>
+  <p class="sottotitolo">почему «сделать сильнее» перестаёт работать</p>
+
+  <p>На первом витке контур был мгновенным: измерили — исправили. Настоящие контуры так не работают.
+  Термометр нагревается полминуты, тёплый воздух доходит до дальнего угла за минуты, данные по
+  инфляции приходят через месяц и потом пересматриваются.</p>
+
+  <p class="replica">душ с длинной трубой — тот же контур,<br>и ведёт себя точно так же</p>
+
+  <p>Регулятор всегда исправляет <span class="termine">прошлое</span>. Коррекция, рассчитанная для
+  состояния «полминуты назад», приходит, когда система уже в другом состоянии, и оказывается
+  воздействием не в ту сторону. При достаточном усилении она перестаёт гасить отклонение
+  и начинает его поддерживать.</p>
+
+  <figure>
+    <svg class="schema" viewBox="0 0 640 155" role="img" aria-label="Схема контура">
+      <g fill="none" stroke="#eae6dc" stroke-width="2" stroke-linecap="round" stroke-dasharray="70 3 50 3 90">
+        <path d="M28,44 C70,41 108,42 132,44 C140,45 142,50 141,59 C140,70 139,74 131,76 C106,79 66,78 32,76 C24,75 22,68 23,59 C24,50 25,46 30,44.6"/>
+        <path d="M196,44 C238,41 276,42 300,44 C308,45 310,50 309,59 C308,70 307,74 299,76 C274,79 234,78 200,76 C192,75 190,68 191,59 C192,50 193,46 198,44.6"/>
+        <path d="M364,44 C406,41 444,42 468,44 C476,45 478,50 477,59 C476,70 475,74 467,76 C442,79 402,78 368,76 C360,75 358,68 359,59 C360,50 361,46 366,44.6"/>
+        <path d="M520,44 C562,41 600,42 624,44 C632,45 634,50 633,59 C632,70 631,74 623,76 C598,79 558,78 524,76 C516,75 514,68 515,59 C516,50 517,46 522,44.6"/>
+      </g>
+      <g fill="none" stroke="#eae6dc" stroke-width="1.8" stroke-linecap="round">
+        <path d="M143,60 L192,60 M184,56 L193,60 L184,64"/>
+        <path d="M311,60 L360,60 M352,56 L361,60 L352,64"/>
+        <path d="M479,60 L514,60 M506,56 L515,60 L506,64"/>
+      </g>
+      <path d="M578,78 C577,98 576,112 574,122 C572,130 564,132 550,132 C400,135 190,134 96,132 C84,131.6 78,124 77,114 C76,100 76,90 77,78 M81,88 L77,78 L73,88"
+            fill="none" stroke="#8fb8d8" stroke-width="2" stroke-linecap="round" stroke-dasharray="120 4 90 3 140"/>
+      <g font-family="Caveat, cursive" font-size="21" fill="#f6f2e8" text-anchor="middle">
+        <text x="82" y="66">цель</text><text x="250" y="66">регулятор</text>
+        <text x="418" y="66">объект</text><text x="574" y="66">датчик</text>
+      </g>
+      <text x="330" y="151" font-family="Caveat, cursive" font-size="20" fill="#d98878" text-anchor="middle">здесь теряется время</text>
+    </svg>
+    <figcaption>обход круга занимает время — и в этом всё дело</figcaption>
+  </figure>
+
+  <div class="strumento">
+    <p class="titolo-strumento">Ручка усиления и ручка запаздывания</p>
+    <p class="suggerimento">запаздывание в ноль, усиление до упора — спокойно;<br>верните усиление и медленно двигайте запаздывание</p>
+
+    <svg class="grafico" viewBox="0 0 600 165" role="img" aria-label="Переходный процесс">
+      <path d="M44,42 H588" stroke="#93c9a1" stroke-width="1.8" stroke-dasharray="9 7" fill="none" opacity=".9"/>
+      <text x="588" y="34" font-family="Caveat, cursive" font-size="19" fill="#93c9a1" text-anchor="end">уставка</text>
+      <path d="M44,146 C62,144 70,114 86,72 C100,32 114,12 130,24 C146,36 152,84 168,96 C186,110 200,70 218,56 C238,40 252,60 272,68 C294,77 310,52 336,50 C370,47 406,56 444,52 C488,47 540,50 588,48"
+            fill="none" stroke="#eae6dc" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M44,146 C66,146 86,144 110,136 C140,127 168,116 212,108 C268,98 336,92 588,88"
+            fill="none" stroke="#8fb8d8" stroke-width="1.6" stroke-dasharray="6 5" opacity=".8"/>
+      <path d="M44,10 V150 M40,148 H590" fill="none" stroke="#9aa79c" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="90 4 60"/>
+      <text x="586" y="106" font-family="Caveat, cursive" font-size="18" fill="#8fb8d8" text-anchor="end">усилие регулятора</text>
+    </svg>
+
+    <div class="quadranti">
+      <span class="quadrante male"><b>статическая ошибка</b><span>0,182</span></span>
+      <span class="quadrante male"><b>перерегулирование</b><span>34%</span></span>
+      <span class="quadrante"><b>время установления</b><span>—</span></span>
+      <span class="quadrante bene"><b>пересечений</b><span>7</span></span>
+    </div>
+
+    <div class="manopole">
+      <span class="manopola"><label>усиление P <i>6,0</i></label><input type="range" min="0" max="16" value="6"></span>
+      <span class="manopola"><label>интеграл I <i>0,50</i></label><input type="range" min="0" max="4" step=".05" value="0.5"></span>
+      <span class="manopola"><label>запаздывание <i>0,60 с</i></label><input type="range" min="0" max="40" value="12"></span>
+    </div>
+  </div>
+
+  <div class="pastiglie">
+    <button class="pastiglia" aria-pressed="true">только P</button>
+    <button class="pastiglia" aria-pressed="false">PI</button>
+    <button class="pastiglia" aria-pressed="false">слишком сильное усиление</button>
+    <button class="pastiglia" aria-pressed="false">запаздывание</button>
+  </div>
+
+  <p class="domanda"><span class="numero">1.</span>Контур с заметным запаздыванием реагирует вяло.
+  Инженер увеличивает усиление вдвое. Что произойдёт с наибольшей вероятностью?</p>
+  <div class="opzioni" role="radiogroup">
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">а</span>Система станет вдвое быстрее и точнее</button>
+    <button class="opzione" role="radio" aria-checked="true"><span class="lettera">б</span>Реакция ускорится, но появится перерегулирование и колебания, вплоть до потери устойчивости</button>
+    <button class="opzione" role="radio" aria-checked="false"><span class="lettera">в</span>Ничего не изменится: запаздывание определяет всё</button>
+  </div>
+
+  <div class="azioni">
+    <button class="bottone bottone--pieno">Проверить</button>
+    <button class="bottone">Дальше</button>
+    <span class="legenda">попытки не штрафуются</span>
+  </div>
+</main>
+
+<script src="../materia.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="ru"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Только разнообразие поглощает разнообразие — Необходимое разнообразие — Кибернетика</title><meta name="description" content="Сколько нужно регулятору, чтобы справиться со средой. Закон Эшби: только разнообразие может поглотить разнообразие."><link rel="preload" href="/Courses/_astro/literata-sempre.Bfql75LH.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-b-sempre.eDOY3w7I.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/caveat-sempre.CRX6Vjg2.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/literata-i-sempre.Dh1EYoH3.woff2" as="font" type="font/woff2" crossorigin><link rel="preload" href="/Courses/_astro/pt-mono-sempre.Bcljgxq8.woff2" as="font" type="font/woff2" crossorigin><meta name="theme-color" content="#f3efe4"><link rel="manifest" href="/Courses/manifest.webmanifest"><link rel="icon" href="/Courses/icona.svg" type="image/svg+xml"><link rel="stylesheet" href="/Courses/_astro/_depth_.eOIfRysB.css"></head> <body> <canvas data-materia data-carta="f7f3e8" data-ombra="9a917f" data-luce="fff7e6" data-rilievo="11" data-fibra="0.055" data-calore="0.05"></canvas> <div class="griglia" data-scorre data-passo></div> <div class="margine"></div> <header class="testata"> <nav class="briciole" aria-label="Где я"> <a href="/Courses/">Тетрадь</a> <span aria-hidden="true">·</span><a href="/Courses/cibernetica/">Кибернетика: введение</a> </nav> <div class="stato" data-stato-gioco data-ripasso="/Courses/ripasso/" aria-live="polite"></div> </header>  <main class="colonna lezione"> <header class="intestazione" data-livello-corrente="cibernetica/variety:1" data-lavori="2"> <p class="sopra mano"> Необходимое разнообразие · виток 1 из 2 </p> <h1>Только разнообразие поглощает разнообразие</h1> <div class="spirale" role="navigation" aria-label="Витки темы"> <a href="/Courses/cibernetica/variety/1/" class="giro corrente" data-livello="cibernetica/variety:1" aria-current="page"> <b>1</b> <span>Только разнообразие поглощает разнообразие</span> </a><a href="/Courses/cibernetica/variety/2/" class="giro" data-livello="cibernetica/variety:2"> <b>2</b> <span>Разнообразие и информация — одна мера</span> </a> </div> <section class="obiettivi"> <h2 class="etichetta">После этого витка вы сможете</h2> <ul><li>считать разнообразие как число различимых состояний</li><li>формулировать закон Эшби и применять его к конкретной системе</li><li>показывать, что нехватка ходов не лечится хитростью</li></ul> <details class="ereditate"> <summary>Считается уже пройденным (6)</summary> <ul><li>узнавать контур управления в устройствах, в живом и в обществе</li><li>называть четыре части контура и говорить, что происходит при обрыве каждой</li><li>объяснять, почему кибернетика говорит о поведении, а не об устройстве</li><li>рисовать контур из четырёх частей и показывать направление обхода</li><li>отличать разомкнутое управление от замкнутого</li><li>называть, что именно возвращается по обратной связи</li></ul> </details> </section> <p class="conteggio tacito">
+Работ на витке: <span data-conteggio>0 из 2</span> </p> <p class="esito-livello" data-esito hidden></p> </header> <article class="testo"><p>Есть утверждение, которое кажется банальным, пока в него не проиграешь. Звучит оно так: чтобы удержать систему, у регулятора должно быть не меньше различных ходов, чем у среды — различных помех.</p>
+<dl class="definizione" id="raznoobrazie"><dt><b class="termine">Разнообразие</b></dt><dd>Число состояний, которые система может различимо принимать. Измеряется либо самим числом, либо его двоичным логарифмом — тогда единица называется битом, и это ровно та же единица, что у <a href="/Courses/cibernetica/information/1/" class="rinvio">информации</a>.</dd></dl>
+<p>Ниже — игра. Среда бросает помеху, вы отвечаете ходом. Пока ходов столько же, сколько помех, вы выигрываете каждый раз. Потом нажмите «отнять ход» и попробуйте снова.</p>
+<cy-varieta class="isola" data-blocco="ashby" data-props="{&quot;kind&quot;:&quot;ashby&quot;,&quot;title&quot;:&quot;Проиграйте в закон&quot;,&quot;hint&quot;:&quot;Сыграйте десяток раундов при четырёх ходах. Потом отнимите ход и сыграйте ещё десяток — играя настолько хорошо, насколько сможете.&quot;,&quot;moves&quot;:4,&quot;target&quot;:8}" style="min-height:580px"></cy-varieta>
+<p>Проигрыш после отнятия хода — не следствие плохой игры. <b class="termine">Никакая стратегия его не спасает</b>, потому что ход, которого нет, нельзя сделать умнее. Это и есть закон.</p>
+<figure class="citazione"><blockquote>Only variety can destroy variety — только разнообразие может уничтожить разнообразие</blockquote><figcaption>У. Росс Эшби, «Введение в кибернетику», 1956</figcaption></figure>
+<figure class="formula-blocco"><div class="formula" translate="no">V(исход) ≥ V(помеха) − V(регулятор)</div><figcaption>Разнообразие исхода (то, насколько система гуляет) не может быть меньше, чем разнообразие помех за вычетом разнообразия ходов. Уменьшить гуляние можно, только добавив ходов.</figcaption></figure>
+<h2 id="kak-zakon-obychno-perevirayut">Как закон обычно перевирают</h2>
+<p>Чаще всего его пересказывают как «сложной системой должен управлять сложный регулятор», и это неверно вдвойне. Во-первых, речь не о сложности, а о разнообразии — о числе различимых состояний, а не о запутанности устройства. Во-вторых, считать надо разнообразие <em>помех</em>, а не всей системы.</p>
+<p>Термостат управляет комнатой, у которой состояний астрономически много, и справляется двумя. Потому что различимых по последствиям помех для его задачи ровно две: слишком холодно и слишком тепло. Всё остальное разнообразие комнаты ему безразлично — и это законный способ жить.</p>
+<p>Отсюда важное следствие: <b class="termine">разнообразие регулятора можно не наращивать, а уменьшать разнообразие помех</b>. Ограждение, регламент, стандарт, буфер, запас — всё это способы срезать разнообразие среды до того, как оно дойдёт до регулятора. Стаффорд Бир называл это ослаблением разнообразия и считал основным приёмом управления организациями.</p>
+<p>У закона есть и цена, о которой вспоминают реже. Ослабляя разнообразие среды, регулятор отказывается различать то, что срезал, — а вместе с различением теряет и способность отвечать. Служба поддержки со скриптом из двадцати ответов не просто экономит: она перестаёт видеть двадцать первый случай, потому что он не помещается ни в одну из её категорий. Поэтому у всякого ограждения есть внешняя сторона, и рано или поздно система встречается с тем, что за ним.</p>
+<h2 id="kak-eto-vyglyadit-v-zhizni">Как это выглядит в жизни</h2>
+<figure class="tabella"><table><thead><tr><th scope="col">Система</th><th scope="col">Разнообразие среды</th><th scope="col">Разнообразие регулятора</th></tr></thead><tbody><tr><th scope="row">Термостат</th><td>температура улицы, окна, люди</td><td>вкл/выкл — крайне бедно, но хватает</td></tr><tr><th scope="row">Иммунитет</th><td>практически любые молекулы</td><td>случайная перестройка генов, миллиарды вариантов</td></tr><tr><th scope="row">Служба поддержки</th><td>что угодно, что придумает пользователь</td><td>скрипт из двадцати ответов — не хватает</td></tr><tr><th scope="row">Светофор</th><td>потоки машин</td><td>три состояния — при заторе не хватает</td></tr></tbody></table></figure>
+<aside class="nota">Заметьте, как часто ответом на нехватку разнообразия служит не увеличение ходов, а уменьшение помех: ограждение, регламент, запрет. Это законный ход — закон Эшби не говорит, с какой стороны выравнивать.</aside>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:1,&quot;question&quot;:{&quot;kind&quot;:&quot;choice&quot;,&quot;id&quot;:&quot;var-1-law&quot;,&quot;prompt&quot;:&quot;У регулятора четыре хода, у среды восемь помех. Что можно сказать наверняка?&quot;,&quot;difficulty&quot;:3,&quot;explain&quot;:&quot;Каждый ход способен отработать не больше одной помехи, значит четыре помехи из восьми останутся. Стратегия здесь ни при чём: у неё нет материала.&quot;,&quot;options&quot;:[&quot;При хорошей стратегии регулятор справится&quot;,&quot;Не меньше половины помех останутся неотработанными&quot;,&quot;Регулятор не справится ни с одной помехой&quot;,&quot;Ничего сказать нельзя&quot;],&quot;answer&quot;:1}}" style="min-height:513px"></cy-quiz>
+<cy-quiz class="isola" data-blocco="question" data-props="{&quot;kind&quot;:&quot;question&quot;,&quot;number&quot;:2,&quot;question&quot;:{&quot;kind&quot;:&quot;numeric&quot;,&quot;id&quot;:&quot;var-1-bits&quot;,&quot;prompt&quot;:&quot;Среда имеет 16 различимых состояний. Сколько это бит разнообразия?&quot;,&quot;difficulty&quot;:2,&quot;explain&quot;:&quot;log₂16 = 4. Та же единица, что у информации, и это не совпадение.&quot;,&quot;answer&quot;:4,&quot;tolerance&quot;:0.01,&quot;unit&quot;:&quot;бит&quot;}}" style="min-height:500px"></cy-quiz>
+<p class="rinvio-blocco"><a href="/Courses/cibernetica/variety/2/" class="rinvio">Второй виток: как разнообразие связано с информацией</a></p></article> <nav class="avanti" aria-label="Дальше"> <a class="prossimo-giro" href="/Courses/cibernetica/variety/2/"> <b class="mano">Глубже по той же теме</b> <span>Виток 2: Разнообразие и информация — одна мера</span> </a> <section class="rimandi"> <h2 class="etichetta">Сюда ссылаются</h2> <ul> <li> <a href="/Courses/cibernetica/whatis/2/">Что такое кибернетика · виток 2: Дисциплина без предмета</a> </li><li> <a href="/Courses/cibernetica/variety/2/">Необходимое разнообразие · виток 2: Разнообразие и информация — одна мера</a> </li><li> <a href="/Courses/cibernetica/blackbox/1/">Чёрный ящик · виток 1: Опознание без вскрытия</a> </li><li> <a href="/Courses/cibernetica/information/1/">Информация · виток 1: Сколько бит в сообщении</a> </li> </ul> </section> <div class="scorrimento"> <a class="precedente" href="/Courses/cibernetica/stability/2/"> <b class="mano">← Назад</b> <span>Устойчивость · виток 2: Порог и то, что за ним</span> </a> <a class="successivo" href="/Courses/cibernetica/variety/2/"> <b class="mano">Дальше →</b> <span>Необходимое разнообразие · виток 2: Разнообразие и информация — одна мера</span> </a> </div> </nav> </main>  <footer class="piede"> <p class="tacito">
+Тетрадь по кибернетике. Работает без сети: однажды открытые витки
+        остаются на устройстве. <a href="/Courses/blocchi/">Из чего собраны страницы</a>.
+</p> </footer> <script type="module" src="/Courses/_astro/Foglio.astro_astro_type_script_index_0_lang.Ch3sMstj.js"></script> <script>(function(){const base = "/Courses/";
+
+      /* Материя грузится по первому касанию, и это не откладывание ради
+         цифры в отчёте.
+
+         Прогиб бумаги существует затем, чтобы отвечать на палец: без пальца
+         он ничего не показывает. А стоит он дорого — компиляция шейдера и
+         сборка карты смещений занимают около двухсот миллисекунд на
+         замедленном вчетверо телефоне, и раньше они приходились ровно на то
+         время, когда читатель пытается начать читать.
+
+         Поэтому скрипт запрашивается по первому же признаку присутствия —
+         касанию, нажатию, прокрутке, клавише. Ни байта до этого: даже
+         prefetch на самом низком приоритете отнимает семнадцать килобайт
+         полосы у текста, который читатель ждёт прямо сейчас. Первое касание
+         поэтому прогиба не даёт — он появляется со второго; это дешевле,
+         чем задержка для всех, включая тех, кто пришёл почитать и бумагу
+         не трогает. */
+      const адрес = `${base}materia/materia.js`;
+
+      let поставлена = false;
+      const поставить = () => {
+        if (поставлена) return;
+        поставлена = true;
+        for (const событие of СИГНАЛЫ) removeEventListener(событие, поставить, ПАССИВНО);
+        const s = document.createElement('script');
+        s.src = адрес;
+        s.defer = true;
+        document.head.appendChild(s);
+      };
+      const СИГНАЛЫ = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+      const ПАССИВНО = { passive: true, once: false };
+      for (const событие of СИГНАЛЫ) addEventListener(событие, поставить, ПАССИВНО);
+
+      /* Служитель делает курс доступным без сети. Регистрация после загрузки:
+         до первой отрисовки ей нечего делать, а мешать она умеет. */
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
+            /* Отказ регистрации — это отказ от офлайна, а не от страницы. */
+          });
+        });
+      }
+    })();</script> </body> </html>
