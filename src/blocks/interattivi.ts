@@ -115,9 +115,14 @@ export const channel = defineBlock({
     ...общие,
     message: s.optional(s.text({ max: 40 })),
     p: s.optional(s.number({ min: 0, max: 0.5 })),
+    /** Провести сообщение целым при шуме не ниже этого. */
+    goal: s.optional(s.record({ noise: s.number({ min: 0, max: 0.5 }) })),
   }),
   tag: 'cy-canale',
   reserve: 670,
+  /* Канал молчит, пока автор не задал уровень шума: без него задание рядом
+     было бы невыполнимым, а выглядело бы обычным. */
+  goals: (b) => (b.goal ? ['delivered'] : []),
   load: () => import('~/widgets/informazione'),
 });
 

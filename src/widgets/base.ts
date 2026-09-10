@@ -41,12 +41,18 @@ export const stile = css`
     background: color-mix(in srgb, var(--бумага, #fffdf6) 62%, transparent);
   }
 
+  /* Обводка прибора. Путь заполняет поле почти целиком, и это не придирка
+     к рисунку: раньше его нижняя линия лежала на 95 % высоты поля, а поле
+     растягивается под прибор — и на высоком приборе линия проходила сквозь
+     последнюю строку итога, обрезая её на глазах. Поймано на игре с пробами,
+     где итог занимает четыре строки; на приборах пониже это просто не
+     показывалось. */
   .telaio::before {
     content: '';
     position: absolute;
-    inset: -6px -8px;
+    inset: -8px;
     pointer-events: none;
-    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200' preserveAspectRatio='none'><path d='M14,10 C90,5 210,7 288,11 C295,12 296,20 296,34 C297,90 296,150 295,178 C294,188 286,190 274,190 C190,193 90,191 22,190 C11,189 7,182 7,170 C5,120 6,50 7,26 C7,16 11,12 22,11' fill='none' stroke='%231b3a6b' stroke-width='1.5' stroke-linecap='round' opacity='.55'/></svg>")
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200' preserveAspectRatio='none'><path d='M16,5 C92,2 212,4 290,8 C297,9 298,17 298,32 C299,95 298,161 297,191 C296,196 288,197 276,196 C192,198 92,196 24,195 C13,194 9,187 9,173 C7,119 8,49 9,23 C9,12 13,6 24,5' fill='none' stroke='%231b3a6b' stroke-width='1.5' stroke-linecap='round' opacity='.55'/></svg>")
       no-repeat center / 100% 100%;
   }
 

@@ -147,6 +147,7 @@ export class Entropia extends Widget<EntropiaProps> {
 /* ── канал ──────────────────────────────────────────────────────────── */
 
 interface CanaleProps {
+  readonly goal?: { noise: number };
   readonly message?: string;
   readonly p?: number;
   readonly title?: string;
@@ -164,10 +165,28 @@ export class Canale extends Widget<CanaleProps> {
   declare hamming: boolean;
   declare seed: number;
 
+  /** Донесено ли уже — чтобы не доносить каждый кадр. */
+  private riferito = false;
+
   protected override avvia(): void {
     this.p = this.props.p ?? 0.08;
     this.hamming = false;
     this.seed = 1;
+  }
+
+  /**
+   * Цель: провести сообщение целым через шум, при котором без избыточности
+   * оно портится. Появилась не для полноты: проверка учебного плана требует,
+   * чтобы в каждой теме было то, чего читатель добивается сам, а тема про
+   * информацию до этого только показывала.
+   */
+  private засчитать(битых: number): void {
+    const цель = this.props.goal;
+    if (!цель || this.riferito) return;
+    const взято = битых === 0 && this.p >= цель.noise;
+    if (!взято) return;
+    this.riferito = true;
+    this.riporta({ goal: 'delivered', reached: true, score: 1 });
   }
 
   protected override render() {
@@ -197,6 +216,7 @@ export class Canale extends Widget<CanaleProps> {
     }
 
     const битых = восстановлено.reduce((n, b, i) => n + (b === исходные[i] ? 0 : 1), 0);
+    this.засчитать(битых);
 
     return html`<section class="telaio">
       <h4>${this.props.title ?? 'Канал с шумом'}</h4>

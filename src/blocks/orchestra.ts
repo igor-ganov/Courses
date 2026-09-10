@@ -56,6 +56,52 @@ export const schedule = defineBlock({
   load: () => import('~/widgets/pianificatore'),
 });
 
+export const traffic = defineBlock({
+  kind: 'traffic',
+  label: 'Очередь и дверь',
+  note: 'Одна механика в двух обличьях: опрос против слежения и обработка по событию против обработки по ключу.',
+  schema: s.record({
+    kind: s.literal('traffic'),
+    ...общие,
+    /** `porta` — дверь и опрос, `coda` — очередь ключей. */
+    modo: s.optional(s.oneOf(['porta', 'coda'] as const)),
+  }),
+  tag: 'cy-coda',
+  reserve: (b) => (b.modo === 'coda' ? 830 : 760),
+  load: () => import('~/widgets/coda'),
+});
+
+export const probes = defineBlock({
+  kind: 'probes',
+  label: 'Наплыв и пробы',
+  note: 'Игра: пережить наплыв, который служба обязана пережить. Убить её могут только настройки проб.',
+  schema: s.record({
+    kind: s.literal('probes'),
+    ...общие,
+    goal: s.optional(s.record({ maxErrors: s.number({ min: 0, max: 1 }) })),
+  }),
+  tag: 'cy-sonde',
+  reserve: 860,
+  goals: () => ['endured'],
+  load: () => import('~/widgets/sonde'),
+});
+
+export const selector = defineBlock({
+  kind: 'selector',
+  label: 'Отбор по метке',
+  note: 'Головоломка: попасть условием ровно в нужное подмножество подов. Очевидный путь теряет своего.',
+  schema: s.record({
+    kind: s.literal('selector'),
+    ...общие,
+    /** Засчитывать как задание. */
+    goal: s.optional(s.flag()),
+  }),
+  tag: 'cy-selettore',
+  reserve: 920,
+  goals: (b) => (b.goal ? ['selected'] : []),
+  load: () => import('~/widgets/selettore'),
+});
+
 export const nightshift = defineBlock({
   kind: 'nightshift',
   label: 'Ночная смена',
