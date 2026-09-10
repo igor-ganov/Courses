@@ -145,3 +145,97 @@ describe('задание', () => {
     expect(s).toBeLessThan(1);
   });
 });
+
+describe('ночная смена', () => {
+  /* Ради этого прибор и затевался: разница между «чинить руками» и
+     «заявить состояние» должна быть не в рассуждении, а в числах. */
+  const ночь = (over: Partial<ClusterSettings>) =>
+    базовые({ chaos: 6, seed: 7, ...over });
+
+  it('беда приходит сама и повторяется от захода к заходу', () => {
+    const первый = прогнать(ночь({ running: true }), 120);
+    const второй = прогнать(ночь({ running: true }), 120);
+    const падений = (c: ReturnType<typeof createCluster>) =>
+      c.state().events.filter((e) => e.kind === 'killed').length;
+    expect(падений(первый)).toBeGreaterThan(0);
+    expect(падений(первый)).toBe(падений(второй));
+  });
+
+  it('без контроллера и без человека кластер вымирает', () => {
+    const c = прогнать(ночь({ running: false }), 400);
+    expect(c.state().ready).toBe(0);
+  });
+
+  it('заявка держит готовность высоко, ничего не требуя от человека', () => {
+    const c = прогнать(ночь({ chaos: 20, running: true }), 600);
+    expect(c.state().uptime).toBeGreaterThan(0.8);
+    expect(c.state().interventions).toBe(0);
+  });
+
+  it('руками — это работа: каждое поднятие считается', () => {
+    const c = createCluster(ночь({ running: false }));
+    for (let i = 0; i < 3; i += 1) c.raise();
+    expect(c.state().interventions).toBe(3);
+    expect(c.state().alive).toBe(3);
+  });
+
+  it('человек с идеальной реакцией всё равно проигрывает контроллеру', () => {
+    /* Играем за безупречного дежурного: он замечает нехватку в тот же миг и
+       поднимает столько, сколько надо. Даже так простой у него больше — под
+       поднимается не мгновенно, а замечать приходится после падения. */
+    const руками = createCluster(ночь({ running: false }));
+    const шагов = Math.round(600 / 0.25);
+    for (let i = 0; i < шагов; i += 1) {
+      руками.step();
+      const s = руками.state();
+      for (let n = s.alive; n < s.desired; n += 1) руками.raise();
+    }
+    const сам = прогнать(ночь({ running: true }), 600);
+    expect(руками.state().interventions).toBeGreaterThan(10);
+    expect(сам.state().uptime).toBeGreaterThanOrEqual(руками.state().uptime - 0.02);
+  });
+});
+
+describe('два хозяина одного поля', () => {
+  it('дают незатухающие колебания заявленного числа', () => {
+    const c = прогнать(базовые({ desired: 3, rival: { desired: 5, every: 4 } }), 60);
+    const числа = new Set(c.state().wanted.map((w) => w.n));
+    expect(числа.size).toBeGreaterThan(1);
+    expect(числа.has(5)).toBe(true);
+  });
+
+  it('и это видно как непрерывная работа: поды рождаются и гаснут', () => {
+    const c = прогнать(базовые({ desired: 2, rival: { desired: 6, every: 5 } }), 120);
+    const виды = c.state().events.map((e) => e.kind);
+    expect(виды).toContain('created');
+    expect(виды).toContain('deleted');
+  });
+
+  it('без второго хозяина заявленное стоит на месте', () => {
+    const c = прогнать(базовые({ desired: 3 }), 60);
+    expect(new Set(c.state().wanted.map((w) => w.n))).toEqual(new Set([3]));
+  });
+});
+
+describe('тёплый старт', () => {
+  it('смена начинается с исправного кластера, а не с пустого', () => {
+    /* Без этого читатель приходит на уже проигранную смену: доля времени в
+       строю равна нулю с первой секунды, и сделать он ничего не успел. */
+    const c = createCluster(базовые({ warm: true, running: false }));
+    expect(c.state().ready).toBe(3);
+    expect(c.state().uptime).toBe(1);
+  });
+
+  it('и по сбросу тоже, иначе «сначала» начинает хуже, чем было', () => {
+    const c = createCluster(базовые({ warm: true, running: false, chaos: 3, seed: 3 }));
+    for (let i = 0; i < 400; i += 1) c.step();
+    expect(c.state().ready).toBeLessThan(3);
+    c.reset();
+    expect(c.state().ready).toBe(3);
+  });
+
+  it('без тёплого старта поднимает контроллер, как и раньше', () => {
+    const c = createCluster(базовые());
+    expect(c.state().ready).toBe(0);
+  });
+});

@@ -26,6 +26,7 @@ export const ISOLE: Record<string, () => Promise<unknown>> = {
   'cy-manifesto': () => import('~/widgets/manifesto'),
   'cy-riconciliazione': () => import('~/widgets/riconciliazione'),
   'cy-pianificatore': () => import('~/widgets/pianificatore'),
+  'cy-turno': () => import('~/widgets/turno'),
 };
 
 /** Завести наблюдателя. Возвращает функцию отписки — для тестов и для ухода. */

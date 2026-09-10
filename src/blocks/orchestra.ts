@@ -56,6 +56,27 @@ export const schedule = defineBlock({
   load: () => import('~/widgets/pianificatore'),
 });
 
+export const nightshift = defineBlock({
+  kind: 'nightshift',
+  label: 'Ночная смена',
+  note: 'Игра: подежурить руками против заявленного состояния. Счёт — доля времени в строю и число пробуждений.',
+  schema: s.record({
+    kind: s.literal('nightshift'),
+    ...общие,
+    desired: s.optional(s.number({ integer: true, min: 1, max: 5 })),
+    /** В среднем раз в столько секунд падает под. */
+    chaos: s.optional(s.number({ min: 1, max: 60 })),
+    goal: s.optional(
+      s.record({ uptime: s.number({ min: 0, max: 1 }), over: s.number({ min: 10 }) }),
+    ),
+  }),
+  tag: 'cy-turno',
+  reserve: 900,
+  /* Смена засчитывается всегда: игра без счёта — это показ. */
+  goals: () => ['survived'],
+  load: () => import('~/widgets/turno'),
+});
+
 export const reconcile = defineBlock({
   kind: 'reconcile',
   label: 'Цикл сверки',
@@ -68,14 +89,24 @@ export const reconcile = defineBlock({
     resync: s.optional(s.number({ min: 0.1, max: 20 })),
     /** Сколько под поднимается до готовности. */
     startup: s.optional(s.number({ min: 0, max: 20 })),
+    /**
+     * Второй хозяин заявленного числа: раз в `every` секунд ставит своё.
+     * Так получается дребезг — оба контура исправны, а поле одно.
+     */
+    rival: s.optional(
+      s.record({
+        desired: s.number({ integer: true, min: 0, max: 8 }),
+        every: s.number({ min: 1, max: 60 }),
+      }),
+    ),
     goal: s.optional(s.record({ hold: s.number({ min: 1 }) })),
   }),
   tag: 'cy-riconciliazione',
-  /* Взято по телефону, а не по среднему: на узком экране подсказка и ручки
+  /* С пилой второго хозяина прибор выше на её высоту. Взято по телефону, а не по среднему: на узком экране подсказка и ручки
      занимают больше, и место надо занимать по худшему случаю. Лишний воздух
      на настольном экране не стоит ничего, а прыжок на телефоне стоит
      попадания по ссылке. */
-  reserve: 970,
+  reserve: (b) => (b.rival ? 1030 : 970),
   /* Молчит, пока автор не задал, сколько держать: без этого прибор — только
      показ, и задание рядом было бы невыполнимым. */
   goals: (b) => (b.goal ? ['held'] : []),

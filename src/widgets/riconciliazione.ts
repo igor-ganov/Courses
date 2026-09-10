@@ -17,6 +17,7 @@ interface Props {
   readonly desired?: number;
   readonly resync?: number;
   readonly startup?: number;
+  readonly rival?: { desired: number; every: number };
   readonly goal?: { hold: number };
   readonly title?: string;
   readonly hint?: string;
@@ -159,6 +160,15 @@ export class Riconciliazione extends Widget<Props> {
       .spento {
         color: var(--красный, #a8402f);
       }
+
+      /* График нужен только там, где есть второй хозяин: дребезг словами
+         описывается плохо, а пилой — сразу. */
+      svg.pila {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin: 0 0 12px;
+      }
     `,
   ];
 
@@ -191,6 +201,7 @@ export class Riconciliazione extends Widget<Props> {
         shutdown: 1.2,
         running: true,
         dt: 0.25,
+        ...(p.rival ? { rival: p.rival } : {}),
       },
       p.goal,
     );
@@ -253,6 +264,33 @@ export class Riconciliazione extends Widget<Props> {
     </ul>`;
   }
 
+  /** Пила заявленного числа и готовых рядом с ним. Только при сопернике. */
+  private pila(s: ClusterState) {
+    const точек = s.wanted.length;
+    if (!this.props.rival || точек < 4) return null;
+    const W = 620;
+    const H = 120;
+    const макс = Math.max(1, ...s.wanted.map((w) => w.n), s.desired, 1);
+    const x = (i: number) => (i / (точек - 1)) * W;
+    const y = (v: number) => H - (v / (макс + 0.4)) * H;
+    const путь = s.wanted
+      .map((w, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(w.n).toFixed(1)}`)
+      .join('');
+    return html`<svg
+      class="pila"
+      viewBox="0 0 ${W} ${H}"
+      preserveAspectRatio="none"
+      role="img"
+      aria-label="Заявленное число экземпляров во времени: пила между двумя значениями">
+      <path
+        d=${путь}
+        fill="none"
+        stroke="var(--паста, #1b3a6b)"
+        stroke-width="2"
+        stroke-linejoin="round" />
+    </svg>`;
+  }
+
   private scala(n: number): void {
     this.desired = n;
     this.cluster.set({ desired: n });
@@ -282,6 +320,8 @@ export class Riconciliazione extends Widget<Props> {
         ${this.props.hint ??
         'Уроните под пальцем — его никто не воскрешает по команде: контроллер просто видит, что заявленному числу не хватает одного. Выключите контроллер и уроните снова.'}
       </p>
+
+      ${this.pila(s)}
 
       <div class="griglia">
         ${Array.from({ length: МЕСТ }, (_, i) => this.posto(s, i))}
